@@ -7,7 +7,7 @@
 | Mazen Khafagy | mkhafagy | MazenKhafagyyy     |
 | Liam Neufeld | leneufel | LiamNeufeld     |
 | Carlos Colina | cmcolina | ccolina03     |
-| [Full Name] | [CCID] | [@username]     |
+| Mohamad Abdallah | mabdalla | Mabdalla-1608     |
 | [Full Name] | [CCID] | [@username]     |
 | Jacob Umble | umble | Jumble28 |
 
