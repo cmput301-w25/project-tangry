@@ -6,7 +6,7 @@
 | ----------- | ------ | --------------- |
 | Mazen Khafagy | mkhafagy | MazenKhafagyyy     |
 | Liam Neufeld | leneufel | LiamNeufeld     |
-| [Full Name] | [CCID] | [@username]     |
+| Carlos Colina | cmcolina | ccolina03     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | Jacob Umble | umble | Jumble28 |
