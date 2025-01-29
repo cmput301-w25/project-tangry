@@ -9,7 +9,7 @@
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
-| Jacob Umble | umble | Jumble28     |
+| Jacob Umble | umble | Jumble28 |
 
 ## Project Description
 
