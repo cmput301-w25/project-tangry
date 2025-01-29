@@ -5,7 +5,7 @@
 | Name        | CCID   | GitHub Username |
 | ----------- | ------ | --------------- |
 | Mazen Khafagy | mkhafagy | MazenKhafagyyy     |
-| [Full Name] | [CCID] | [@username]     |
+| Liam Neufeld | leneufel | LiamNeufeld     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
 | [Full Name] | [CCID] | [@username]     |
