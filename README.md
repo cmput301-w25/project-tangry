@@ -8,7 +8,7 @@
 | Liam Neufeld | leneufel | LiamNeufeld     |
 | Carlos Colina | cmcolina | ccolina03     |
 | Mohamad Abdallah | mabdalla | Mabdalla-1608     |
-| [Full Name] | [CCID] | [@username]     |
+| Daniel Dejud Marciacq | dejud | ddejud14     |
 | Jacob Umble | umble | Jumble28 |
 
 ## Project Description
