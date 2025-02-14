@@ -29,7 +29,7 @@
 
 ## Documentation
 
-- [Wiki Link]
-- [Scrum Board]
-- [UI Mockups]
-- [UML]
+- [Wiki Link] https://github.com/cmput301-w25/project-tangry/wiki/Tangry-wiki
+- [Scrum Board] https://github.com/orgs/cmput301-w25/projects/15
+- [UI Mockups] https://github.com/cmput301-w25/project-tangry/wiki/StoryBoard-Sequence
+- [UML] https://github.com/cmput301-w25/project-tangry/wiki/CRC-Cards
