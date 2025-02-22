@@ -58,7 +58,7 @@ public class DetailEmotionFragment extends Fragment {
             emotionTextView.setText(emotionText);
         }
 
-        //Temporal image placeholder: daniel implem
+        // Temporal image placeholder: daniel implem
         imageAttachment.setOnClickListener(v -> selectImage());
         saveButton.setOnClickListener(v -> saveMoodEvent());
     }
@@ -86,9 +86,15 @@ public class DetailEmotionFragment extends Fragment {
 
         try {
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation);
-            repository.saveEmotionPost(post);
-            Toast.makeText(getContext(), "Mood event saved!", Toast.LENGTH_SHORT).show();
-            navController.navigateUp();  // Navigate back after saving
+            // Call Firestore here
+            repository.saveEmotionPostToFirestore(post,
+                    docRef -> {
+                        Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
+                        navController.navigateUp();
+                    },
+                    e -> {
+                        Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         } catch (IllegalArgumentException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }

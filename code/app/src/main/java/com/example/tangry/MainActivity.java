@@ -1,6 +1,7 @@
 package com.example.tangry;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -12,9 +13,15 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.tangry.databinding.ActivityMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
@@ -39,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.emotionsFragment);
         });
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {
