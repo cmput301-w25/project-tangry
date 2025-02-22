@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">tangry</string>
+    <string name="title_home">Home</string>
+    <string name="title_map">Map</string>
+    <string name="title_add_user">Add User</string>
+    <string name="title_friends">Friends</string>
+</resources>
