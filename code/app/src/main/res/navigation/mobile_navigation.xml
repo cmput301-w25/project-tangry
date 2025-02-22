@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/emotionsFragment"
         android:name="com.example.tangry.EmotionsFragment"
-        android:label="Emotions List">
+        android:label="Add Mood">
         <action
             android:id="@+id/action_emotionsFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
@@ -42,7 +42,7 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.tangry.DetailEmotionFragment"
-        android:label="Emotion Detail">
+        android:label="Add Mood">
         <argument
             android:name="itemText"
             app:argType="string" />

@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private ActivityMainBinding binding;
+    private NavController navController;
+    private AppBarConfiguration appBarConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_map, R.id.navigation_add_user)
+        appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_home, R.id.navigation_map, R.id.navigation_add_user, R.id.navigation_friends)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
         // Find the FAB
@@ -44,4 +46,11 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.emotionsFragment);
         });
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        return NavigationUI.navigateUp(navController, appBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
+
 }
