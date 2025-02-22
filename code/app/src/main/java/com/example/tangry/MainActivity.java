@@ -33,10 +33,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
-        // Find the FAB and bring it to the front
+        // Find the FAB
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.bringToFront(); // Ensure FAB is in front of the BottomNavigationView
-        fab.setTranslationZ(10); // Make sure FAB is above the navbar
+        fab.setOnClickListener(view -> {
+            navController.navigate(R.id.emotionsFragment);
+        });
     }
 
 }
