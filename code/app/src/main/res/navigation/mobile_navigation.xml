@@ -28,4 +28,24 @@
         android:name="com.example.tangry.ui.friends.FriendsFragment"
         android:label="@string/title_friends"
         tools:layout="@layout/fragment_friends" />
+
+<!-- Redirect to Emotions List after +Mood Button clicked-->
+    <fragment
+        android:id="@+id/emotionsFragment"
+        android:name="com.example.tangry.EmotionsFragment"
+        android:label="Emotions List">
+        <action
+            android:id="@+id/action_emotionsFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
+    <!-- Redirect to post of Emotion-->
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.tangry.DetailEmotionFragment"
+        android:label="Emotion Detail">
+        <argument
+            android:name="itemText"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -36,7 +37,7 @@ android {
 }
 
 dependencies {
-
+    implementation(libs.androidx.recyclerview)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
