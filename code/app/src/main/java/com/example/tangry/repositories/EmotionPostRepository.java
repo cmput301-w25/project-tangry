@@ -1,57 +1,50 @@
 package com.example.tangry.repositories;
 
-import com.example.tangry.database.FirebaseConfig;
 import com.example.tangry.models.EmotionPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.Timestamp;
-
-import java.util.ArrayList;
+import com.google.firebase.firestore.Query;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class EmotionPostRepository {
     private static EmotionPostRepository instance;
-    private final List<EmotionPost> emotionPosts;
+    private final FirebaseFirestore db;
+    private static final String COLLECTION_NAME = "emotions";
 
     private EmotionPostRepository() {
-        emotionPosts = new ArrayList<>();
+        db = FirebaseFirestore.getInstance();
     }
 
-    public static EmotionPostRepository getInstance() {
+    public static synchronized EmotionPostRepository getInstance() {
         if (instance == null) {
             instance = new EmotionPostRepository();
         }
         return instance;
     }
 
-    public void saveEmotionPost(EmotionPost post) {
-        emotionPosts.add(post);
-        System.out.println("Saved: " + post); // Log for debugging
-    }
-
-    public List<EmotionPost> getAllPosts() {
-        return new ArrayList<>(emotionPosts); // Return a copy to prevent external modification
-    }
-
     public void saveEmotionPostToFirestore(EmotionPost post,
-            OnSuccessListener<DocumentReference> successListener,
-            OnFailureListener failureListener) {
-        FirebaseFirestore db = FirebaseConfig.getFirestoreInstance();
-
+                                           OnSuccessListener<DocumentReference> successListener,
+                                           OnFailureListener failureListener) {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
+        data.put("imageUri", post.getImageUri() != null ? post.getImageUri().toString() : null);
         data.put("location", post.getLocation());
         data.put("socialSituation", post.getSocialSituation());
-        data.put("imageUri", post.getImageUri() != null ? post.getImageUri().toString() : null);
-        data.put("timestamp", Timestamp.now()); // Set the current timestamp
+        data.put("timestamp", FieldValue.serverTimestamp());
 
-        db.collection("emotions").add(data)
+        db.collection(COLLECTION_NAME)
+                .add(data)
                 .addOnSuccessListener(successListener)
                 .addOnFailureListener(failureListener);
+    }
+
+    public Query getPostsQuery() {
+        return db.collection(COLLECTION_NAME)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
     }
 }
