@@ -22,7 +22,7 @@
         android:id="@+id/explanation_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Why? (max 20 chars)"
+        android:hint="Why? (max 20 chars or 3 words)"
         android:maxLength="20"
         app:layout_constraintTop_toBottomOf="@id/emotion_text"
         app:layout_constraintStart_toStartOf="parent"
@@ -48,13 +48,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Social Situation Input -->
-    <EditText
-        android:id="@+id/social_situation_input"
+    <!-- Social Situation Title -->
+    <TextView
+        android:id="@+id/social_situation_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Social Situation"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/location_input"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Social Situation Dropdown -->
+    <Spinner
+        android:id="@+id/social_situation_spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Describe social situation"
-        app:layout_constraintTop_toBottomOf="@id/location_input"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -64,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
-        app:layout_constraintTop_toBottomOf="@id/social_situation_input"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_spinner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

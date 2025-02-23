@@ -1,57 +1,212 @@
 package com.example.tangry.models;
 
 import android.net.Uri;
-import com.google.firebase.Timestamp;
-import java.io.Serializable;
+import android.util.Log;
 
-public class EmotionPost implements Serializable {
+import com.google.firebase.Timestamp;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Represents a mood event with various attributes such as emotion, explanation,
+ * image, location, and social situation.
+ */
+public class EmotionPost {
+    private static final String TAG = "EmotionPost";
+
     private String emotion;
     private String explanation;
-    private String imageUri;
+    private Uri imageUri;
     private String location;
     private String socialSituation;
     private Timestamp timestamp;
 
-    public EmotionPost() {}
+    public EmotionPost() {
+    };
 
-    private EmotionPost(String emotion, String explanation, String imageUri,
-                        String location, String socialSituation) {
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+            "With one other person", "With two to several people", "With a crowd");
+
+    /**
+     * Private constructor to create an EmotionPost object.
+     *
+     * @param emotion         The emotion associated with the mood event.
+     * @param explanation     A brief textual explanation for the mood event.
+     * @param imageUri        The URI of the image associated with the mood event.
+     * @param location        The location where the mood event occurred.
+     * @param socialSituation The social situation during the mood event.
+     */
+    private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
         this.location = location;
         this.socialSituation = socialSituation;
+        this.timestamp = Timestamp.now(); // Set the current timestamp
     }
 
-    public static EmotionPost create(String emotion, String explanation, Uri imageUri,
-                                     String location, String socialSituation) {
+    /**
+     * Factory method to create an EmotionPost object with validation.
+     *
+     * @param emotion         The emotion associated with the mood event.
+     * @param explanation     A brief textual explanation for the mood event.
+     * @param imageUri        The URI of the image associated with the mood event.
+     * @param location        The location where the mood event occurred.
+     * @param socialSituation The social situation during the mood event.
+     * @param imageStream     The InputStream of the image to validate its size.
+     * @return A new EmotionPost object.
+     * @throws IllegalArgumentException If any validation fails.
+     * @throws IOException              If an I/O error occurs.
+     */
+    public static EmotionPost create(String emotion, String explanation, Uri imageUri, String location,
+            String socialSituation, InputStream imageStream) throws IllegalArgumentException, IOException {
+        if (emotion == null || emotion.trim().isEmpty()) {
+            throw new IllegalArgumentException("Emotion is required.");
+        }
+
         if (explanation.length() > 20 || explanation.split("\\s+").length > 3) {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
-        return new EmotionPost(
-                emotion,
-                explanation,
-                imageUri != null ? imageUri.toString() : null,
-                location,
-                socialSituation
-        );
+
+        if (!VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
+            throw new IllegalArgumentException("Invalid social situation.");
+        }
+
+        if (imageStream != null) {
+            int imageSizeInBytes = imageStream.available();
+            if (imageSizeInBytes > 65536) {
+                throw new IllegalArgumentException("Image size must be under 65536 bytes.");
+            }
+        }
+
+        return new EmotionPost(emotion, explanation, imageUri, location, socialSituation);
     }
 
-    // Getters
+    /**
+     * Gets the emotion associated with the mood event.
+     *
+     * @return The emotion.
+     */
+    public String getEmotion() {
+        return emotion;
+    }
+
+    /**
+     * Sets the emotion associated with the mood event.
+     *
+     * @param emotion The emotion to set.
+     */
+    public void setEmotion(String emotion) {
+        this.emotion = emotion;
+    }
+
+    /**
+     * Gets the explanation for the mood event.
+     *
+     * @return The explanation.
+     */
+    public String getExplanation() {
+        return explanation;
+    }
+
+    /**
+     * Sets the explanation for the mood event.
+     *
+     * @param explanation The explanation to set.
+     */
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+
+    /**
+     * Gets the URI of the image associated with the mood event.
+     *
+     * @return The image URI.
+     */
     public Uri getImageUri() {
-        return imageUri != null ? Uri.parse(imageUri) : null;
+        return imageUri;
     }
 
-    public String getEmotion() { return emotion; }
-    public String getExplanation() { return explanation; }
-    public String getLocation() { return location; }
-    public String getSocialSituation() { return socialSituation; }
-    public Timestamp getTimestamp() { return timestamp; }
+    /**
+     * Sets the URI of the image associated with the mood event.
+     *
+     * @param imageUri The image URI to set.
+     */
+    public void setImageUri(Uri imageUri) {
+        this.imageUri = imageUri;
+    }
 
-    public void setEmotion(String emotion) { this.emotion = emotion; }
-    public void setExplanation(String explanation) { this.explanation = explanation; }
-    public void setImageUri(String imageUri) { this.imageUri = imageUri; }
-    public void setLocation(String location) { this.location = location; }
-    public void setSocialSituation(String socialSituation) { this.socialSituation = socialSituation; }
-    public void setTimestamp(Timestamp timestamp) { this.timestamp = timestamp; }
+    /**
+     * Gets the location where the mood event occurred.
+     *
+     * @return The location.
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
+     * Sets the location where the mood event occurred.
+     *
+     * @param location The location to set.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
+     * Gets the social situation during the mood event.
+     *
+     * @return The social situation.
+     */
+    public String getSocialSituation() {
+        return socialSituation;
+    }
+
+    /**
+     * Sets the social situation during the mood event.
+     *
+     * @param socialSituation The social situation to set.
+     */
+    public void setSocialSituation(String socialSituation) {
+        this.socialSituation = socialSituation;
+    }
+
+    /**
+     * Gets the timestamp of the mood event.
+     *
+     * @return The timestamp.
+     */
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets the timestamp of the mood event.
+     *
+     * @param timestamp The timestamp to set.
+     */
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * Returns a string representation of the EmotionPost object.
+     *
+     * @return A string representation of the EmotionPost object.
+     */
+    @Override
+    public String toString() {
+        return "EmotionPost{" +
+                "emotion='" + emotion + '\'' +
+                ", explanation='" + explanation + '\'' +
+                ", imageUri=" + imageUri +
+                ", location='" + location + '\'' +
+                ", socialSituation='" + socialSituation + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
