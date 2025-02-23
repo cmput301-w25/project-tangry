@@ -18,8 +18,8 @@ public class EmotionPost {
     private String location;
     private String socialSituation;
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("alone", "with one other person",
-            "with two to several people", "with a crowd");
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
+            "With two to several people", "With a crowd");
 
     /**
      * Private constructor to create an EmotionPost object.
