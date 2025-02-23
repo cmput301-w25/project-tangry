@@ -1,22 +1,34 @@
 package com.example.tangry.models;
 
 import android.net.Uri;
-import com.google.firebase.Timestamp;
-import java.io.Serializable;
+import android.util.Log;
 
-public class EmotionPost implements Serializable {
+import com.google.firebase.Timestamp;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * Represents a mood event with various attributes such as emotion, explanation,
+ * image, location, and social situation.
+ */
+public class EmotionPost {
+    private static final String TAG = "EmotionPost";
+
     private String emotion;
     private String explanation;
-    private String imageUri;
+    private Uri imageUri;
     private String location;
     private String socialSituation;
     private Timestamp timestamp;
 
     public EmotionPost() {
-    }
+    };
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
-            "With two to several people", "With a crowd");
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+            "With one other person", "With two to several people", "With a crowd");
 
     /**
      * Private constructor to create an EmotionPost object.
@@ -28,14 +40,12 @@ public class EmotionPost implements Serializable {
      * @param socialSituation The social situation during the mood event.
      */
     private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation) {
-
-    private EmotionPost(String emotion, String explanation, String imageUri,
-            String location, String socialSituation) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
         this.location = location;
         this.socialSituation = socialSituation;
+        this.timestamp = Timestamp.now(); // Set the current timestamp
     }
 
     /**
@@ -85,6 +95,15 @@ public class EmotionPost implements Serializable {
     }
 
     /**
+     * Sets the emotion associated with the mood event.
+     *
+     * @param emotion The emotion to set.
+     */
+    public void setEmotion(String emotion) {
+        this.emotion = emotion;
+    }
+
+    /**
      * Gets the explanation for the mood event.
      *
      * @return The explanation.
@@ -94,12 +113,30 @@ public class EmotionPost implements Serializable {
     }
 
     /**
+     * Sets the explanation for the mood event.
+     *
+     * @param explanation The explanation to set.
+     */
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
+    }
+
+    /**
      * Gets the URI of the image associated with the mood event.
      *
      * @return The image URI.
      */
     public Uri getImageUri() {
-        return imageUri != null ? Uri.parse(imageUri) : null;
+        return imageUri;
+    }
+
+    /**
+     * Sets the URI of the image associated with the mood event.
+     *
+     * @param imageUri The image URI to set.
+     */
+    public void setImageUri(Uri imageUri) {
+        this.imageUri = imageUri;
     }
 
     /**
@@ -112,12 +149,48 @@ public class EmotionPost implements Serializable {
     }
 
     /**
+     * Sets the location where the mood event occurred.
+     *
+     * @param location The location to set.
+     */
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    /**
      * Gets the social situation during the mood event.
      *
      * @return The social situation.
      */
     public String getSocialSituation() {
         return socialSituation;
+    }
+
+    /**
+     * Sets the social situation during the mood event.
+     *
+     * @param socialSituation The social situation to set.
+     */
+    public void setSocialSituation(String socialSituation) {
+        this.socialSituation = socialSituation;
+    }
+
+    /**
+     * Gets the timestamp of the mood event.
+     *
+     * @return The timestamp.
+     */
+    public Timestamp getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets the timestamp of the mood event.
+     *
+     * @param timestamp The timestamp to set.
+     */
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
 
     /**
@@ -133,6 +206,7 @@ public class EmotionPost implements Serializable {
                 ", imageUri=" + imageUri +
                 ", location='" + location + '\'' +
                 ", socialSituation='" + socialSituation + '\'' +
+                ", timestamp=" + timestamp +
                 '}';
     }
 }

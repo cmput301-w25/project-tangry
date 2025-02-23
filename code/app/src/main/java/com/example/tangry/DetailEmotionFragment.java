@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import java.util.List;
  */
 public class DetailEmotionFragment extends Fragment {
 
+    private static final String TAG = "DetailEmotionFragment";
     private static final int PICK_IMAGE_REQUEST = 1;
 
     private TextView emotionTextView;
@@ -43,8 +45,8 @@ public class DetailEmotionFragment extends Fragment {
     private NavController navController;
     private EmotionPostRepository repository;
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
-            "With two to several people", "With a crowd");
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+            "With one other person", "With two to several people", "With a crowd");
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -96,6 +98,7 @@ public class DetailEmotionFragment extends Fragment {
                 VALID_SOCIAL_SITUATIONS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSituationSpinner.setAdapter(adapter);
+        socialSituationSpinner.setSelection(0); // Set default selection to the placeholder
 
         imageAttachment.setOnClickListener(v -> selectImage());
         saveButton.setOnClickListener(v -> saveMoodEvent());
@@ -128,6 +131,7 @@ public class DetailEmotionFragment extends Fragment {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             imageUri = data.getData();
             imageAttachment.setImageURI(imageUri);
+            Log.d(TAG, "Image selected: " + imageUri.toString());
         }
     }
 
@@ -139,6 +143,9 @@ public class DetailEmotionFragment extends Fragment {
         String explanation = explanationInput.getText().toString().trim();
         String location = locationInput.getText().toString().trim();
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+        if (socialSituation.equals("Select social situation")) {
+            socialSituation = null;
+        }
 
         try {
             InputStream imageStream = null;
@@ -148,6 +155,7 @@ public class DetailEmotionFragment extends Fragment {
 
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation,
                     imageStream);
+            Log.d(TAG, "Saving mood event: " + post.toString());
             repository.saveEmotionPostToFirestore(post,
                     docRef -> {
                         Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
@@ -155,9 +163,11 @@ public class DetailEmotionFragment extends Fragment {
                     },
                     e -> {
                         Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to save mood event", e);
                     });
         } catch (IllegalArgumentException | IOException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error saving mood event", e);
         }
     }
 }

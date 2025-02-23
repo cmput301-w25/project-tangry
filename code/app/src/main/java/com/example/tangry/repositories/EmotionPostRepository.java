@@ -27,14 +27,14 @@ public class EmotionPostRepository {
     }
 
     public void saveEmotionPostToFirestore(EmotionPost post,
-                                           OnSuccessListener<DocumentReference> successListener,
-                                           OnFailureListener failureListener) {
+            OnSuccessListener<DocumentReference> successListener,
+            OnFailureListener failureListener) {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
         data.put("imageUri", post.getImageUri() != null ? post.getImageUri().toString() : null);
         data.put("location", post.getLocation());
-        data.put("socialSituation", post.getSocialSituation());
+        data.put("socialSituation",post.getSocialSituation());
         data.put("timestamp", FieldValue.serverTimestamp());
 
         db.collection(COLLECTION_NAME)
