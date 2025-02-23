@@ -8,9 +8,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -21,17 +23,26 @@ import androidx.navigation.Navigation;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
+
 public class DetailEmotionFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
 
     private TextView emotionTextView;
-    private EditText explanationInput, locationInput, socialSituationInput;
+    private EditText explanationInput, locationInput;
+    private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
     private Button saveButton;
     private Uri imageUri;
     private NavController navController;
     private EmotionPostRepository repository;
+
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
+            "With two to several people", "With a crowd");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -46,7 +57,7 @@ public class DetailEmotionFragment extends Fragment {
         emotionTextView = view.findViewById(R.id.emotion_text);
         explanationInput = view.findViewById(R.id.explanation_input);
         locationInput = view.findViewById(R.id.location_input);
-        socialSituationInput = view.findViewById(R.id.social_situation_input);
+        socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
         imageAttachment = view.findViewById(R.id.image_attachment);
         saveButton = view.findViewById(R.id.save_button);
 
@@ -58,7 +69,12 @@ public class DetailEmotionFragment extends Fragment {
             emotionTextView.setText(emotionText);
         }
 
-        // Temporal image placeholder: daniel implem
+        // Populate the Spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item,
+                VALID_SOCIAL_SITUATIONS);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        socialSituationSpinner.setAdapter(adapter);
+
         imageAttachment.setOnClickListener(v -> selectImage());
         saveButton.setOnClickListener(v -> saveMoodEvent());
     }
@@ -82,11 +98,16 @@ public class DetailEmotionFragment extends Fragment {
         String emotion = emotionTextView.getText().toString();
         String explanation = explanationInput.getText().toString().trim();
         String location = locationInput.getText().toString().trim();
-        String socialSituation = socialSituationInput.getText().toString().trim();
+        String socialSituation = socialSituationSpinner.getSelectedItem().toString();
 
         try {
-            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation);
-            // Call Firestore here
+            InputStream imageStream = null;
+            if (imageUri != null) {
+                imageStream = getContext().getContentResolver().openInputStream(imageUri);
+            }
+
+            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation,
+                    imageStream);
             repository.saveEmotionPostToFirestore(post,
                     docRef -> {
                         Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
@@ -95,7 +116,7 @@ public class DetailEmotionFragment extends Fragment {
                     e -> {
                         Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IOException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
