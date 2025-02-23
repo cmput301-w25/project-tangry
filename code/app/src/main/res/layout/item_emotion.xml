@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <!-- Icon/emoji on the left -->
+    <!-- Emoji on the left -->
     <ImageView
         android:id="@+id/emotionIcon"
         android:layout_width="40dp"

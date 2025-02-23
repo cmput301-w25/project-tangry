@@ -1,22 +1,19 @@
 package com.example.tangry.models;
 
 import android.net.Uri;
+import com.google.firebase.Timestamp;
+import java.io.Serializable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-
-/**
- * Represents a mood event with various attributes such as emotion, explanation,
- * image, location, and social situation.
- */
-public class EmotionPost {
+public class EmotionPost implements Serializable {
     private String emotion;
     private String explanation;
-    private Uri imageUri;
+    private String imageUri;
     private String location;
     private String socialSituation;
+    private Timestamp timestamp;
+
+    public EmotionPost() {
+    }
 
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
             "With two to several people", "With a crowd");
@@ -31,6 +28,9 @@ public class EmotionPost {
      * @param socialSituation The social situation during the mood event.
      */
     private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation) {
+
+    private EmotionPost(String emotion, String explanation, String imageUri,
+            String location, String socialSituation) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -99,7 +99,7 @@ public class EmotionPost {
      * @return The image URI.
      */
     public Uri getImageUri() {
-        return imageUri;
+        return imageUri != null ? Uri.parse(imageUri) : null;
     }
 
     /**
