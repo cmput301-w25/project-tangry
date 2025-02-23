@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Fragment for adding details to a mood event.
+ */
 public class DetailEmotionFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -44,11 +46,31 @@ public class DetailEmotionFragment extends Fragment {
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Alone", "With one other person",
             "With two to several people", "With a crowd");
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to
+     *                           inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the
+     *                           fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
+     * @return Return the View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_detail_emotion, container, false);
     }
 
+    /**
+     * Called immediately after onCreateView(LayoutInflater, ViewGroup, Bundle) has
+     * returned, but before any saved state has been restored in to the view.
+     *
+     * @param view               The View returned by onCreateView(LayoutInflater,
+     *                           ViewGroup, Bundle).
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -79,12 +101,27 @@ public class DetailEmotionFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveMoodEvent());
     }
 
+    /**
+     * Opens the image picker to select an image.
+     */
     private void selectImage() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Called when an activity you launched exits, giving you the requestCode you
+     * started it with, the resultCode it returned, and any additional data from it.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who
+     *                    this result came from.
+     * @param resultCode  The integer result code returned by the child activity
+     *                    through its setResult().
+     * @param data        An Intent, which can return result data to the caller
+     *                    (various data can be attached to Intent "extras").
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -94,6 +131,9 @@ public class DetailEmotionFragment extends Fragment {
         }
     }
 
+    /**
+     * Saves the mood event to Firestore.
+     */
     private void saveMoodEvent() {
         String emotion = emotionTextView.getText().toString();
         String explanation = explanationInput.getText().toString().trim();
