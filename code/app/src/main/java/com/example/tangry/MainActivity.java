@@ -2,6 +2,7 @@ package com.example.tangry;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -53,8 +54,16 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> {
             navController.navigate(R.id.emotionsFragment);
         });
+        // Initially hide UI elements until logged in
+        binding.navView.setVisibility(View.GONE);
+        fab.setVisibility(View.GONE);
     }
-
+    public void onLoginSuccess() {
+        // Reveal UI after successful login
+        binding.navView.setVisibility(View.VISIBLE);
+        findViewById(R.id.fab).setVisibility(View.VISIBLE);
+        navController.navigate(R.id.navigation_home);
+    }
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
