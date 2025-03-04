@@ -4,25 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?attr/selectableItemBackground">
 
-    <!-- Emoji on the left -->
+    <!-- Emotion Icon (will use a selector such as ic_angry_selector, ic_confused_selector, etc.) -->
     <ImageView
         android:id="@+id/emotionIcon"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="center_vertical"
         android:src="@drawable/ic_angry_selector"
-    android:contentDescription="@string/emotion_icon" />
+        android:contentDescription="@string/emotion_icon" />
 
-    <!-- Emotion name on the right -->
+    <!-- Emotion Name -->
     <TextView
         android:id="@+id/emotionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_gravity="center_vertical"
+        android:text="@string/emotion_name"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textColor="@color/black"/>
 
 </LinearLayout>

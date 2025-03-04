@@ -1,59 +1,50 @@
-// HomeFragment.java
 package com.example.tangry.ui.home;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 import com.example.tangry.R;
-import com.example.tangry.adapters.EmotionPostAdapter;
-import com.example.tangry.models.EmotionPost;
-import com.example.tangry.repositories.EmotionPostRepository;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 public class HomeFragment extends Fragment {
-    private RecyclerView recyclerView;
-    private EmotionPostAdapter adapter;
-    private final List<EmotionPost> posts = new ArrayList<>();
-    private EmotionPostRepository repository;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
 
-        recyclerView = root.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EmotionPostAdapter(posts);
-        recyclerView.setAdapter(adapter);
-
-        repository = EmotionPostRepository.getInstance();
-        setupFirestoreListener();
-        return root;
+    public HomeFragment() {
+        // Required empty public constructor
     }
 
-    private void setupFirestoreListener() {
-        repository.getPostsQuery().addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.e("HomeFragment", "Listen failed", error);
-                return;
-            }
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the container layout with TabLayout and ViewPager2
+        return inflater.inflate(R.layout.fragment_home, container, false);
+    }
 
-            if (value != null) {
-                posts.clear();
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    EmotionPost post = doc.toObject(EmotionPost.class);
-                    posts.add(post);
-                }
-                adapter.notifyDataSetChanged();
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        tabLayout = view.findViewById(R.id.tab_layout_home);
+        viewPager = view.findViewById(R.id.view_pager_home);
+
+        // Use the new HomePagerAdapter (created below)
+        HomePagerAdapter adapter = new HomePagerAdapter(this);
+        viewPager.setAdapter(adapter);
+
+        // Attach the TabLayout to the ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            if (position == 0) {
+                tab.setText("Your Mood");
+            } else {
+                tab.setText("Friend Moods");
             }
-        });
+        }).attach();
     }
 }
