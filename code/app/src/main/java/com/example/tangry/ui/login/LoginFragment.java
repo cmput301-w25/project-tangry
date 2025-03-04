@@ -24,6 +24,7 @@ public class LoginFragment extends Fragment {
     private LoginViewModel loginViewModel;
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
+    private Button createButton;
 
     @Nullable
     @Override
@@ -35,6 +36,8 @@ public class LoginFragment extends Fragment {
         usernameEditText = view.findViewById(R.id.editTextUsername);
         passwordEditText = view.findViewById(R.id.editTextPassword);
         loginButton = view.findViewById(R.id.buttonLogin);
+        createButton = view.findViewById(R.id.buttonCreate);
+
 
         loginButton.setOnClickListener(v -> {
             String username = usernameEditText.getText().toString().trim();
@@ -43,6 +46,11 @@ public class LoginFragment extends Fragment {
             loginViewModel.setUsername(username);
             loginViewModel.setPassword(password);
             loginViewModel.login();
+        });
+
+        createButton.setOnClickListener(v -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+            navController.navigate(R.id.action_navigation_login_to_navigation_add_user);
         });
 
         loginViewModel.getIsLoggedIn().observe(getViewLifecycleOwner(), isLoggedIn -> {

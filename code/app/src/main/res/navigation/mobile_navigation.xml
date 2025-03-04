@@ -15,6 +15,9 @@
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_add_user"
+            app:destination="@id/navigation_add_user" />
     </fragment>
     <fragment
         android:id="@+id/navigation_home"
