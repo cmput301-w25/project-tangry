@@ -35,6 +35,7 @@ public class EmotionPostRepository {
         data.put("imageUri", post.getImageUri() != null ? post.getImageUri().toString() : null);
         data.put("location", post.getLocation());
         data.put("socialSituation",post.getSocialSituation());
+        data.put("username", post.getUsername());
         data.put("timestamp", FieldValue.serverTimestamp());
 
         db.collection(COLLECTION_NAME)

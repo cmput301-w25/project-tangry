@@ -22,6 +22,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
+import com.example.tangry.repositories.UsernameRepository;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -143,6 +145,8 @@ public class DetailEmotionFragment extends Fragment {
         String explanation = explanationInput.getText().toString().trim();
         String location = locationInput.getText().toString().trim();
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        String username = UsernameRepository.getInstance().getUsernameFromEmail(email).toString();
         if (socialSituation.equals("Select social situation")) {
             socialSituation = null;
         }
@@ -153,7 +157,7 @@ public class DetailEmotionFragment extends Fragment {
                 imageStream = getContext().getContentResolver().openInputStream(imageUri);
             }
 
-            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation,
+            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation, username,
                     imageStream);
             Log.d(TAG, "Saving mood event: " + post.toString());
             repository.saveEmotionPostToFirestore(post,

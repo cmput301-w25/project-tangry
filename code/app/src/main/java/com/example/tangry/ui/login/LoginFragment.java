@@ -1,6 +1,7 @@
 package com.example.tangry.ui.login;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,40 +13,44 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.example.tangry.MainActivity;
 import com.example.tangry.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginFragment extends Fragment {
 
-    private LoginViewModel loginViewModel;
     private EditText usernameEditText, passwordEditText;
     private Button loginButton;
     private Button createButton;
+    private FirebaseAuth mAuth;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
+        mAuth = FirebaseAuth.getInstance();
 
         usernameEditText = view.findViewById(R.id.editTextUsername);
         passwordEditText = view.findViewById(R.id.editTextPassword);
         loginButton = view.findViewById(R.id.buttonLogin);
         createButton = view.findViewById(R.id.buttonCreate);
 
-
         loginButton.setOnClickListener(v -> {
-            String username = usernameEditText.getText().toString().trim();
+            String email = usernameEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
 
-            loginViewModel.setUsername(username);
-            loginViewModel.setPassword(password);
-            loginViewModel.login();
+            if (TextUtils.isEmpty(email)) {
+                Toast.makeText(getContext(), "Email is required", Toast.LENGTH_SHORT).show();
+            } else if (TextUtils.isEmpty(password)) {
+                Toast.makeText(getContext(), "Password is required", Toast.LENGTH_SHORT).show();
+            } else {
+                loginUser(email, password);
+            }
         });
 
         createButton.setOnClickListener(v -> {
@@ -53,16 +58,22 @@ public class LoginFragment extends Fragment {
             navController.navigate(R.id.action_navigation_login_to_navigation_add_user);
         });
 
-        loginViewModel.getIsLoggedIn().observe(getViewLifecycleOwner(), isLoggedIn -> {
-            if (isLoggedIn) {
-                ((MainActivity) requireActivity()).onLoginSuccess();
-            } else {
-                Toast.makeText(getContext(), "Invalid login", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         return view;
     }
+
+    private void loginUser(String email, String password) {
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
+                        ((MainActivity) requireActivity()).onLoginSuccess();
+                    } else {
+                        Toast.makeText(getContext(), "Login failed: Invalid login", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     @Override
     public void onResume() {
         super.onResume();

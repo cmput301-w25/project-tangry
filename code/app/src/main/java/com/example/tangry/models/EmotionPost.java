@@ -3,6 +3,8 @@ package com.example.tangry.models;
 import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.firebase.Timestamp;
 
 import java.io.IOException;
@@ -12,7 +14,7 @@ import java.util.List;
 
 /**
  * Represents a mood event with various attributes such as emotion, explanation,
- * image, location, and social situation.
+ * image, location, social situation, and username.
  */
 public class EmotionPost {
     private static final String TAG = "EmotionPost";
@@ -22,6 +24,7 @@ public class EmotionPost {
     private Uri imageUri;
     private String location;
     private String socialSituation;
+    private String username;
     private Timestamp timestamp;
 
     public EmotionPost() {
@@ -38,13 +41,15 @@ public class EmotionPost {
      * @param imageUri        The URI of the image associated with the mood event.
      * @param location        The location where the mood event occurred.
      * @param socialSituation The social situation during the mood event.
+     * @param username        The username of the person posting the emotion.
      */
-    private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation) {
+    private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation, String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
         this.location = location;
         this.socialSituation = socialSituation;
+        this.username = username;
         this.timestamp = Timestamp.now(); // Set the current timestamp
     }
 
@@ -56,13 +61,14 @@ public class EmotionPost {
      * @param imageUri        The URI of the image associated with the mood event.
      * @param location        The location where the mood event occurred.
      * @param socialSituation The social situation during the mood event.
+     * @param username        The username of the person posting the emotion.
      * @param imageStream     The InputStream of the image to validate its size.
      * @return A new EmotionPost object.
      * @throws IllegalArgumentException If any validation fails.
      * @throws IOException              If an I/O error occurs.
      */
     public static EmotionPost create(String emotion, String explanation, Uri imageUri, String location,
-            String socialSituation, InputStream imageStream) throws IllegalArgumentException, IOException {
+                                     String socialSituation, String username, InputStream imageStream) throws IllegalArgumentException, IOException {
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
@@ -82,7 +88,7 @@ public class EmotionPost {
             }
         }
 
-        return new EmotionPost(emotion, explanation, imageUri, location, socialSituation);
+        return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);
     }
 
     /**
@@ -176,6 +182,24 @@ public class EmotionPost {
     }
 
     /**
+     * Gets the username of the person posting the emotion.
+     *
+     * @return The username.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Sets the username of the person posting the emotion.
+     *
+     * @param username The username to set.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
      * Gets the timestamp of the mood event.
      *
      * @return The timestamp.
@@ -198,6 +222,7 @@ public class EmotionPost {
      *
      * @return A string representation of the EmotionPost object.
      */
+    @NonNull
     @Override
     public String toString() {
         return "EmotionPost{" +
@@ -206,6 +231,7 @@ public class EmotionPost {
                 ", imageUri=" + imageUri +
                 ", location='" + location + '\'' +
                 ", socialSituation='" + socialSituation + '\'' +
+                ", username='" + username + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }
