@@ -45,7 +45,7 @@ public class DetailEmotionFragment extends Fragment {
     private NavController navController;
     private EmotionPostRepository repository;
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", "Alone",
             "With one other person", "With two to several people", "With a crowd");
 
     /**
