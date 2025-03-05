@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,11 +44,11 @@ public class DetailEmotionFragment extends Fragment {
     private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
     private Button saveButton;
-    private Uri imageUri;
+    private String imageUri;
     private NavController navController;
     private EmotionPostRepository repository;
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", "Alone",
             "With one other person", "With two to several people", "With a crowd");
 
     /**
@@ -131,9 +132,11 @@ public class DetailEmotionFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            imageUri = data.getData();
-            imageAttachment.setImageURI(imageUri);
-            Log.d(TAG, "Image selected: " + imageUri.toString());
+            Uri uri = data.getData();
+            assert uri != null;
+            imageUri = uri.toString();
+            imageAttachment.setImageURI(uri);
+            Log.d(TAG, "Image selected: " + uri.toString());
         }
     }
 
@@ -141,37 +144,41 @@ public class DetailEmotionFragment extends Fragment {
      * Saves the mood event to Firestore.
      */
     private void saveMoodEvent() {
-        String emotion = emotionTextView.getText().toString();
-        String explanation = explanationInput.getText().toString().trim();
-        String location = locationInput.getText().toString().trim();
-        String socialSituation = socialSituationSpinner.getSelectedItem().toString();
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        String username = UsernameRepository.getInstance().getUsernameFromEmail(email).toString();
-        if (socialSituation.equals("Select social situation")) {
+        UsernameRepository.getInstance().getUsernameFromEmail(email, username -> {
+            String emotion = emotionTextView.getText().toString();
+            String explanation = explanationInput.getText().toString().trim();
+            String location = locationInput.getText().toString().trim();
+            String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+            if (socialSituation.equals("Select social situation")) {
             socialSituation = null;
-        }
+            }
 
-        try {
+            try {
             InputStream imageStream = null;
             if (imageUri != null) {
-                imageStream = getContext().getContentResolver().openInputStream(imageUri);
+                imageStream = getContext().getContentResolver().openInputStream(Uri.parse(imageUri));
             }
 
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation, username,
-                    imageStream);
+                imageStream);
             Log.d(TAG, "Saving mood event: " + post.toString());
             repository.saveEmotionPostToFirestore(post,
-                    docRef -> {
-                        Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
-                        navController.navigateUp();
-                    },
-                    e -> {
-                        Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to save mood event", e);
-                    });
-        } catch (IllegalArgumentException | IOException e) {
+                docRef -> {
+                    Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
+                    navController.navigateUp();
+                },
+                e -> {
+                    Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to save mood event", e);
+                });
+            } catch (IllegalArgumentException | IOException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Error saving mood event", e);
-        }
+            }
+        }, e -> {
+            Toast.makeText(getContext(), "Failed to get username. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Failed to get username", e);
+        });
     }
 }

@@ -32,7 +32,7 @@ public class EmotionPostRepository {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
-        data.put("imageUri", post.getImageUri() != null ? post.getImageUri().toString() : null);
+        data.put("imageUri", post.getImageUri());
         data.put("location", post.getLocation());
         data.put("socialSituation",post.getSocialSituation());
         data.put("username", post.getUsername());

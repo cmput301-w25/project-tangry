@@ -3,12 +3,16 @@ package com.example.tangry.repositories;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class UsernameRepository {
     private static UsernameRepository instance;
@@ -44,17 +48,19 @@ public class UsernameRepository {
                 .orderBy("username", Query.Direction.DESCENDING);
     }
 
-    public Task<String> getUsernameFromEmail(String email) {
-        return db.collection(COLLECTION_NAME)
+    public void getUsernameFromEmail(String email, OnSuccessListener<String> successListener, OnFailureListener failureListener) {
+        FirebaseFirestore.getInstance()
+                .collection(COLLECTION_NAME)
                 .whereEqualTo("email", email)
                 .limit(1)
                 .get()
-                .continueWith(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        return task.getResult().getDocuments().get(0).getString("username");
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        successListener.onSuccess(querySnapshot.getDocuments().get(0).getString("username"));
                     } else {
-                        return null;
+                        successListener.onSuccess(null);
                     }
-                });
+                })
+                .addOnFailureListener(failureListener);
     }
 }

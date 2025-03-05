@@ -21,7 +21,7 @@ public class EmotionPost {
 
     private String emotion;
     private String explanation;
-    private Uri imageUri;
+    private String imageUri;
     private String location;
     private String socialSituation;
     private String username;
@@ -30,7 +30,7 @@ public class EmotionPost {
     public EmotionPost() {
     };
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", null, "Alone",
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", "Alone",
             "With one other person", "With two to several people", "With a crowd");
 
     /**
@@ -43,7 +43,7 @@ public class EmotionPost {
      * @param socialSituation The social situation during the mood event.
      * @param username        The username of the person posting the emotion.
      */
-    private EmotionPost(String emotion, String explanation, Uri imageUri, String location, String socialSituation, String username) {
+    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation, String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -67,7 +67,7 @@ public class EmotionPost {
      * @throws IllegalArgumentException If any validation fails.
      * @throws IOException              If an I/O error occurs.
      */
-    public static EmotionPost create(String emotion, String explanation, Uri imageUri, String location,
+    public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
                                      String socialSituation, String username, InputStream imageStream) throws IllegalArgumentException, IOException {
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
@@ -132,7 +132,7 @@ public class EmotionPost {
      *
      * @return The image URI.
      */
-    public Uri getImageUri() {
+    public String getImageUri() {
         return imageUri;
     }
 
@@ -141,7 +141,7 @@ public class EmotionPost {
      *
      * @param imageUri The image URI to set.
      */
-    public void setImageUri(Uri imageUri) {
+    public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
     }
 
