@@ -56,8 +56,7 @@ public class MainActivity extends AppCompatActivity {
             secondaryToolbar.setTitle("");
         }
 
-        // Add a destination changed listener to update the secondary toolbar's title
-        // with the current destination's label (e.g., "Home", "Map", etc.)
+
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (secondaryToolbar != null) {
                 CharSequence label = destination.getLabel();

@@ -87,33 +87,28 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/FriendMoodsFragment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/HomePagerAdapter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/YourMoodFragment.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/edittext_background.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_profile.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/font/montserrat_light.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_friend_moods.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_your_mood.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/menu/menu_profile.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/angry_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/confused_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/disgusted_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/fearful_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/happy_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/sad_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/shameful_emoji.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/surprised_emoji.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/DetailEmotionFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/DetailEmotionFragment.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/HomeFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/HomeFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_add_user.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_add_user.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_angry.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_angry.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_confused.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_confused.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_disgust.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_disgust.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_fear.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_fear.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_happiness.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_happiness.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_sadness.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_sadness.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_shame.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_shame.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/ic_surprise.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_surprise.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_emotions.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_emotions.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_friends.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_friends.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_home.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_home.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_map.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_map.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/item_emotion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_emotion.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/item_emotion_post.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_emotion_post.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/bottom_nav_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/menu/bottom_nav_menu.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/themes.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/themes.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -201,7 +196,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "liambranch1",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/leneu/AndroidStudioProjects/project-tangry/code",
     "settings.editor.selected.configurable": "editor.preferences.import"
@@ -209,6 +204,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\leneu\AndroidStudioProjects\project-tangry\code\app\src\main\res\drawable" />
       <recent name="C:\Users\leneu\AndroidStudioProjects\project-tangry\code\app\src\main\res\font" />
     </key>
   </component>
@@ -301,17 +297,17 @@
       <map>
         <entry key="com.example.tangry">
           <value>
-            <CheckInfo lastCheckTimestamp="1741024679083" />
+            <CheckInfo lastCheckTimestamp="1741130115824" />
           </value>
         </entry>
         <entry key="com.example.tangry.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1741024823981" />
+            <CheckInfo lastCheckTimestamp="1741130115858" />
           </value>
         </entry>
         <entry key="com.example.tangry.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1741024823981" />
+            <CheckInfo lastCheckTimestamp="1741130115858" />
           </value>
         </entry>
       </map>
