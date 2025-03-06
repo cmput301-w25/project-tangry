@@ -47,6 +47,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
         private final ImageView postImage;
         private final TextView locationText;
         private final TextView socialSituationText;
+        private final TextView usernameText;
 
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -55,6 +56,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             postImage = itemView.findViewById(R.id.post_image);
             locationText = itemView.findViewById(R.id.location_text);
             socialSituationText = itemView.findViewById(R.id.social_situation_text);
+            usernameText = itemView.findViewById(R.id.username_text);
         }
 
         public void bind(EmotionPost post) {
@@ -62,11 +64,12 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             explanationText.setText(post.getExplanation());
             locationText.setText(post.getLocation());
             socialSituationText.setText(post.getSocialSituation());
+            usernameText.setText(post.getUsername());
 
-            Uri imageUri = post.getImageUri();
+            String imageUri = post.getImageUri();
             if (imageUri != null) {
                 Glide.with(itemView.getContext())
-                        .load(imageUri)
+                        .load(Uri.parse(imageUri))
                         .into(postImage);
             } else {
                 postImage.setImageResource(R.drawable.ic_placeholder);
