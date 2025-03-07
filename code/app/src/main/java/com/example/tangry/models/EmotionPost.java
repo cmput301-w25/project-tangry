@@ -222,7 +222,6 @@ public class EmotionPost {
      *
      * @return A string representation of the EmotionPost object.
      */
-    @NonNull
     @Override
     public String toString() {
         return "EmotionPost{" +
