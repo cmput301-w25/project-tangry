@@ -13,44 +13,52 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
-import com.example.tangry.MainActivity;
 import com.example.tangry.R;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class LoginFragment extends Fragment {
 
-    private EditText usernameEditText, passwordEditText;
+    private EditText emailEditText, passwordEditText;
     private Button loginButton;
     private Button createButton;
-    private FirebaseAuth mAuth;
+    private LoginViewModel viewModel;
+    // Flag to prevent showing toast on startup
+    private boolean loginAttempted = false;
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        usernameEditText = view.findViewById(R.id.editTextUsername);
+        emailEditText = view.findViewById(R.id.editTextUsername);
         passwordEditText = view.findViewById(R.id.editTextPassword);
         loginButton = view.findViewById(R.id.buttonLogin);
         createButton = view.findViewById(R.id.buttonCreate);
 
-        loginButton.setOnClickListener(v -> {
-            String email = usernameEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString().trim();
+        viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
 
-            if (TextUtils.isEmpty(email)) {
-                Toast.makeText(getContext(), "Email is required", Toast.LENGTH_SHORT).show();
-            } else if (TextUtils.isEmpty(password)) {
-                Toast.makeText(getContext(), "Password is required", Toast.LENGTH_SHORT).show();
-            } else {
-                loginUser(email, password);
+        // Observe login status
+        viewModel.getIsLoggedIn().observe(getViewLifecycleOwner(), isLoggedIn -> {
+            if (loginAttempted) {
+                if (isLoggedIn) {
+                    NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+                    navController.navigate(R.id.navigation_home);
+                } else {
+                    Toast.makeText(requireContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                }
+                loginAttempted = false; // reset flag after handling result
             }
+        });
+
+        loginButton.setOnClickListener(v -> {
+            viewModel.setEmail(emailEditText.getText().toString().trim());
+            viewModel.setPassword(passwordEditText.getText().toString());
+            loginAttempted = true;
+            viewModel.login();
         });
 
         createButton.setOnClickListener(v -> {
@@ -61,24 +69,11 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    private void loginUser(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(getContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                        ((MainActivity) requireActivity()).onLoginSuccess();
-                    } else {
-                        Toast.makeText(getContext(), "Login failed: Invalid login", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().hide();
+            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
         }
     }
 
@@ -86,7 +81,7 @@ public class LoginFragment extends Fragment {
     public void onPause() {
         super.onPause();
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         }
     }
 }

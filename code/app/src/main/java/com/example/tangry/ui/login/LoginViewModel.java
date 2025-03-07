@@ -1,8 +1,15 @@
 package com.example.tangry.ui.login;
 
+import android.text.TextUtils;
+import android.widget.Toast;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+
+import com.example.tangry.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginViewModel extends ViewModel {
 
@@ -10,7 +17,7 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<String> password = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoggedIn = new MutableLiveData<>(false);
 
-    public void setUsername(String user) {
+    public void setEmail(String user) {
         username.setValue(user);
     }
 
@@ -23,12 +30,20 @@ public class LoginViewModel extends ViewModel {
     }
 
     public void login() {
-        // Placeholder logic: Accept any username/password that's non-empty
-        if (username.getValue() != null && !username.getValue().isEmpty()
-                && password.getValue() != null && !password.getValue().isEmpty()) {
-            isLoggedIn.setValue(true);
-        } else {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        if (TextUtils.isEmpty(username.getValue()) || TextUtils.isEmpty(password.getValue())) {
             isLoggedIn.setValue(false);
+            return;
         }
+
+        mAuth.signInWithEmailAndPassword(username.getValue(), password.getValue())
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    isLoggedIn.setValue(user != null);
+                } else {
+                    isLoggedIn.setValue(false);
+                }
+            });
     }
 }
