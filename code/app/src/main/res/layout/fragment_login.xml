@@ -30,6 +30,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Username"
+        android:imeOptions="actionNext"
+        android:inputType="text"
         android:textColorHint="?android:attr/textColorHint" />
 
     <EditText
@@ -37,8 +39,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
+        android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:textColorHint="?android:attr/textColorHint" />
+
+    <!-- Remember Me CheckBox -->
+    <CheckBox
+        android:id="@+id/rememberMeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Remember Me"
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginTop="8dp" />
 
     <Button
         android:id="@+id/buttonLogin"
