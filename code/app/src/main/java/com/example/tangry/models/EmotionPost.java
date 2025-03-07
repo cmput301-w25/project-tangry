@@ -43,7 +43,8 @@ public class EmotionPost {
      * @param socialSituation The social situation during the mood event.
      * @param username        The username of the person posting the emotion.
      */
-    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation, String username) {
+    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation,
+            String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -68,7 +69,8 @@ public class EmotionPost {
      * @throws IOException              If an I/O error occurs.
      */
     public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
-                                     String socialSituation, String username, InputStream imageStream) throws IllegalArgumentException, IOException {
+            String socialSituation, String username, InputStream imageStream)
+            throws IllegalArgumentException, IOException {
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }

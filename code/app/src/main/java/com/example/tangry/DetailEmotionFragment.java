@@ -24,12 +24,15 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.repositories.UsernameRepository;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Fragment for adding details to a mood event.
@@ -133,52 +136,79 @@ public class DetailEmotionFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             Uri uri = data.getData();
-            assert uri != null;
-            imageUri = uri.toString();
-            imageAttachment.setImageURI(uri);
-            Log.d(TAG, "Image selected: " + uri.toString());
+            if (uri != null) {
+                imageUri = uri.toString();
+                imageAttachment.setImageURI(uri);
+                Log.d(TAG, "Image selected: " + uri.toString());
+            } else {
+                Log.e(TAG, "Image URI is null");
+            }
         }
     }
 
-    /**
-     * Saves the mood event to Firestore.
-     */
     private void saveMoodEvent() {
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         UsernameRepository.getInstance().getUsernameFromEmail(email, username -> {
-            String emotion = emotionTextView.getText().toString();
-            String explanation = explanationInput.getText().toString().trim();
-            String location = locationInput.getText().toString().trim();
+            final String emotion = emotionTextView.getText().toString();
+            final String explanation = explanationInput.getText().toString().trim();
+            final String location = locationInput.getText().toString().trim();
             String socialSituation = socialSituationSpinner.getSelectedItem().toString();
             if (socialSituation.equals("Select social situation")) {
-            socialSituation = null;
+                socialSituation = null;
             }
+            final String finalSocialSituation = socialSituation;
 
-            try {
-            InputStream imageStream = null;
             if (imageUri != null) {
-                imageStream = getContext().getContentResolver().openInputStream(Uri.parse(imageUri));
-            }
-
-            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation, username,
-                imageStream);
-            Log.d(TAG, "Saving mood event: " + post.toString());
-            repository.saveEmotionPostToFirestore(post,
-                docRef -> {
-                    Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
-                    navController.navigateUp();
-                },
-                e -> {
-                    Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to save mood event", e);
-                });
-            } catch (IllegalArgumentException | IOException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Error saving mood event", e);
+                Log.d(TAG, "Image URI: " + imageUri);
+                // Upload image to Firebase Storage
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
+                imageRef.putFile(Uri.parse(imageUri))
+                        .addOnSuccessListener(taskSnapshot -> {
+                            Log.d(TAG, "Image upload successful");
+                            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                                String downloadUrl = uri.toString();
+                                Log.d(TAG, "Download URL: " + downloadUrl);
+                                createEmotionPost(emotion, explanation, downloadUrl, location, finalSocialSituation,
+                                        username);
+                            }).addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to get download URL", e);
+                                Toast.makeText(getContext(), "Failed to get download URL: " + e.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            });
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to upload image", e);
+                            Toast.makeText(getContext(), "Failed to upload image: " + e.getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                createEmotionPost(emotion, explanation, null, location, finalSocialSituation, username);
             }
         }, e -> {
             Toast.makeText(getContext(), "Failed to get username. " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Failed to get username", e);
         });
+    }
+
+    private void createEmotionPost(String emotion, String explanation, String imageUrl, String location,
+            String socialSituation, String username) {
+        try {
+            EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl, location, socialSituation, username,
+                    null);
+            Log.d(TAG, "Saving mood event: " + post.toString());
+            repository.saveEmotionPostToFirestore(post,
+                    docRef -> {
+                        Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
+                        navController.navigateUp();
+                    },
+                    e -> {
+                        Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to save mood event", e);
+                    });
+        } catch (IllegalArgumentException | IOException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error saving mood event", e);
+        }
     }
 }
