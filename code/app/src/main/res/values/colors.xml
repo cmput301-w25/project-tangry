@@ -17,4 +17,7 @@
     <color name="colorSadness">#0E69D8</color>
     <color name="colorShame">#CB11D5</color>
     <color name="colorSurprise">#DBCE36</color>
+    <color name="colorPrimary">#07B464</color>
+    <color name="colorPrimaryDark">#44403F</color>
+    <color name="colorAccent">#C6CDC1</color>
 </resources>
