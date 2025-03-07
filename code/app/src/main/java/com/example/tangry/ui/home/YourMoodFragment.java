@@ -43,14 +43,18 @@ public class YourMoodFragment extends Fragment {
     private void setupFirestoreListener() {
         repository.getPostsQuery().addSnapshotListener((value, error) -> {
             if (error != null) {
-                Log.e("YourMoodFragment", "Listen failed", error);
+                Log.e("HomeFragment", "Listen failed", error);
                 return;
             }
+
             if (value != null) {
                 posts.clear();
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     EmotionPost post = doc.toObject(EmotionPost.class);
-                    posts.add(post);
+                    if (post != null) {
+                        post.setPostId(doc.getId());
+                        posts.add(post);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }

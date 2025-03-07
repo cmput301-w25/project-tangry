@@ -1,6 +1,7 @@
 package com.example.tangry.adapters;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,10 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.R;
+import com.google.gson.Gson;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -35,7 +39,22 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         EmotionPost post = posts.get(position);
         holder.bind(post);
+
+        holder.itemView.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+
+            // ✅ Convert EmotionPost to JSON String
+            Gson gson = new Gson();
+            String postJson = gson.toJson(post);
+
+            bundle.putString("post", postJson);  // 🔥 Pass JSON instead of Object
+            bundle.putString("postId", post.getPostId());
+
+            // ✅ Navigate using Safe Args
+            Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_postDetailsFragment, bundle);
+        });
     }
+
 
     @Override
     public int getItemCount() {
@@ -70,7 +89,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
             timeText.setText(sdf.format(post.getTimestamp().toDate()));
 
-            // Load mood image TODO Use another method for storing images since content// is wrong
+            // Load mood image
             if (post.getImageUri() != null) {
                 Glide.with(itemView.getContext())
                         .load(Uri.parse(post.getImageUri()))
@@ -89,7 +108,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                     emojiImage.setImageResource(R.drawable.ic_sadness);
                     moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorSadness));
                     break;
-                case "anger":
+                case "angry":
                     emojiImage.setImageResource(R.drawable.ic_angry);
                     moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorAngry));
                     break;

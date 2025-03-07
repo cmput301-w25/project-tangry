@@ -9,6 +9,7 @@ import com.google.firebase.Timestamp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * Represents a mood event with various attributes such as emotion, explanation,
  * image, location, social situation, and username.
  */
-public class EmotionPost {
+public class EmotionPost implements Serializable {
     private static final String TAG = "EmotionPost";
 
     private String emotion;
@@ -26,6 +27,7 @@ public class EmotionPost {
     private String socialSituation;
     private String username;
     private Timestamp timestamp;
+    private String postId; // Firestore Document ID
 
     public EmotionPost() {
     };
@@ -216,6 +218,9 @@ public class EmotionPost {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
+
+    public String getPostId() { return postId; }
+    public void setPostId(String postId) { this.postId = postId; }
 
     /**
      * Returns a string representation of the EmotionPost object.
