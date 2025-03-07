@@ -79,6 +79,10 @@ public class EmotionPost {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
 
+        if (explanation.length() == 0 && (imageUri == null || imageUri.length() == 0)) {
+            throw new IllegalArgumentException("Emotion post should have a text or image at least");
+        }
+
         if (!VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
             throw new IllegalArgumentException("Invalid social situation.");
         }
@@ -224,7 +228,6 @@ public class EmotionPost {
      *
      * @return A string representation of the EmotionPost object.
      */
-    @NonNull
     @Override
     public String toString() {
         return "EmotionPost{" +
