@@ -39,6 +39,51 @@
                 android:layoutDirection="rtl"
                 android:text="Sad"
                 android:textColor="@color/colorSadness" />
+            <CheckBox
+                android:id="@+id/Angry_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:text="Angry"
+                android:textColor="@color/colorAngry" />
+
+            <CheckBox
+                android:id="@+id/Surprised_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:text="Surprised"
+                android:textColor="@color/colorSurprise" />
+
+            <CheckBox
+                android:id="@+id/Disgusted_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:text="Disgusted"
+                android:textColor="@color/colorDisgust" />
+
+            <CheckBox
+                android:id="@+id/Fearful_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:text="Fearful"
+                android:textColor="@color/colorFear" />
+
+            <CheckBox
+                android:id="@+id/Shame_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:layoutDirection="rtl"
+                android:text="Shame"
+                android:textColor="@color/colorShame" />
+
 
             <!-- Add more CheckBoxes as needed -->
 
