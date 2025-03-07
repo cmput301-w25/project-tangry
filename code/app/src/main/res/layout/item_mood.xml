@@ -45,7 +45,7 @@
                             android:id="@+id/user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Mazen feels "
+                            android:text="User feels "
                             android:textColor="@android:color/black"
                             android:textSize="16sp" />
 
@@ -62,7 +62,7 @@
                         android:id="@+id/user_handle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="\@midnafagy"
+                        android:text="\@userHandle"
                         android:textColor="@android:color/darker_gray"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -98,7 +98,7 @@
                     android:id="@+id/location_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="CCIS"
+                    android:text="Not Provided"
                     android:textColor="@android:color/black"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -142,7 +142,7 @@
                     android:id="@+id/reason_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="watched Sunrise"
+                    android:text="Not Provided"
                     android:textColor="@android:color/black"
                     android:textSize="14sp" />
 

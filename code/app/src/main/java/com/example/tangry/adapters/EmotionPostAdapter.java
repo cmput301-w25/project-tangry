@@ -17,8 +17,10 @@ import com.example.tangry.R;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.PostViewHolder> {
     private final List<EmotionPost> posts;
@@ -82,12 +84,21 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             userName.setText(post.getUsername() + " feels ");
             moodText.setText(post.getEmotion());
             userHandle.setText("@" + post.getUsername());
-            locationText.setText(post.getLocation());
+            if (!post.getLocation().isEmpty()) {
+                locationText.setText(post.getLocation());
+                locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+            } else {
+                locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
             withText.setText(post.getSocialSituation());
-            reasonText.setText(post.getExplanation());
+            if (!post.getExplanation().isEmpty()) {
+                reasonText.setText(post.getExplanation());
+                reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+            } else {
+                reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
-            timeText.setText(sdf.format(post.getTimestamp().toDate()));
+            timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
 
             // Load mood image
             if (post.getImageUri() != null) {
@@ -135,6 +146,26 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                 default:
                     emojiImage.setImageResource(R.drawable.ic_placeholder);
                     break;
+            }
+        }
+
+        private String getTimeAgo(Date date) {
+            long timeDiff = System.currentTimeMillis() - date.getTime();
+
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
+            long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
+            long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
+
+            if (minutes < 1) {
+                return "Just now";
+            } else if (minutes < 60) {
+                return minutes + " minutes ago";
+            } else if (hours < 24) {
+                return hours + " hours ago";
+            } else if (days < 5) {
+                return days + " days ago";
+            } else {
+                return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
             }
         }
     }

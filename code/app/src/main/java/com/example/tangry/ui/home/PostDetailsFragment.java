@@ -9,11 +9,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.appcompat.app.AlertDialog;
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.models.EmotionPost;
@@ -21,7 +24,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
@@ -78,12 +84,21 @@ public class PostDetailsFragment extends Fragment {
         userName.setText(post.getUsername() + " feels ");
         moodText.setText(post.getEmotion());
         userHandle.setText("@" + post.getUsername());
-        locationText.setText(post.getLocation());
+        if (!post.getLocation().isEmpty()) {
+            locationText.setText(post.getLocation());
+            locationText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
+        } else {
+            locationText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
+        }
         withText.setText(post.getSocialSituation());
-        reasonText.setText(post.getExplanation());
+        if (!post.getExplanation().isEmpty()) {
+            reasonText.setText(post.getExplanation());
+            reasonText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
+        } else {
+            reasonText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
+        }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy hh:mm a", Locale.getDefault());
-        timeText.setText(sdf.format(post.getTimestamp().toDate()));
+        timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
 
         if (post.getImageUri() != null) {
             Glide.with(requireContext())
@@ -115,15 +130,44 @@ public class PostDetailsFragment extends Fragment {
         moodText.setTextColor(ContextCompat.getColor(requireContext(), colorResId));
     }
 
+    private String getTimeAgo(Date date) {
+        long timeDiff = System.currentTimeMillis() - date.getTime();
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
+        long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
+        long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
+
+        if (minutes < 1) {
+            return "Just now";
+        } else if (minutes < 60) {
+            return minutes + " minutes ago";
+        } else if (hours < 24) {
+            return hours + " hours ago";
+        } else if (days < 5) {
+            return days + " days ago";
+        } else {
+            return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
+        }
+    }
+
     private void deletePost() {
         if (postId != null) {
-            FirebaseFirestore.getInstance().collection("posts").document(postId)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Log.d("PostDetails", "Post deleted successfully");
-                        requireActivity().getSupportFragmentManager().popBackStack();
+            // Show Confirmation Dialog Before Deleting
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Post")
+                    .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
+                    .setPositiveButton("Delete", (dialog, which) -> {
+                        // User Confirmed: Proceed with Deletion
+                        FirebaseFirestore.getInstance().collection("emotions").document(postId)
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    Log.d("PostDetails", "Post deleted successfully");
+                                    requireActivity().getSupportFragmentManager().popBackStack();
+                                })
+                                .addOnFailureListener(e -> Log.e("PostDetails", "Error deleting post", e));
                     })
-                    .addOnFailureListener(e -> Log.e("PostDetails", "Error deleting post", e));
+                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()) // Cancel Deletion
+                    .show();
         }
     }
 }
