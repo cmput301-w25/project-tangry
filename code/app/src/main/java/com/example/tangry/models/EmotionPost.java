@@ -73,8 +73,12 @@ public class EmotionPost {
             throw new IllegalArgumentException("Emotion is required.");
         }
 
-        if (explanation.length() > 20 || explanation.split("\\s+").length > 3 || explanation.length() == 0) {
+        if (explanation.length() > 20 || explanation.split("\\s+").length > 3) {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
+        }
+
+        if (explanation.length() == 0 && (imageUri == null || imageUri.length() == 0)) {
+            throw new IllegalArgumentException("Emotion post should have a text or image at least");
         }
 
         if (!VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
