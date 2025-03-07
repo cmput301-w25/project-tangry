@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="?android:attr/colorBackground">
 
     <!-- Emotion Text -->
     <TextView
@@ -13,6 +14,7 @@
         android:layout_height="wrap_content"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -24,6 +26,8 @@
         android:layout_height="wrap_content"
         android:hint="Why? (max 20 chars or 3 words)"
         android:maxLength="20"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textColorHint="?android:attr/textColorHint"
         app:layout_constraintTop_toBottomOf="@id/emotion_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -44,6 +48,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter location"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textColorHint="?android:attr/textColorHint"
         app:layout_constraintTop_toBottomOf="@id/image_attachment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -55,6 +61,7 @@
         android:layout_height="wrap_content"
         android:text="Social Situation"
         android:textSize="18sp"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/location_input"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -73,6 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Save"
+        android:textColor="?attr/colorOnBackground"
         app:layout_constraintTop_toBottomOf="@id/social_situation_spinner"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
