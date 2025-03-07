@@ -68,6 +68,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/adapters/EmotionPostAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/adapters/EmotionPostAdapter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

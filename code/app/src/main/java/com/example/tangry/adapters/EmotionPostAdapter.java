@@ -89,7 +89,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                     emojiImage.setImageResource(R.drawable.ic_sadness);
                     moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorSadness));
                     break;
-                case "anger":
+                case "angry":
                     emojiImage.setImageResource(R.drawable.ic_angry);
                     moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorAngry));
                     break;
