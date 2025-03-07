@@ -73,7 +73,7 @@ public class EmotionPost {
             throw new IllegalArgumentException("Emotion is required.");
         }
 
-        if (explanation.length() > 20 || explanation.split("\\s+").length > 3) {
+        if (explanation.length() > 20 || explanation.split("\\s+").length > 3 || explanation.length() == 0) {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
 
