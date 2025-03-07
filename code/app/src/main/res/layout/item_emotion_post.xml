@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,28 +12,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="@color/white">
 
         <TextView
             android:id="@+id/emotion_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Emotion"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/explanation_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Short explanation here"
             android:layout_marginTop="4dp"
-            android:textColor="@color/gray"/>
+            android:textColor="@color/colorPrimaryDark"/>
 
         <ImageView
             android:id="@+id/post_image"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_placeholder" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,7 +51,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/ic_location"
-                android:drawablePadding="4dp"/>
+                android:drawablePadding="4dp"
+                android:text="Location: ..."
+                android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/username_text"
@@ -61,7 +69,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:drawableStart="@drawable/ic_group"
-                android:drawablePadding="4dp"/>
+                android:drawablePadding="4dp"
+                android:text="With a crowd"
+                android:textColor="@color/black"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
