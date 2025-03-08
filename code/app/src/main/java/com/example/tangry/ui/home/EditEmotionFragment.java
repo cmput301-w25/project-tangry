@@ -2,8 +2,11 @@ package com.example.tangry.ui.home;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +27,17 @@ import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Fragment responsible for editing an existing emotion post.
@@ -35,9 +46,6 @@ import java.util.List;
  * explanation, location, social situation, and optionally attach an image.
  * It communicates with Firestore using {@link EmotionPostRepository}.
  * <p>
- * **Outstanding Issues:**
- * - Image updating is currently not implemented (`TODO UPDATE PICTURE`).
- * - Ensuring valid navigation when editing from different starting points.
  */
 public class EditEmotionFragment extends Fragment {
     private static final String TAG = "EditEmotionFragment";
@@ -151,7 +159,7 @@ public class EditEmotionFragment extends Fragment {
 
     /**
      * Updates the emotion post in Firestore.
-     * Validates user input before proceeding.
+     * If an image is selected, it will be compressed and uploaded before updating the post.
      */
     private void updatePost() {
         String explanation = explanationInput.getText().toString().trim();
@@ -173,8 +181,30 @@ public class EditEmotionFragment extends Fragment {
         updatedPost.setLocation(location);
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
-        // TODO: Implement image updating logic
-        // updatedPost.setImageUri(imageUri);
+
+        if (imageUri != null) {
+            try {
+                Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
+                uploadImage(processedUri);
+            } catch (IOException e) {
+                Log.e(TAG, "Error processing image", e);
+                Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // No image to upload, proceed with updating the post
+            updatePostInFirestore(null);
+        }
+    }
+
+    /**
+     * Updates the post in Firestore with the given image URL.
+     *
+     * @param imageUrl The new image URL (or null if unchanged).
+     */
+    private void updatePostInFirestore(String imageUrl) {
+        if (imageUrl != null) {
+            updatedPost.setImageUri(imageUrl);
+        }
 
         repository.updateEmotionPost(postId, updatedPost, () -> {
             Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
@@ -184,6 +214,82 @@ public class EditEmotionFragment extends Fragment {
             Log.e(TAG, "Failed to update post", e);
         });
     }
+
+    /**
+     * Compresses an image if it's larger than 64KB.
+     *
+     * @param originalUri The original URI of the selected image.
+     * @return The URI of the compressed image.
+     * @throws IOException If the compression fails.
+     */
+    private Uri checkAndCompressImage(Uri originalUri) throws IOException {
+        ParcelFileDescriptor pfd = getActivity().getContentResolver().openFileDescriptor(originalUri, "r");
+        long fileSize = pfd.getStatSize();
+        pfd.close();
+
+        if (fileSize <= 65536) { // 64KB
+            return originalUri;
+        }
+
+        Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), originalUri);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        int quality = 80;
+        do {
+            outputStream.reset();
+            originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            quality -= 10;
+        } while (outputStream.size() > 65536 && quality > 0);
+
+        if (outputStream.size() > 65536) {
+            float scale = 0.8f;
+            while (outputStream.size() > 65536 && scale > 0.1f) {
+                int newWidth = (int) (originalBitmap.getWidth() * scale);
+                int newHeight = (int) (originalBitmap.getHeight() * scale);
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+                outputStream.reset();
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
+                scale -= 0.1f;
+            }
+        }
+
+        if (outputStream.size() > 65536) {
+            throw new IOException("Could not compress image to under 64KB.");
+        }
+
+        File cacheDir = getContext().getCacheDir();
+        File tempFile = File.createTempFile("compressed_image", ".jpg", cacheDir);
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        fos.write(outputStream.toByteArray());
+        fos.close();
+
+        return Uri.fromFile(tempFile);
+    }
+
+    /**
+     * Uploads an image to Firebase Storage and updates the post with the download URL.
+     *
+     * @param imageUri The URI of the image to upload.
+     */
+    private void uploadImage(Uri imageUri) {
+        Log.d(TAG, "Uploading image: " + imageUri);
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
+
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        updatePostInFirestore(downloadUrl);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Image upload failed", e);
+                });
+    }
+
 
     /**
      * Opens an image picker to allow the user to select an image.
