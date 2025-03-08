@@ -45,7 +45,8 @@ public class EmotionPost implements Serializable {
      * @param socialSituation The social situation during the mood event.
      * @param username        The username of the person posting the emotion.
      */
-    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation, String username) {
+    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation,
+            String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -70,7 +71,8 @@ public class EmotionPost implements Serializable {
      * @throws IOException              If an I/O error occurs.
      */
     public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
-                                     String socialSituation, String username, InputStream imageStream) throws IllegalArgumentException, IOException {
+            String socialSituation, String username) throws IllegalArgumentException {
+        // Existing validations except image size
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
@@ -79,15 +81,12 @@ public class EmotionPost implements Serializable {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
 
-        if (!VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
-            throw new IllegalArgumentException("Invalid social situation.");
+        if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
+            throw new IllegalArgumentException("Emotion post requires text or image.");
         }
 
-        if (imageStream != null) {
-            int imageSizeInBytes = imageStream.available();
-            if (imageSizeInBytes > 65536) {
-                throw new IllegalArgumentException("Image size must be under 65536 bytes.");
-            }
+        if (socialSituation != null && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
+            throw new IllegalArgumentException("Invalid social situation.");
         }
 
         return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);

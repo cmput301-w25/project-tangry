@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,12 +25,24 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.repositories.UsernameRepository;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Fragment for adding details to a mood event.
@@ -133,52 +146,143 @@ public class DetailEmotionFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             Uri uri = data.getData();
-            assert uri != null;
-            imageUri = uri.toString();
-            imageAttachment.setImageURI(uri);
-            Log.d(TAG, "Image selected: " + uri.toString());
+            if (uri != null) {
+                imageUri = uri.toString();
+                imageAttachment.setImageURI(uri);
+                Log.d(TAG, "Image selected: " + uri.toString());
+            } else {
+                Log.e(TAG, "Image URI is null");
+            }
         }
     }
 
-    /**
-     * Saves the mood event to Firestore.
-     */
     private void saveMoodEvent() {
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         UsernameRepository.getInstance().getUsernameFromEmail(email, username -> {
-            String emotion = emotionTextView.getText().toString();
-            String explanation = explanationInput.getText().toString().trim();
-            String location = locationInput.getText().toString().trim();
+            final String emotion = emotionTextView.getText().toString();
+            final String explanation = explanationInput.getText().toString().trim();
+            final String location = locationInput.getText().toString().trim();
             String socialSituation = socialSituationSpinner.getSelectedItem().toString();
             if (socialSituation.equals("Select social situation")) {
-            socialSituation = null;
+                socialSituation = null;
             }
+            final String finalSocialSituation = socialSituation;
 
-            try {
-            InputStream imageStream = null;
+            // Process image if present
             if (imageUri != null) {
-                imageStream = getContext().getContentResolver().openInputStream(Uri.parse(imageUri));
-            }
-
-            EmotionPost post = EmotionPost.create(emotion, explanation, imageUri, location, socialSituation, username,
-                imageStream);
-            Log.d(TAG, "Saving mood event: " + post.toString());
-            repository.saveEmotionPostToFirestore(post,
-                docRef -> {
-                    Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
-                    navController.navigateUp();
-                },
-                e -> {
-                    Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Failed to save mood event", e);
-                });
-            } catch (IllegalArgumentException | IOException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Error saving mood event", e);
+                try {
+                    // Check and possibly compress the image
+                    Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
+                    uploadImage(processedUri, emotion, explanation, location, finalSocialSituation, username);
+                } catch (IOException e) {
+                    Log.e(TAG, "Error processing image", e);
+                    Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                // No image case
+                createEmotionPost(emotion, explanation, null, location, finalSocialSituation, username);
             }
         }, e -> {
-            Toast.makeText(getContext(), "Failed to get username. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Failed to get username", e);
+            Toast.makeText(getContext(), "Failed to get username.", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private Uri checkAndCompressImage(Uri originalUri) throws IOException {
+        // Get original image size
+        ParcelFileDescriptor pfd = getActivity().getContentResolver().openFileDescriptor(originalUri, "r");
+        long fileSize = pfd.getStatSize();
+        pfd.close();
+
+        // If image is already small enough, return the original URI
+        if (fileSize <= 65536) { // 64KB
+            return originalUri;
+        }
+
+        // Load the bitmap
+        Bitmap originalBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), originalUri);
+
+        // Create a ByteArrayOutputStream to compress the image
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        // Start with 80% quality
+        int quality = 80;
+
+        // Compress and check size, reducing quality until under 64KB
+        do {
+            outputStream.reset(); // Clear the stream
+            originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            quality -= 10; // Reduce quality by 10% each iteration
+        } while (outputStream.size() > 65536 && quality > 0);
+
+        // If still too large, try reducing dimensions
+        if (outputStream.size() > 65536) {
+            // Scale down dimensions
+            float scale = 0.8f;
+            while (outputStream.size() > 65536 && scale > 0.1f) {
+                int newWidth = (int) (originalBitmap.getWidth() * scale);
+                int newHeight = (int) (originalBitmap.getHeight() * scale);
+
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, newWidth, newHeight, true);
+                outputStream.reset();
+
+                // Try with 70% quality for scaled image
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream);
+                scale -= 0.1f;
+            }
+        }
+
+        // If we still can't get it under 64KB, inform the user
+        if (outputStream.size() > 65536) {
+            throw new IOException("Could not compress image to under 64KB.");
+        }
+
+        // Save the compressed bitmap to a temporary file
+        File cacheDir = getContext().getCacheDir();
+        File tempFile = File.createTempFile("compressed_image", ".jpg", cacheDir);
+
+        FileOutputStream fos = new FileOutputStream(tempFile);
+        fos.write(outputStream.toByteArray());
+        fos.close();
+
+        // Return URI for the compressed image
+        return Uri.fromFile(tempFile);
+    }
+
+    private void uploadImage(Uri imageUri, String emotion, String explanation,
+                             String location, String socialSituation, String username) {
+        Log.d(TAG, "Image URI for upload: " + imageUri);
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
+
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                        String downloadUrl = uri.toString();
+                        createEmotionPost(emotion, explanation, downloadUrl, location, socialSituation, username);
+                    });
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void createEmotionPost(String emotion, String explanation, String imageUrl, String location,
+            String socialSituation, String username) {
+        try {
+            EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl, location, socialSituation, username);
+            Log.d(TAG, "Saving mood event: " + post.toString());
+            repository.saveEmotionPostToFirestore(post,
+                    docRef -> {
+                        Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
+                        navController.navigateUp();
+                    },
+                    e -> {
+                        Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Failed to save mood event", e);
+                    });
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error saving mood event", e);
+        }
     }
 }

@@ -54,4 +54,5 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
     implementation ("com.google.code.gson:gson:2.8.9")
+    implementation("id.zelory:compressor:3.0.1")
 }
