@@ -182,7 +182,7 @@ public class EditEmotionFragment extends Fragment {
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
 
-        if (imageUri != null) {
+        if (imageUri != null && !imageUri.startsWith("https://firebasestorage")) {
             try {
                 Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
                 uploadImage(processedUri);
