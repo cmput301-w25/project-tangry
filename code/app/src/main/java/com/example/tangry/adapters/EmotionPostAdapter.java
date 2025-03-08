@@ -45,14 +45,14 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
         holder.itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
 
-            // ✅ Convert EmotionPost to JSON String
+            // Convert EmotionPost to JSON String
             Gson gson = new Gson();
             String postJson = gson.toJson(post);
 
-            bundle.putString("post", postJson);  // 🔥 Pass JSON instead of Object
+            bundle.putString("post", postJson);  // Pass JSON instead of Object
             bundle.putString("postId", post.getPostId());
 
-            // ✅ Navigate using Safe Args
+            // Navigate using Safe Args
             Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_postDetailsFragment, bundle);
         });
     }

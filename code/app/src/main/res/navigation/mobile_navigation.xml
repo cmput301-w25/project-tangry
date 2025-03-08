@@ -55,10 +55,29 @@
     <fragment
         android:id="@+id/emotionsFragment"
         android:name="com.example.tangry.EmotionsFragment"
-        android:label="Add Mood">
+        android:label="Add Mood"
+        tools:layout="@layout/fragment_emotions">
+
+        <argument
+            android:name="isEditing"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+        <argument
+            android:name="postJson"
+            app:argType="string" />
+        <argument
+            android:name="postId"
+            app:argType="string" />
+
+        <!-- Navigation for adding a new post -->
         <action
             android:id="@+id/action_emotionsFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
+
+        <!-- Navigation for editing mode -->
+        <action
+            android:id="@+id/action_emotionsFragment_to_editEmotionFragment"
+            app:destination="@id/editEmotionFragment" />
     </fragment>
 
     <!-- Redirect to post of Emotion-->
@@ -71,7 +90,7 @@
             app:argType="string" />
     </fragment>
 
-    <!-- New Post Details Fragment -->
+    <!-- Post Details Fragment -->
     <fragment
         android:id="@+id/postDetailsFragment"
         android:name="com.example.tangry.ui.home.PostDetailsFragment"
@@ -85,6 +104,26 @@
 
         <argument
             android:name="postId"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_postDetailsFragment_to_emotionsFragment"
+            app:destination="@id/emotionsFragment" />
+    </fragment>
+
+    <!-- Edit Emotion Fragment -->
+    <fragment
+        android:id="@+id/editEmotionFragment"
+        android:name="com.example.tangry.ui.home.EditEmotionFragment"
+        android:label="Edit Mood"
+        tools:layout="@layout/fragment_edit_emotion">
+
+        <!-- Arguments to pass post data -->
+        <argument
+            android:name="postId"
+            app:argType="string" />
+        <argument
+            android:name="postJson"
             app:argType="string" />
     </fragment>
 

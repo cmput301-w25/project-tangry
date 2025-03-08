@@ -52,9 +52,20 @@ public class EmotionsFragment extends Fragment implements EmotionAdapter.ItemCli
 
     @Override
     public void onItemClick(Emotion emotion) {
-        // Example: Navigate and pass the emotion name using Safe Args
-        EmotionsFragmentDirections.ActionEmotionsFragmentToDetailFragment action =
-                EmotionsFragmentDirections.actionEmotionsFragmentToDetailFragment(emotion.getName());
-        navController.navigate(action);
+        Bundle args = getArguments();
+        if (args != null && args.getBoolean("isEditing", false)) {
+            // Editing Mode → Pass Selected Emotion to EditEmotionFragment
+            Bundle bundle = new Bundle();
+            bundle.putString("postJson", args.getString("postJson")); // Keep post data
+            bundle.putString("postId", args.getString("postId")); // Keep post ID
+            bundle.putString("selectedEmotion", emotion.getName()); // Pass new emotion
+
+            navController.navigate(R.id.action_emotionsFragment_to_editEmotionFragment, bundle);
+        } else {
+            // Add Mode → Navigate to Add Post Screen
+            EmotionsFragmentDirections.ActionEmotionsFragmentToDetailFragment action =
+                    EmotionsFragmentDirections.actionEmotionsFragmentToDetailFragment(emotion.getName());
+            navController.navigate(action);
+        }
     }
 }

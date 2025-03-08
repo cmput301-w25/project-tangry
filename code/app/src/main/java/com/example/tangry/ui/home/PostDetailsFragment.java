@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -26,7 +25,6 @@ import com.google.gson.Gson;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class PostDetailsFragment extends Fragment {
@@ -63,18 +61,18 @@ public class PostDetailsFragment extends Fragment {
 
         // Retrieve Data Using Arguments
         if (getArguments() != null) {
-            String postJson = getArguments().getString("post");  // ✅ Retrieve JSON
+            String postJson = getArguments().getString("post");  // Retrieve JSON
             postId = getArguments().getString("postId");
 
             if (postJson != null) {
                 Gson gson = new Gson();
-                post = gson.fromJson(postJson, EmotionPost.class);  // ✅ Convert JSON back to Object
+                post = gson.fromJson(postJson, EmotionPost.class);  // Convert JSON back to Object
                 bindPostDetails(post);
             }
         }
 
         // Edit Button Click Listener
-        editButton.setOnClickListener(v -> Log.d("PostDetails", "Edit button clicked"));
+        editButton.setOnClickListener(v -> editPost());
 
         // Delete Button Click Listener
         deleteButton.setOnClickListener(v -> deletePost());
@@ -147,6 +145,18 @@ public class PostDetailsFragment extends Fragment {
             return days + " days ago";
         } else {
             return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
+        }
+    }
+
+    private void editPost() {
+        if (post != null) {
+            // Navigate to EmotionsFragment FIRST
+            Bundle bundle = new Bundle();
+            bundle.putString("postJson", new Gson().toJson(post)); // Pass the post JSON
+            bundle.putString("postId", postId); // Pass Firestore ID
+            bundle.putBoolean("isEditing", true); // Indicate that this is editing mode
+
+            Navigation.findNavController(requireView()).navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
         }
     }
 

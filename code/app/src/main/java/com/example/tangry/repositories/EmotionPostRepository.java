@@ -1,5 +1,7 @@
 package com.example.tangry.repositories;
 
+import android.util.Log;
+
 import com.example.tangry.models.EmotionPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -9,6 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class EmotionPostRepository {
     private static EmotionPostRepository instance;
@@ -48,4 +51,29 @@ public class EmotionPostRepository {
         return db.collection(COLLECTION_NAME)
                 .orderBy("timestamp", Query.Direction.DESCENDING);
     }
+
+    public void getEmotionPostFromFirestore(String postId, Consumer<EmotionPost> onSuccess, Consumer<Exception> onFailure) {
+        db.collection("emotions").document(postId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        EmotionPost post = documentSnapshot.toObject(EmotionPost.class);
+                        onSuccess.accept(post);
+                    } else {
+                        onSuccess.accept(null);
+                    }
+                })
+                .addOnFailureListener(e -> onFailure.accept(e));
+    }
+
+    public void updateEmotionPostInFirestore(String postId, EmotionPost post, Runnable onSuccess, OnFailureListener onFailure) {
+        db.collection("emotions").document(postId)
+                .set(post)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Post updated successfully");
+                    onSuccess.run();
+                })
+                .addOnFailureListener(onFailure);
+    }
+
 }
