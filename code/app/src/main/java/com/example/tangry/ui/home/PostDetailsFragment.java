@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -19,34 +18,60 @@ import androidx.appcompat.app.AlertDialog;
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.models.EmotionPost;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.tangry.repositories.EmotionPostRepository;
+import com.example.tangry.utils.TimeUtils;
 import com.google.gson.Gson;
+import java.util.Objects;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
+/**
+ * Fragment responsible for displaying details of an emotion post.
+ * <p>
+ * Users can view, edit, or delete their posts. Firestore operations are handled
+ * through {@link EmotionPostRepository}.
+ * <p>
+ * **Outstanding Issues:**
+ * - Image updating not handled when editing.
+ * - Ensure consistent navigation after editing/deleting.
+ */
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
     private ImageView moodImage, emojiImage;
     private Button editButton, deleteButton;
     private EmotionPost post;
     private String postId;
+    private EmotionPostRepository repository;
 
-    public PostDetailsFragment() { }
+    /**
+     * Default empty constructor required for Fragments.
+     */
+    public PostDetailsFragment() {}
 
+    /**
+     * Inflates the fragment layout.
+     *
+     * @param inflater           Layout inflater.
+     * @param container          Parent view container.
+     * @param savedInstanceState Previous saved state.
+     * @return The root View.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_mood_details, container, false);
     }
 
+    /**
+     * Initializes the fragment views and retrieves post data.
+     *
+     * @param view               The root view.
+     * @param savedInstanceState Previously saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        repository = EmotionPostRepository.getInstance();
 
-        // Initialize views
+        // Initialize Views
         userName = view.findViewById(R.id.user_name);
         moodText = view.findViewById(R.id.mood_text);
         userHandle = view.findViewById(R.id.user_handle);
@@ -59,45 +84,36 @@ public class PostDetailsFragment extends Fragment {
         editButton = view.findViewById(R.id.edit_button);
         deleteButton = view.findViewById(R.id.delete_button);
 
-        // Retrieve Data Using Arguments
+        // Retrieve Arguments (Post Data)
         if (getArguments() != null) {
-            String postJson = getArguments().getString("post");  // Retrieve JSON
+            String postJson = getArguments().getString("post");
             postId = getArguments().getString("postId");
 
             if (postJson != null) {
-                Gson gson = new Gson();
-                post = gson.fromJson(postJson, EmotionPost.class);  // Convert JSON back to Object
+                post = new Gson().fromJson(postJson, EmotionPost.class);
                 bindPostDetails(post);
             }
         }
 
-        // Edit Button Click Listener
         editButton.setOnClickListener(v -> editPost());
-
-        // Delete Button Click Listener
-        deleteButton.setOnClickListener(v -> deletePost());
+        deleteButton.setOnClickListener(v -> confirmDeletePost());
     }
 
+    /**
+     * Binds the emotion post details to the UI.
+     *
+     * @param post The emotion post object.
+     */
     private void bindPostDetails(EmotionPost post) {
         userName.setText(post.getUsername() + " feels ");
         moodText.setText(post.getEmotion());
         userHandle.setText("@" + post.getUsername());
-        if (!post.getLocation().isEmpty()) {
-            locationText.setText(post.getLocation());
-            locationText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
-        } else {
-            locationText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
-        }
+        locationText.setText(post.getLocation().isEmpty() ? "No Location" : post.getLocation());
         withText.setText(post.getSocialSituation());
-        if (!post.getExplanation().isEmpty()) {
-            reasonText.setText(post.getExplanation());
-            reasonText.setTextColor(ContextCompat.getColor(requireContext(), R.color.black));
-        } else {
-            reasonText.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray));
-        }
+        reasonText.setText(post.getExplanation().isEmpty() ? "No Explanation" : post.getExplanation());
+        timeText.setText(TimeUtils.getTimeAgo(post.getTimestamp().toDate()));
 
-        timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
-
+        // Load mood image if available
         if (post.getImageUri() != null) {
             Glide.with(requireContext())
                     .load(Uri.parse(post.getImageUri()))
@@ -106,10 +122,15 @@ public class PostDetailsFragment extends Fragment {
             moodImage.setImageResource(R.drawable.ic_placeholder);
         }
 
-        // Load emoji based on mood
+        // Load emoji & mood color
         setEmojiAndColor(post.getEmotion());
     }
 
+    /**
+     * Sets the appropriate emoji and text color based on emotion.
+     *
+     * @param emotion The emotion string.
+     */
     private void setEmojiAndColor(String emotion) {
         int emojiResId, colorResId;
         switch (emotion.toLowerCase()) {
@@ -128,56 +149,44 @@ public class PostDetailsFragment extends Fragment {
         moodText.setTextColor(ContextCompat.getColor(requireContext(), colorResId));
     }
 
-    private String getTimeAgo(Date date) {
-        long timeDiff = System.currentTimeMillis() - date.getTime();
-
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
-        long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
-        long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
-
-        if (minutes < 1) {
-            return "Just now";
-        } else if (minutes < 60) {
-            return minutes + " minutes ago";
-        } else if (hours < 24) {
-            return hours + " hours ago";
-        } else if (days < 5) {
-            return days + " days ago";
-        } else {
-            return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
-        }
-    }
-
+    /**
+     * Navigates to the Edit Emotion screen.
+     */
     private void editPost() {
         if (post != null) {
-            // Navigate to EmotionsFragment FIRST
             Bundle bundle = new Bundle();
-            bundle.putString("postJson", new Gson().toJson(post)); // Pass the post JSON
-            bundle.putString("postId", postId); // Pass Firestore ID
-            bundle.putBoolean("isEditing", true); // Indicate that this is editing mode
+            bundle.putString("postJson", new Gson().toJson(post));
+            bundle.putString("postId", postId);
+            bundle.putBoolean("isEditing", true);
 
             Navigation.findNavController(requireView()).navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
         }
     }
 
+    /**
+     * Shows a confirmation dialog before deleting the post.
+     */
+    private void confirmDeletePost() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Post")
+                .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> deletePost())
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .show();
+    }
+
+    /**
+     * Deletes the post from Firestore using the Repository.
+     */
     private void deletePost() {
         if (postId != null) {
-            // Show Confirmation Dialog Before Deleting
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Delete Post")
-                    .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
-                    .setPositiveButton("Delete", (dialog, which) -> {
-                        // User Confirmed: Proceed with Deletion
-                        FirebaseFirestore.getInstance().collection("emotions").document(postId)
-                                .delete()
-                                .addOnSuccessListener(aVoid -> {
-                                    Log.d("PostDetails", "Post deleted successfully");
-                                    requireActivity().getSupportFragmentManager().popBackStack();
-                                })
-                                .addOnFailureListener(e -> Log.e("PostDetails", "Error deleting post", e));
-                    })
-                    .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss()) // Cancel Deletion
-                    .show();
+            repository.deleteEmotionPost(postId,
+                    () -> {
+                        Log.d("PostDetails", "Post deleted successfully");
+                        Navigation.findNavController(requireView()).popBackStack(R.id.navigation_home, false);
+                    },
+                    e -> Log.e("PostDetails", "Error deleting post", e)
+            );
         }
     }
 }
