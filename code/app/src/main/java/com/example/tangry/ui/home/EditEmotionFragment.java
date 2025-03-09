@@ -42,7 +42,8 @@ import java.util.UUID;
 /**
  * Fragment responsible for editing an existing emotion post.
  * <p>
- * This fragment allows users to modify an existing mood post, update details like
+ * This fragment allows users to modify an existing mood post, update details
+ * like
  * explanation, location, social situation, and optionally attach an image.
  * It communicates with Firestore using {@link EmotionPostRepository}.
  * <p>
@@ -51,6 +52,7 @@ public class EditEmotionFragment extends Fragment {
     private static final String TAG = "EditEmotionFragment";
     private static final int PICK_IMAGE_REQUEST = 1;
     private String postId, imageUri;
+    private boolean isNewImageSelected = false;
     private EmotionPost updatedPost;
     private EmotionPostRepository repository;
     private NavController navController;
@@ -63,8 +65,7 @@ public class EditEmotionFragment extends Fragment {
 
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
             "Select social situation", "Alone", "With one other person",
-            "With two to several people", "With a crowd"
-    );
+            "With two to several people", "With a crowd");
 
     /**
      * Inflates the layout for this fragment.
@@ -101,7 +102,8 @@ public class EditEmotionFragment extends Fragment {
         actionButton = view.findViewById(R.id.save_button);
 
         // Populate Spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, VALID_SOCIAL_SITUATIONS);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item,
+                VALID_SOCIAL_SITUATIONS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSituationSpinner.setAdapter(adapter);
 
@@ -137,6 +139,7 @@ public class EditEmotionFragment extends Fragment {
 
         if (updatedPost.getImageUri() != null) {
             imageUri = updatedPost.getImageUri();
+            isNewImageSelected = false;
             Glide.with(requireContext()).load(Uri.parse(imageUri)).into(imageAttachment);
         }
     }
@@ -159,7 +162,8 @@ public class EditEmotionFragment extends Fragment {
 
     /**
      * Updates the emotion post in Firestore.
-     * If an image is selected, it will be compressed and uploaded before updating the post.
+     * If an image is selected, it will be compressed and uploaded before updating
+     * the post.
      */
     private void updatePost() {
         String explanation = explanationInput.getText().toString().trim();
@@ -173,7 +177,8 @@ public class EditEmotionFragment extends Fragment {
         }
 
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
-            Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -202,10 +207,31 @@ public class EditEmotionFragment extends Fragment {
      * @param imageUrl The new image URL (or null if unchanged).
      */
     private void updatePostInFirestore(String imageUrl) {
+        // If we have a new image and there was an old one, delete the old one
+        if (imageUrl != null && updatedPost.getImageUri() != null &&
+                !updatedPost.getImageUri().isEmpty() &&
+                updatedPost.getImageUri().startsWith("https://firebasestorage")) {
+
+            try {
+                StorageReference oldImageRef = FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(updatedPost.getImageUri());
+                oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Old image deleted successfully");
+                }).addOnFailureListener(e -> {
+                    Log.e(TAG, "Error deleting old image", e);
+                    // Continue with the update even if old image deletion fails
+                });
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Invalid old image storage URL", e);
+            }
+        }
+
+        // Update the post with the new image URL
         if (imageUrl != null) {
             updatedPost.setImageUri(imageUrl);
         }
 
+        // Save to Firestore
         repository.updateEmotionPost(postId, updatedPost, () -> {
             Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
             navController.popBackStack(R.id.navigation_home, false);
@@ -268,7 +294,8 @@ public class EditEmotionFragment extends Fragment {
     }
 
     /**
-     * Uploads an image to Firebase Storage and updates the post with the download URL.
+     * Uploads an image to Firebase Storage and updates the post with the download
+     * URL.
      *
      * @param imageUri The URI of the image to upload.
      */
@@ -289,7 +316,6 @@ public class EditEmotionFragment extends Fragment {
                     Log.e(TAG, "Image upload failed", e);
                 });
     }
-
 
     /**
      * Opens an image picker to allow the user to select an image.
@@ -314,8 +340,8 @@ public class EditEmotionFragment extends Fragment {
             Uri uri = data.getData();
             assert uri != null;
             imageUri = uri.toString();
+            isNewImageSelected = true; // Mark as newly selected
             imageAttachment.setImageURI(uri);
-            Log.d(TAG, "Image selected: " + uri.toString());
         }
     }
 }
