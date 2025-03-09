@@ -54,7 +54,7 @@
 <!-- Redirect to Emotions List after +Mood Button clicked-->
     <fragment
         android:id="@+id/emotionsFragment"
-        android:name="com.example.tangry.EmotionsFragment"
+        android:name="com.example.tangry.ui.emotionEmojis.EmotionsFragment"
         android:label="Add Mood"
         tools:layout="@layout/fragment_emotions">
 
@@ -83,7 +83,7 @@
     <!-- Redirect to post of Emotion-->
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.example.tangry.DetailEmotionFragment"
+        android:name="com.example.tangry.ui.home.CreateEmotionPostFragment"
         android:label="Add Mood">
         <argument
             android:name="itemText"

@@ -1,4 +1,4 @@
-package com.example.tangry;
+package com.example.tangry.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,10 +8,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.tangry.R;
 import com.example.tangry.models.Emotion;
 import java.util.List;
 
-public class EmotionAdapter extends RecyclerView.Adapter<EmotionAdapter.ViewHolder> {
+public class EmotionEmojisAdapter extends RecyclerView.Adapter<EmotionEmojisAdapter.ViewHolder> {
 
     public interface ItemClickListener {
         void onItemClick(Emotion emotion);
@@ -20,7 +22,7 @@ public class EmotionAdapter extends RecyclerView.Adapter<EmotionAdapter.ViewHold
     private final List<Emotion> emotionList;
     private final ItemClickListener listener;
 
-    public EmotionAdapter(List<Emotion> emotionList, ItemClickListener listener) {
+    public EmotionEmojisAdapter(List<Emotion> emotionList, ItemClickListener listener) {
         this.emotionList = emotionList;
         this.listener = listener;
     }
