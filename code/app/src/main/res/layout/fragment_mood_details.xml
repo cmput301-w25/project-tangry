@@ -13,6 +13,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- User Info Section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -26,14 +27,14 @@
 
                 <ImageView
                     android:id="@+id/emoji_image"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="8dp"
                     android:src="@android:drawable/btn_star_big_on" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -45,9 +46,10 @@
                             android:id="@+id/user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="User feels "
-                            android:textColor="?android:attr/textColorPrimary"
-                            android:textSize="16sp" />
+                            android:text="Mazen feels "
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/mood_text"
@@ -55,20 +57,31 @@
                             android:layout_height="wrap_content"
                             android:text="Happy"
                             android:textColor="@android:color/holo_green_light"
-                            android:textSize="16sp" />
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
                     <TextView
                         android:id="@+id/user_handle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:text="\@userHandle"
+                        android:text="mkhafagy"
+                        android:textColor="@android:color/darker_gray"
                         android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Large Mood Image -->
+        <ImageView
+            android:id="@+id/mood_image"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_gallery" />
+
+        <!-- Mood Details -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="AT: "
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -93,7 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Not Provided"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -106,7 +119,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="With: "
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -115,7 +128,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Alone"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp" />
             </LinearLayout>
 
@@ -128,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Reason: "
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -137,7 +150,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Not Provided"
-                    android:textColor="?android:attr/textColorPrimary"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp" />
 
                 <TextView
@@ -146,17 +159,40 @@
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:text="02-11 17:36"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/mood_image"
+        <!-- Edit & Delete Buttons -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:layout_marginTop="8dp"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_gallery" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/edit_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Edit"
+                android:textColor="@android:color/white"
+                android:backgroundTint="@color/colorPrimary"
+                android:layout_marginEnd="8dp"
+                android:padding="10dp" />
+
+            <Button
+                android:id="@+id/delete_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Delete"
+                android:textColor="@android:color/white"
+                android:backgroundTint="@android:color/holo_red_dark"
+                android:padding="10dp" />
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>
