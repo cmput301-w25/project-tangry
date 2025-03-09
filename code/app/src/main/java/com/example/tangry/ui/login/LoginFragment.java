@@ -131,21 +131,39 @@ public class LoginFragment extends Fragment {
         }
 
         return view;
-    }
+        }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+        @Override
+        public void onResume() {
+            super.onResume();
+            if (getActivity() instanceof AppCompatActivity) {
+                ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+            }
+            // Hide primary and secondary toolbars
+            View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
+            if (toolbarPrimary != null) {
+                toolbarPrimary.setVisibility(View.GONE);
+            }
+            View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
+            if (toolbarSecondary != null) {
+                toolbarSecondary.setVisibility(View.GONE);
+            }
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            if (getActivity() instanceof AppCompatActivity) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+            }
+            // Show primary and secondary toolbars when the fragment pauses
+            View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
+            if (toolbarPrimary != null) {
+                toolbarPrimary.setVisibility(View.VISIBLE);
+            }
+            View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
+            if (toolbarSecondary != null) {
+                toolbarSecondary.setVisibility(View.VISIBLE);
+            }
         }
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
-        }
-    }
-}

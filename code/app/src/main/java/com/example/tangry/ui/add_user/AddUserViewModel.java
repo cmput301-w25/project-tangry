@@ -62,7 +62,7 @@ public class AddUserViewModel extends ViewModel {
                                         if (task.isSuccessful()) {
                                             UsernameRepository.getInstance().saveUsernameToFirestore(username, email,
                                                 docRef -> {
-                                                    message.setValue("Account created successfully");
+                                                    message.setValue("Account created successfully. Please login");
                                                     accountCreated.setValue(true);
                                                 },
                                                 e -> message.setValue("Registration failed: " + e.getMessage())
