@@ -55,4 +55,12 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation ("com.google.code.gson:gson:2.8.9")
     implementation("id.zelory:compressor:3.0.1")
+
+    // Testing dependencies
+    testImplementation(libs.junit)
+    // Add these new lines
+    testImplementation("org.mockito:mockito-core:5.2.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.2.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }
