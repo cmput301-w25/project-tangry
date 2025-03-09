@@ -31,9 +31,6 @@ import com.google.firebase.storage.StorageReference;
  * Users can view, edit, or delete their posts. Firestore operations are handled
  * through {@link EmotionPostRepository}.
  * <p>
- * **Outstanding Issues:**
- * - Image updating not handled when editing.
- * - Ensure consistent navigation after editing/deleting.
  */
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
