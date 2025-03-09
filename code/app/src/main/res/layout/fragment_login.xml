@@ -29,7 +29,7 @@
         android:id="@+id/editTextUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
+        android:hint="Email"
         android:imeOptions="actionNext"
         android:inputType="text"
         android:textColorHint="?android:attr/textColorHint" />
