@@ -1,26 +1,40 @@
 package com.example.tangry.repositories;
 
 import android.util.Log;
-import com.example.tangry.datasource.FirebaseDataSource;
+
 import com.example.tangry.models.EmotionPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Repository class for handling CRUD operations on Firestore for Emotion Posts.
+ * <p>
+ * Implements Singleton pattern to ensure a single instance across the app.
+ * <p>
+ * Provides methods for:
+ * - Saving new posts
+ * - Retrieving posts
+ * - Updating posts
+ * - Deleting posts
+ */
 public class EmotionPostRepository {
     private static EmotionPostRepository instance;
-    private final FirebaseDataSource firebaseDataSource;
+    private final FirebaseFirestore db;
+    private static final String COLLECTION_NAME = "emotions";
 
-    private static final String TAG = "EmotionPostRepository";
-
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes Firestore instance.
+     */
     private EmotionPostRepository() {
-        this.firebaseDataSource = new FirebaseDataSource("emotions");
+        db = FirebaseFirestore.getInstance();
     }
 
     // Constructor for testing
@@ -41,15 +55,15 @@ public class EmotionPostRepository {
     }
 
     /**
-     * Saves an EmotionPost to Firestore
+     * Saves a new EmotionPost to Firestore.
      *
-     * @param post            EmotionPost object to save
-     * @param successListener Callback for success
-     * @param failureListener Callback for failure
+     * @param post            The EmotionPost object to save.
+     * @param successListener Callback for successful save.
+     * @param failureListener Callback for failure event.
      */
     public void saveEmotionPostToFirestore(EmotionPost post,
-            OnSuccessListener<DocumentReference> successListener,
-            OnFailureListener failureListener) {
+                                           OnSuccessListener<DocumentReference> successListener,
+                                           OnFailureListener failureListener) {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
@@ -59,68 +73,78 @@ public class EmotionPostRepository {
         data.put("username", post.getUsername());
         data.put("timestamp", FieldValue.serverTimestamp());
 
-        firebaseDataSource.saveData(data, successListener, failureListener);
+        db.collection(COLLECTION_NAME)
+                .add(data)
+                .addOnSuccessListener(successListener)
+                .addOnFailureListener(failureListener);
     }
 
     /**
-     * Retrieves all EmotionPosts in descending timestamp order.
+     * Retrieves all posts ordered by timestamp (descending).
      *
-     * @return Firestore Query object for retrieving posts
+     * @return Firestore Query for retrieving posts.
      */
     public Query getPostsQuery() {
-        return firebaseDataSource.getQuery();
+        return db.collection(COLLECTION_NAME)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
     }
 
     /**
-     * Retrieves an EmotionPost by ID
+     * Retrieves a specific EmotionPost from Firestore using its ID.
      *
-     * @param postId    The document ID in Firestore
-     * @param onSuccess Callback function on successful retrieval
-     * @param onFailure Callback function for failure
+     * @param postId    The ID of the post.
+     * @param onSuccess Callback for successful retrieval (returns EmotionPost).
+     * @param onFailure Callback for failure event.
      */
-    public void getEmotionPost(String postId, Consumer<EmotionPost> onSuccess, OnFailureListener onFailure) {
-        firebaseDataSource.getData(postId,
-                documentSnapshot -> {
+    public void getEmotionPost(String postId, Consumer<EmotionPost> onSuccess, Consumer<Exception> onFailure) {
+        db.collection(COLLECTION_NAME).document(postId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         EmotionPost post = documentSnapshot.toObject(EmotionPost.class);
                         onSuccess.accept(post);
                     } else {
                         onSuccess.accept(null);
                     }
-                },
-                onFailure);
+                })
+                .addOnFailureListener(e -> onFailure.accept(e));
     }
 
     /**
-     * Updates an existing EmotionPost in Firestore
+     * Updates an existing EmotionPost in Firestore.
      *
-     * @param postId    The Firestore document ID
-     * @param post      Updated EmotionPost object
-     * @param onSuccess Callback for success
-     * @param onFailure Callback for failure
+     * @param postId    The ID of the post to update.
+     * @param post      The updated EmotionPost object.
+     * @param onSuccess Callback for successful update.
+     * @param onFailure Callback for failure event.
      */
     public void updateEmotionPost(String postId, EmotionPost post, Runnable onSuccess, OnFailureListener onFailure) {
-        firebaseDataSource.updateData(postId, post,
-                aVoid -> {
-                    Log.d(TAG, "Post updated successfully");
+        db.collection(COLLECTION_NAME).document(postId)
+                .set(post)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Post updated successfully");
                     onSuccess.run();
-                },
-                onFailure);
+                })
+                .addOnFailureListener(onFailure);
     }
 
     /**
-     * Deletes an EmotionPost from Firestore
+     * Deletes an EmotionPost from Firestore.
      *
-     * @param postId    The Firestore document ID
-     * @param onSuccess Callback for success
-     * @param onFailure Callback for failure
+     * @param postId    The ID of the post to delete.
+     * @param onSuccess Callback for successful deletion.
+     * @param onFailure Callback for failure event.
      */
-    public void deleteEmotionPost(String postId, Runnable onSuccess, OnFailureListener onFailure) {
-        firebaseDataSource.deleteData(postId,
-                aVoid -> {
-                    Log.d(TAG, "Post deleted successfully");
+    public void deleteEmotionPost(String postId, Runnable onSuccess, Consumer<Exception> onFailure) {
+        db.collection(COLLECTION_NAME).document(postId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "Post deleted successfully");
                     onSuccess.run();
-                },
-                onFailure);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error deleting post", e);
+                    onFailure.accept(e);
+                });
     }
 }
