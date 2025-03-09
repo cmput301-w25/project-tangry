@@ -31,9 +31,6 @@ import com.google.firebase.storage.StorageReference;
  * Users can view, edit, or delete their posts. Firestore operations are handled
  * through {@link EmotionPostRepository}.
  * <p>
- * **Outstanding Issues:**
- * - Image updating not handled when editing.
- * - Ensure consistent navigation after editing/deleting.
  */
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
@@ -122,7 +119,7 @@ public class PostDetailsFragment extends Fragment {
                     .load(Uri.parse(post.getImageUri()))
                     .into(moodImage);
         } else {
-            moodImage.setImageResource(R.drawable.ic_placeholder);
+            moodImage.setVisibility(View.GONE);
         }
 
         // Load emoji & mood color

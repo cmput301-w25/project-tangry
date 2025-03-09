@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.R;
+import com.example.tangry.utils.TimeUtils;
 import com.google.gson.Gson;
 
 import java.text.SimpleDateFormat;
@@ -98,15 +99,20 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                 reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             }
 
-            timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
+            if (post.getTimestamp() != null) {
+                timeText.setText(TimeUtils.getTimeAgo(post.getTimestamp().toDate()));
+            } else {
+                timeText.setText("Unknown Time"); // Placeholder text
+            }
 
             // Load mood image
             if (post.getImageUri() != null) {
+                moodImage.setVisibility(View.VISIBLE);
                 Glide.with(itemView.getContext())
                         .load(Uri.parse(post.getImageUri()))
                         .into(moodImage);
             } else {
-                moodImage.setImageResource(R.drawable.ic_placeholder);
+                moodImage.setVisibility(View.GONE);
             }
 
             // Load emoji based on mood
@@ -146,26 +152,6 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                 default:
                     emojiImage.setImageResource(R.drawable.ic_placeholder);
                     break;
-            }
-        }
-
-        private String getTimeAgo(Date date) {
-            long timeDiff = System.currentTimeMillis() - date.getTime();
-
-            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
-            long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
-            long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
-
-            if (minutes < 1) {
-                return "Just now";
-            } else if (minutes < 60) {
-                return minutes + " minutes ago";
-            } else if (hours < 24) {
-                return hours + " hours ago";
-            } else if (days < 5) {
-                return days + " days ago";
-            } else {
-                return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
             }
         }
     }
