@@ -37,6 +37,11 @@ public class EmotionPostRepository {
         db = FirebaseFirestore.getInstance();
     }
 
+    // Constructor for testing
+    public EmotionPostRepository(FirebaseFirestore firestore) {
+        db = firestore;
+    }
+
     /**
      * Returns the singleton instance of the repository.
      *
@@ -64,7 +69,7 @@ public class EmotionPostRepository {
         data.put("explanation", post.getExplanation());
         data.put("imageUri", post.getImageUri());
         data.put("location", post.getLocation());
-        data.put("socialSituation",post.getSocialSituation());
+        data.put("socialSituation", post.getSocialSituation());
         data.put("username", post.getUsername());
         data.put("timestamp", FieldValue.serverTimestamp());
 
@@ -87,9 +92,9 @@ public class EmotionPostRepository {
     /**
      * Retrieves a specific EmotionPost from Firestore using its ID.
      *
-     * @param postId      The ID of the post.
-     * @param onSuccess   Callback for successful retrieval (returns EmotionPost).
-     * @param onFailure   Callback for failure event.
+     * @param postId    The ID of the post.
+     * @param onSuccess Callback for successful retrieval (returns EmotionPost).
+     * @param onFailure Callback for failure event.
      */
     public void getEmotionPost(String postId, Consumer<EmotionPost> onSuccess, Consumer<Exception> onFailure) {
         db.collection(COLLECTION_NAME).document(postId)
@@ -108,10 +113,10 @@ public class EmotionPostRepository {
     /**
      * Updates an existing EmotionPost in Firestore.
      *
-     * @param postId     The ID of the post to update.
-     * @param post       The updated EmotionPost object.
-     * @param onSuccess  Callback for successful update.
-     * @param onFailure  Callback for failure event.
+     * @param postId    The ID of the post to update.
+     * @param post      The updated EmotionPost object.
+     * @param onSuccess Callback for successful update.
+     * @param onFailure Callback for failure event.
      */
     public void updateEmotionPost(String postId, EmotionPost post, Runnable onSuccess, OnFailureListener onFailure) {
         db.collection(COLLECTION_NAME).document(postId)

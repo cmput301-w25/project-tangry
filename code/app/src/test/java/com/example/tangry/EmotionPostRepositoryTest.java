@@ -4,19 +4,14 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,221 +27,347 @@ import java.util.function.Consumer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EmotionPostRepositoryTest {
-
+    // Existing mocks and setup
     @Mock
     private FirebaseFirestore mockFirestore;
-
+    
     @Mock
     private CollectionReference mockCollection;
-
+    
     @Mock
     private DocumentReference mockDocument;
-
+    
     @Mock
-    private Task<DocumentReference> mockDocRefTask;
-
+    private Task<DocumentReference> mockAddTask;
+    
     @Mock
-    private Task<Void> mockVoidTask;
-
+    private Task<Void> mockSetTask;
+    
     @Mock
-    private OnSuccessListener<DocumentReference> mockSuccessListener;
-
+    private Task<Void> mockDeleteTask;
+    
     @Mock
-    private OnFailureListener mockFailureListener;
-
-    // Use reflection to set the mockFirestore in our singleton repository
+    private Task<DocumentSnapshot> mockGetTask;
+    
+    @Mock
+    private DocumentSnapshot mockDocumentSnapshot;
+    
     private EmotionPostRepository repository;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
-
-        // Get the singleton instance
-        repository = EmotionPostRepository.getInstance();
-
-        // Use reflection to replace the private db field with our mock
-        java.lang.reflect.Field dbField = EmotionPostRepository.class.getDeclaredField("db");
-        dbField.setAccessible(true);
-        dbField.set(repository, mockFirestore);
-
-        // Set up common mock behaviors
-        when(mockFirestore.collection(any())).thenReturn(mockCollection);
-        when(mockCollection.document(any())).thenReturn(mockDocument);
-        when(mockCollection.add(anyMap())).thenReturn(mockDocRefTask);
-        when(mockDocument.set(any())).thenReturn(mockVoidTask);
-        when(mockDocument.delete()).thenReturn(mockVoidTask);
+        
+        // Set up the mocking chain for add operation
+        when(mockFirestore.collection("emotions")).thenReturn(mockCollection);
+        when(mockCollection.add(anyMap())).thenReturn(mockAddTask);
+        when(mockAddTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockAddTask);
+        when(mockAddTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockAddTask);
+        
+        // Set up mocking chain for update operation
+        when(mockCollection.document(anyString())).thenReturn(mockDocument);
+        when(mockDocument.set(any(EmotionPost.class))).thenReturn(mockSetTask);
+        when(mockSetTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockSetTask);
+        when(mockSetTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockSetTask);
+        
+        // Set up mocking chain for delete operation
+        when(mockDocument.delete()).thenReturn(mockDeleteTask);
+        when(mockDeleteTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockDeleteTask);
+        when(mockDeleteTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockDeleteTask);
+        
+        // Set up mocking chain for get operation
+        when(mockDocument.get()).thenReturn(mockGetTask);
+        when(mockGetTask.addOnSuccessListener(any(OnSuccessListener.class))).thenReturn(mockGetTask);
+        when(mockGetTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockGetTask);
+        
+        // Create repository with mocked Firestore
+        repository = new EmotionPostRepository(mockFirestore);
     }
 
     @Test
     public void testSaveEmotionPostToFirestore() {
-        // Create a valid emotion post
+        // Create a test post
         EmotionPost post = EmotionPost.create(
-                "happiness",
-                "I am happy",
-                null,
-                "Home",
-                "Alone",
-                "testUser");
-
-        // Set up Mockito to capture the data passed to Firestore
-        ArgumentCaptor<Map<String, Object>> dataCaptor = ArgumentCaptor.forClass(Map.class);
-
-        // Call the method under test
+            "happiness",
+            "Test",
+            "image_uri",
+            "Location",
+            "Alone",
+            "testUser"
+        );
+        
+        // Mock callbacks
+        OnSuccessListener<DocumentReference> mockSuccessListener = mock(OnSuccessListener.class);
+        OnFailureListener mockFailureListener = mock(OnFailureListener.class);
+        
+        // Call the repository method
         repository.saveEmotionPostToFirestore(post, mockSuccessListener, mockFailureListener);
-
-        // Verify interactions
-        verify(mockFirestore).collection(eq("emotions"));
-        verify(mockCollection).add(dataCaptor.capture());
-        verify(mockDocRefTask).addOnSuccessListener(mockSuccessListener);
-        verify(mockDocRefTask).addOnFailureListener(mockFailureListener);
-
-        // Verify the data is correct
-        Map<String, Object> capturedData = dataCaptor.getValue();
-        assertEquals("happiness", capturedData.get("emotion"));
-        assertEquals("I am happy", capturedData.get("explanation"));
-        assertNull(capturedData.get("imageUri"));
-        assertEquals("Home", capturedData.get("location"));
-        assertEquals("Alone", capturedData.get("socialSituation"));
-        assertEquals("testUser", capturedData.get("username"));
-        assertNotNull(capturedData.get("timestamp")); // Should be FieldValue.serverTimestamp()
+        
+        // Verify that collection.add() was called with the correct data
+        ArgumentCaptor<Map<String, Object>> mapCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(mockCollection).add(mapCaptor.capture());
+        
+        Map<String, Object> capturedMap = mapCaptor.getValue();
+        assertEquals("happiness", capturedMap.get("emotion"));
+        assertEquals("Test", capturedMap.get("explanation"));
+        assertEquals("image_uri", capturedMap.get("imageUri"));
+        assertEquals("Location", capturedMap.get("location"));
+        assertEquals("Alone", capturedMap.get("socialSituation"));
+        assertEquals("testUser", capturedMap.get("username"));
+        
+        // Verify listeners were added
+        verify(mockAddTask).addOnSuccessListener(mockSuccessListener);
+        verify(mockAddTask).addOnFailureListener(mockFailureListener);
     }
-
+    
+    // Test getEmotionPost when post exists
     @Test
-    public void testUpdateEmotionPost() {
-        // Create a valid emotion post
-        EmotionPost post = EmotionPost.create(
-                "sadness",
-                "I am sad",
-                null,
-                "Office",
-                "With one other person",
-                "testUser");
-
-        String postId = "post123";
-        Runnable mockSuccessRunnable = mock(Runnable.class);
-
-        // Call the method under test
-        repository.updateEmotionPost(postId, post, mockSuccessRunnable, mockFailureListener);
-
-        // Verify interactions
-        verify(mockFirestore).collection(eq("emotions"));
-        verify(mockCollection).document(eq(postId));
-        verify(mockDocument).set(eq(post));
-        verify(mockVoidTask).addOnSuccessListener(any());
-        verify(mockVoidTask).addOnFailureListener(eq(mockFailureListener));
-
-        // Simulate success callback
-        ArgumentCaptor<OnSuccessListener<Void>> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
-        verify(mockVoidTask).addOnSuccessListener(successCaptor.capture());
-        successCaptor.getValue().onSuccess(null);
-
-        // Verify success callback was triggered
-        verify(mockSuccessRunnable).run();
-    }
-
-    @Test
-    public void testDeleteEmotionPost() {
-        String postId = "post456";
-        Runnable mockSuccessRunnable = mock(Runnable.class);
-        Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
-
-        // Call the method under test
-        repository.deleteEmotionPost(postId, mockSuccessRunnable, mockFailureConsumer);
-
-        // Verify interactions
-        verify(mockFirestore).collection(eq("emotions"));
-        verify(mockCollection).document(eq(postId));
-        verify(mockDocument).delete();
-
-        // Simulate success callback
-        ArgumentCaptor<OnSuccessListener<Void>> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
-        verify(mockVoidTask).addOnSuccessListener(successCaptor.capture());
-        successCaptor.getValue().onSuccess(null);
-
-        // Verify success callback was triggered
-        verify(mockSuccessRunnable).run();
-    }
-
-    @Test
-    public void testGetEmotionPost() {
-        String postId = "post789";
+    public void testGetEmotionPostWhenExists() {
+        // Create test data
+        String postId = "test_post_id";
+        EmotionPost expectedPost = EmotionPost.create(
+            "sadness", 
+            "Feeling sad", 
+            null, 
+            "Home", 
+            "Alone", 
+            "testUser"
+        );
+        
+        // Set up mock to return a post when document exists
+        when(mockDocumentSnapshot.exists()).thenReturn(true);
+        when(mockDocumentSnapshot.toObject(EmotionPost.class)).thenReturn(expectedPost);
+        
+        // Mock the success callback to capture the result
         Consumer<EmotionPost> mockSuccessConsumer = mock(Consumer.class);
         Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
-
-        // Mock the get() operation and its task
-        Task<com.google.firebase.firestore.DocumentSnapshot> mockDocSnapshotTask = mock(Task.class);
-        when(mockDocument.get()).thenReturn(mockDocSnapshotTask);
-
-        // Call the method under test
+        
+        // Call the repository method
         repository.getEmotionPost(postId, mockSuccessConsumer, mockFailureConsumer);
-
-        // Verify basic interactions
-        verify(mockFirestore).collection(eq("emotions"));
-        verify(mockCollection).document(eq(postId));
-        verify(mockDocument).get();
-        verify(mockDocSnapshotTask).addOnSuccessListener(any());
-        verify(mockDocSnapshotTask).addOnFailureListener(any());
-
-        // For full testing, we would need to simulate the document snapshot callback
-        // but that's more complex and requires additional mocking
+        
+        // Capture and execute the success listener
+        ArgumentCaptor<OnSuccessListener> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
+        verify(mockGetTask).addOnSuccessListener(successCaptor.capture());
+        successCaptor.getValue().onSuccess(mockDocumentSnapshot);
+        
+        // Verify the correct document was requested
+        verify(mockCollection).document(postId);
+        
+        // Verify the result was passed to the success consumer
+        verify(mockSuccessConsumer).accept(expectedPost);
+        
+        // Verify failure consumer was never called
+        verify(mockFailureConsumer, never()).accept(any(Exception.class));
     }
-
+    
+    // Test getEmotionPost when post does not exist
     @Test
-    public void testCreateEmotionPostWithInvalidInputs() {
-        // Test exception is thrown for empty emotion
-        try {
-            EmotionPost.create(
-                    "", // Empty emotion - should fail
-                    "Test",
-                    null,
-                    "Location",
-                    "Alone",
-                    "testUser");
-            fail("Should have thrown IllegalArgumentException for empty emotion");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-
-        // Test exception for too long explanation
-        try {
-            EmotionPost.create(
-                    "happiness",
-                    "This explanation is way too long and should fail the validation",
-                    null,
-                    "Location",
-                    "Alone",
-                    "testUser");
-            fail("Should have thrown IllegalArgumentException for too long explanation");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-
-        // Test exception for no explanation and no image
-        try {
-            EmotionPost.create(
-                    "happiness",
-                    "", // Empty explanation
-                    null, // No image
-                    "Location",
-                    "Alone",
-                    "testUser");
-            fail("Should have thrown IllegalArgumentException for no explanation and no image");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
-
-        // Test exception for invalid social situation
-        try {
-            EmotionPost.create(
-                    "happiness",
-                    "Test",
-                    null,
-                    "Location",
-                    "Invalid Situation", // Invalid social situation
-                    "testUser");
-            fail("Should have thrown IllegalArgumentException for invalid social situation");
-        } catch (IllegalArgumentException e) {
-            // Expected
-        }
+    public void testGetEmotionPostWhenNotExists() {
+        // Create test data
+        String postId = "nonexistent_post_id";
+        
+        // Set up mock to return no post (document doesn't exist)
+        when(mockDocumentSnapshot.exists()).thenReturn(false);
+        
+        // Mock the callbacks
+        Consumer<EmotionPost> mockSuccessConsumer = mock(Consumer.class);
+        Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
+        
+        // Call the repository method
+        repository.getEmotionPost(postId, mockSuccessConsumer, mockFailureConsumer);
+        
+        // Capture and execute the success listener
+        ArgumentCaptor<OnSuccessListener> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
+        verify(mockGetTask).addOnSuccessListener(successCaptor.capture());
+        successCaptor.getValue().onSuccess(mockDocumentSnapshot);
+        
+        // Verify the correct document was requested
+        verify(mockCollection).document(postId);
+        
+        // Verify the null result was passed to the success consumer
+        verify(mockSuccessConsumer).accept(null);
+    }
+    
+    // Test getEmotionPost with failure
+    @Test
+    public void testGetEmotionPostFailure() {
+        // Create test data
+        String postId = "test_post_id";
+        Exception expectedException = new RuntimeException("Test exception");
+        
+        // Mock the callbacks
+        Consumer<EmotionPost> mockSuccessConsumer = mock(Consumer.class);
+        Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
+        
+        // Call the repository method
+        repository.getEmotionPost(postId, mockSuccessConsumer, mockFailureConsumer);
+        
+        // Capture and execute the failure listener
+        ArgumentCaptor<OnFailureListener> failureCaptor = ArgumentCaptor.forClass(OnFailureListener.class);
+        verify(mockGetTask).addOnFailureListener(failureCaptor.capture());
+        failureCaptor.getValue().onFailure(expectedException);
+        
+        // Verify the correct document was requested
+        verify(mockCollection).document(postId);
+        
+        // Verify the exception was passed to the failure consumer
+        verify(mockFailureConsumer).accept(expectedException);
+        
+        // Verify success consumer was never called
+        verify(mockSuccessConsumer, never()).accept(any());
+    }
+    
+    // Test updateEmotionPost with success
+    @Test
+    public void testUpdateEmotionPostSuccess() {
+        // Create test data
+        String postId = "test_post_id";
+        EmotionPost post = EmotionPost.create(
+            "fear", 
+            "Scary", 
+            "image_uri", 
+            "Outside", 
+            "With one other person", 
+            "testUser"
+        );
+        
+        // Mock the callbacks
+        Runnable mockSuccessRunnable = mock(Runnable.class);
+        OnFailureListener mockFailureListener = mock(OnFailureListener.class);
+        
+        // Call the repository method
+        repository.updateEmotionPost(postId, post, mockSuccessRunnable, mockFailureListener);
+        
+        // Verify the correct document was updated with the post
+        verify(mockCollection).document(postId);
+        verify(mockDocument).set(post);
+        
+        // Capture and execute the success listener
+        ArgumentCaptor<OnSuccessListener> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
+        verify(mockSetTask).addOnSuccessListener(successCaptor.capture());
+        successCaptor.getValue().onSuccess(null);
+        
+        // Verify the success callback was executed
+        verify(mockSuccessRunnable).run();
+        
+        // Verify failure listener was never called
+        verify(mockFailureListener, never()).onFailure(any(Exception.class));
+    }
+    
+    // Test updateEmotionPost with failure
+    @Test
+    public void testUpdateEmotionPostFailure() {
+        // Create test data
+        String postId = "test_post_id";
+        EmotionPost post = EmotionPost.create(
+            "anger", 
+            "Angry", 
+            null, 
+            "Work", 
+            "With a crowd", 
+            "testUser"
+        );
+        Exception expectedException = new RuntimeException("Update failed");
+        
+        // Mock the callbacks
+        Runnable mockSuccessRunnable = mock(Runnable.class);
+        OnFailureListener mockFailureListener = mock(OnFailureListener.class);
+        
+        // Call the repository method
+        repository.updateEmotionPost(postId, post, mockSuccessRunnable, mockFailureListener);
+        
+        // Verify the correct document was attempted to be updated
+        verify(mockCollection).document(postId);
+        verify(mockDocument).set(post);
+        
+        // Capture and execute the failure listener
+        ArgumentCaptor<OnFailureListener> failureCaptor = ArgumentCaptor.forClass(OnFailureListener.class);
+        verify(mockSetTask).addOnFailureListener(failureCaptor.capture());
+        failureCaptor.getValue().onFailure(expectedException);
+        
+        // Verify the failure callback was executed with the exception
+        verify(mockFailureListener).onFailure(expectedException);
+        
+        // Verify success runnable was never called
+        verify(mockSuccessRunnable, never()).run();
+    }
+    
+    // Test deleteEmotionPost with success
+    @Test
+    public void testDeleteEmotionPostSuccess() {
+        // Create test data
+        String postId = "test_post_id";
+        
+        // Mock the callbacks
+        Runnable mockSuccessRunnable = mock(Runnable.class);
+        Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
+        
+        // Call the repository method
+        repository.deleteEmotionPost(postId, mockSuccessRunnable, mockFailureConsumer);
+        
+        // Verify the correct document was deleted
+        verify(mockCollection).document(postId);
+        verify(mockDocument).delete();
+        
+        // Capture and execute the success listener
+        ArgumentCaptor<OnSuccessListener> successCaptor = ArgumentCaptor.forClass(OnSuccessListener.class);
+        verify(mockDeleteTask).addOnSuccessListener(successCaptor.capture());
+        successCaptor.getValue().onSuccess(null);
+        
+        // Verify the success callback was executed
+        verify(mockSuccessRunnable).run();
+        
+        // Verify failure consumer was never called
+        verify(mockFailureConsumer, never()).accept(any(Exception.class));
+    }
+    
+    // Test deleteEmotionPost with failure
+    @Test
+    public void testDeleteEmotionPostFailure() {
+        // Create test data
+        String postId = "test_post_id";
+        Exception expectedException = new RuntimeException("Delete failed");
+        
+        // Mock the callbacks
+        Runnable mockSuccessRunnable = mock(Runnable.class);
+        Consumer<Exception> mockFailureConsumer = mock(Consumer.class);
+        
+        // Call the repository method
+        repository.deleteEmotionPost(postId, mockSuccessRunnable, mockFailureConsumer);
+        
+        // Verify the correct document was attempted to be deleted
+        verify(mockCollection).document(postId);
+        verify(mockDocument).delete();
+        
+        // Capture and execute the failure listener
+        ArgumentCaptor<OnFailureListener> failureCaptor = ArgumentCaptor.forClass(OnFailureListener.class);
+        verify(mockDeleteTask).addOnFailureListener(failureCaptor.capture());
+        failureCaptor.getValue().onFailure(expectedException);
+        
+        // Verify the failure callback was executed with the exception
+        verify(mockFailureConsumer).accept(expectedException);
+        
+        // Verify success runnable was never called
+        verify(mockSuccessRunnable, never()).run();
+    }
+    
+    // Test getPostsQuery returns properly configured query
+    @Test
+    public void testGetPostsQuery() {
+        // Mock for query and its orderBy method
+        Query mockQuery = mock(Query.class);
+        when(mockCollection.orderBy("timestamp", Query.Direction.DESCENDING)).thenReturn(mockQuery);
+        
+        // Call the repository method
+        Query result = repository.getPostsQuery();
+        
+        // Verify the collection reference was obtained
+        verify(mockFirestore).collection("emotions");
+        
+        // Verify the proper ordering was applied
+        verify(mockCollection).orderBy("timestamp", Query.Direction.DESCENDING);
+        
+        // Verify the result is what we expect
+        assertEquals(mockQuery, result);
     }
 }

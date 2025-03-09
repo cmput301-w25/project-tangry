@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+
+# Firebase emulator
+firebase-tools-instant-win.exe
