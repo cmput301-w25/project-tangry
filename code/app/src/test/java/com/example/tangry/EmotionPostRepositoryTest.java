@@ -81,7 +81,7 @@ public class EmotionPostRepositoryTest {
         when(mockGetTask.addOnFailureListener(any(OnFailureListener.class))).thenReturn(mockGetTask);
         
         // Create repository with mocked Firestore
-        repository = new EmotionPostRepository(mockFirestore);
+        repository = new EmotionPostRepository();
     }
 
     @Test
