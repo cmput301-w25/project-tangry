@@ -98,7 +98,11 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                 reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             }
 
-            timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
+            if (post.getTimestamp() != null) {
+                timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
+            } else {
+                timeText.setText("Unknown Time"); // Placeholder text
+            }
 
             // Load mood image
             if (post.getImageUri() != null) {
