@@ -187,20 +187,16 @@ public class EditEmotionFragment extends Fragment {
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
 
-        if (imageUri != null) {
-            if (isNewImageSelected) {
-                try {
-                    Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
-                    uploadImage(processedUri);
-                } catch (IOException e) {
-                    Log.e(TAG, "Error processing image", e);
-                    Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                // Use existing image URL directly
-                updatePostInFirestore(imageUri);
+        if (imageUri != null && !imageUri.startsWith("https://firebasestorage")) {
+            try {
+                Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
+                uploadImage(processedUri);
+            } catch (IOException e) {
+                Log.e(TAG, "Error processing image", e);
+                Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
             }
         } else {
+            // No image to upload, proceed with updating the post
             updatePostInFirestore(null);
         }
     }
