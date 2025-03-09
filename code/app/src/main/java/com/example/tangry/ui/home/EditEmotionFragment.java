@@ -207,10 +207,31 @@ public class EditEmotionFragment extends Fragment {
      * @param imageUrl The new image URL (or null if unchanged).
      */
     private void updatePostInFirestore(String imageUrl) {
+        // If we have a new image and there was an old one, delete the old one
+        if (imageUrl != null && updatedPost.getImageUri() != null &&
+                !updatedPost.getImageUri().isEmpty() &&
+                updatedPost.getImageUri().startsWith("https://firebasestorage")) {
+
+            try {
+                StorageReference oldImageRef = FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(updatedPost.getImageUri());
+                oldImageRef.delete().addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Old image deleted successfully");
+                }).addOnFailureListener(e -> {
+                    Log.e(TAG, "Error deleting old image", e);
+                    // Continue with the update even if old image deletion fails
+                });
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Invalid old image storage URL", e);
+            }
+        }
+
+        // Update the post with the new image URL
         if (imageUrl != null) {
             updatedPost.setImageUri(imageUrl);
         }
 
+        // Save to Firestore
         repository.updateEmotionPost(postId, updatedPost, () -> {
             Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
             navController.popBackStack(R.id.navigation_home, false);

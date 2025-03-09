@@ -22,6 +22,8 @@ import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.utils.TimeUtils;
 import com.google.gson.Gson;
 import java.util.Objects;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Fragment responsible for displaying details of an emotion post.
@@ -44,7 +46,8 @@ public class PostDetailsFragment extends Fragment {
     /**
      * Default empty constructor required for Fragments.
      */
-    public PostDetailsFragment() {}
+    public PostDetailsFragment() {
+    }
 
     /**
      * Inflates the fragment layout.
@@ -134,15 +137,42 @@ public class PostDetailsFragment extends Fragment {
     private void setEmojiAndColor(String emotion) {
         int emojiResId, colorResId;
         switch (emotion.toLowerCase()) {
-            case "happiness": emojiResId = R.drawable.ic_happiness; colorResId = R.color.colorHappiness; break;
-            case "sadness": emojiResId = R.drawable.ic_sadness; colorResId = R.color.colorSadness; break;
-            case "angry": emojiResId = R.drawable.ic_angry; colorResId = R.color.colorAngry; break;
-            case "fear": emojiResId = R.drawable.ic_fear; colorResId = R.color.colorFear; break;
-            case "disgust": emojiResId = R.drawable.ic_disgust; colorResId = R.color.colorDisgust; break;
-            case "shame": emojiResId = R.drawable.ic_shame; colorResId = R.color.colorShame; break;
-            case "surprise": emojiResId = R.drawable.ic_surprise; colorResId = R.color.colorSurprise; break;
-            case "confused": emojiResId = R.drawable.ic_confused; colorResId = R.color.colorConfused; break;
-            default: emojiResId = R.drawable.ic_placeholder; colorResId = R.color.colorPrimaryDark; break;
+            case "happiness":
+                emojiResId = R.drawable.ic_happiness;
+                colorResId = R.color.colorHappiness;
+                break;
+            case "sadness":
+                emojiResId = R.drawable.ic_sadness;
+                colorResId = R.color.colorSadness;
+                break;
+            case "angry":
+                emojiResId = R.drawable.ic_angry;
+                colorResId = R.color.colorAngry;
+                break;
+            case "fear":
+                emojiResId = R.drawable.ic_fear;
+                colorResId = R.color.colorFear;
+                break;
+            case "disgust":
+                emojiResId = R.drawable.ic_disgust;
+                colorResId = R.color.colorDisgust;
+                break;
+            case "shame":
+                emojiResId = R.drawable.ic_shame;
+                colorResId = R.color.colorShame;
+                break;
+            case "surprise":
+                emojiResId = R.drawable.ic_surprise;
+                colorResId = R.color.colorSurprise;
+                break;
+            case "confused":
+                emojiResId = R.drawable.ic_confused;
+                colorResId = R.color.colorConfused;
+                break;
+            default:
+                emojiResId = R.drawable.ic_placeholder;
+                colorResId = R.color.colorPrimaryDark;
+                break;
         }
 
         emojiImage.setImageResource(emojiResId);
@@ -159,7 +189,8 @@ public class PostDetailsFragment extends Fragment {
             bundle.putString("postId", postId);
             bundle.putBoolean("isEditing", true);
 
-            Navigation.findNavController(requireView()).navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
+            Navigation.findNavController(requireView()).navigate(R.id.action_postDetailsFragment_to_emotionsFragment,
+                    bundle);
         }
     }
 
@@ -176,17 +207,47 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Deletes the post from Firestore using the Repository.
+     * Deletes the post and its associated image from Firebase.
      */
     private void deletePost() {
         if (postId != null) {
-            repository.deleteEmotionPost(postId,
-                    () -> {
-                        Log.d("PostDetails", "Post deleted successfully");
-                        Navigation.findNavController(requireView()).popBackStack(R.id.navigation_home, false);
-                    },
-                    e -> Log.e("PostDetails", "Error deleting post", e)
-            );
+            // First check if the post has an image
+            if (post.getImageUri() != null && !post.getImageUri().isEmpty()) {
+                // Get a Firebase Storage reference from the URL
+                try {
+                    StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(post.getImageUri());
+
+                    // Delete the image file
+                    imageRef.delete().addOnSuccessListener(aVoid -> {
+                        Log.d("PostDetails", "Image deleted successfully");
+                        // After image is deleted, delete the post
+                        deletePostFromFirestore();
+                    }).addOnFailureListener(e -> {
+                        Log.e("PostDetails", "Error deleting image", e);
+                        // Even if image deletion fails, still try to delete the post
+                        deletePostFromFirestore();
+                    });
+                } catch (IllegalArgumentException e) {
+                    Log.e("PostDetails", "Invalid storage URL", e);
+                    // If URL parsing fails, still delete the post
+                    deletePostFromFirestore();
+                }
+            } else {
+                // No image to delete, just delete the post
+                deletePostFromFirestore();
+            }
         }
+    }
+
+    /**
+     * Deletes the post document from Firestore.
+     */
+    private void deletePostFromFirestore() {
+        repository.deleteEmotionPost(postId,
+                () -> {
+                    Log.d("PostDetails", "Post deleted successfully");
+                    Navigation.findNavController(requireView()).popBackStack(R.id.navigation_home, false);
+                },
+                e -> Log.e("PostDetails", "Error deleting post", e));
     }
 }
