@@ -122,7 +122,7 @@ public class PostDetailsFragment extends Fragment {
                     .load(Uri.parse(post.getImageUri()))
                     .into(moodImage);
         } else {
-            moodImage.setImageResource(R.drawable.ic_placeholder);
+            moodImage.setVisibility(View.GONE);
         }
 
         // Load emoji & mood color
