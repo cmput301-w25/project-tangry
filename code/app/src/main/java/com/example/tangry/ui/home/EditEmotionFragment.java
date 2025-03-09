@@ -25,6 +25,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
+import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.google.firebase.storage.FirebaseStorage;
@@ -54,7 +55,9 @@ public class EditEmotionFragment extends Fragment {
     private String postId, imageUri;
     private boolean isNewImageSelected = false;
     private EmotionPost updatedPost;
-    private EmotionPostRepository repository;
+//    private EmotionPostRepository repository;
+
+    private EmotionPostController emotionPostController;
     private NavController navController;
 
     private TextView emotionTextView;
@@ -77,7 +80,7 @@ public class EditEmotionFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_detail_emotion, container, false); // 🔥 Reusing the same XML
+        return inflater.inflate(R.layout.fragment_detail_emotion, container, false);
     }
 
     /**
@@ -91,7 +94,7 @@ public class EditEmotionFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
-        repository = EmotionPostRepository.getInstance();
+        emotionPostController = new EmotionPostController();
 
         // Initialize UI components
         emotionTextView = view.findViewById(R.id.emotion_text);
@@ -232,9 +235,9 @@ public class EditEmotionFragment extends Fragment {
         }
 
         // Save to Firestore
-        repository.updateEmotionPost(postId, updatedPost, () -> {
+        emotionPostController.updateEmotionPost(postId, updatedPost, () -> {
             Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
-            navController.popBackStack(R.id.navigation_home, false);
+            navController.popBackStack(R.id.navigation_home, true); //changed from false to true to test it
         }, e -> {
             Toast.makeText(getContext(), "Failed to update. " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Failed to update post", e);

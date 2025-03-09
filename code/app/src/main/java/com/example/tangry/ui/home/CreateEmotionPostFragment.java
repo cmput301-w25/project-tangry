@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,7 +152,8 @@ public class CreateEmotionPostFragment extends Fragment {
             emotionPostController.createPost(post,
                     (DocumentReference docRef) -> {
                         Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
-                        navController.navigateUp();
+                        navController.popBackStack();
+                        navController.popBackStack();
                     },
                     e -> {
                         Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
