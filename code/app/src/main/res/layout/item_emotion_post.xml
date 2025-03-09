@@ -13,8 +13,9 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:background="@color/white">
+        android:background="?attr/colorSurface">
 
+        <!-- Emotion Title -->
         <TextView
             android:id="@+id/emotion_text"
             android:layout_width="wrap_content"
@@ -22,16 +23,18 @@
             android:text="Emotion"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black" />
+            android:textColor="?android:attr/textColorPrimary" />
 
+        <!-- Explanation Text -->
         <TextView
             android:id="@+id/explanation_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Short explanation here"
             android:layout_marginTop="4dp"
-            android:textColor="@color/colorPrimaryDark"/>
+            android:textColor="?android:attr/textColorSecondary" />
 
+        <!-- Post Image -->
         <ImageView
             android:id="@+id/post_image"
             android:layout_width="match_parent"
@@ -40,6 +43,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_placeholder" />
 
+        <!-- Details Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,7 +57,7 @@
                 android:drawableStart="@drawable/ic_location"
                 android:drawablePadding="4dp"
                 android:text="Location: ..."
-                android:textColor="@color/black"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
             <TextView
                 android:id="@+id/username_text"
@@ -61,7 +65,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:drawableStart="@drawable/ic_user"
-                android:drawablePadding="4dp"/>
+                android:drawablePadding="4dp"
+                android:textColor="?android:attr/textColorPrimary"/>
 
             <TextView
                 android:id="@+id/social_situation_text"
@@ -71,7 +76,7 @@
                 android:drawableStart="@drawable/ic_group"
                 android:drawablePadding="4dp"
                 android:text="With a crowd"
-                android:textColor="@color/black"/>
+                android:textColor="?android:attr/textColorPrimary"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

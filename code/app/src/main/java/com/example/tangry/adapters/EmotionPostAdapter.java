@@ -1,21 +1,28 @@
-// EmotionPostAdapter.java
 package com.example.tangry.adapters;
 
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.R;
+import com.google.gson.Gson;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.PostViewHolder> {
-
     private final List<EmotionPost> posts;
 
     public EmotionPostAdapter(List<EmotionPost> posts) {
@@ -26,7 +33,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_emotion_post, parent, false);
+                .inflate(R.layout.item_mood, parent, false);
         return new PostViewHolder(view);
     }
 
@@ -34,7 +41,22 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         EmotionPost post = posts.get(position);
         holder.bind(post);
+
+        holder.itemView.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+
+            // Convert EmotionPost to JSON String
+            Gson gson = new Gson();
+            String postJson = gson.toJson(post);
+
+            bundle.putString("post", postJson);  // Pass JSON instead of Object
+            bundle.putString("postId", post.getPostId());
+
+            // Navigate using Safe Args
+            Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_postDetailsFragment, bundle);
+        });
     }
+
 
     @Override
     public int getItemCount() {
@@ -42,37 +64,108 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     }
 
     static class PostViewHolder extends RecyclerView.ViewHolder {
-        private final TextView emotionText;
-        private final TextView explanationText;
-        private final ImageView postImage;
-        private final TextView locationText;
-        private final TextView socialSituationText;
-        private final TextView usernameText;
+        private final TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
+        private final ImageView moodImage, emojiImage;
 
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
-            emotionText = itemView.findViewById(R.id.emotion_text);
-            explanationText = itemView.findViewById(R.id.explanation_text);
-            postImage = itemView.findViewById(R.id.post_image);
+            userName = itemView.findViewById(R.id.user_name);
+            moodText = itemView.findViewById(R.id.mood_text);
+            userHandle = itemView.findViewById(R.id.user_handle);
             locationText = itemView.findViewById(R.id.location_text);
-            socialSituationText = itemView.findViewById(R.id.social_situation_text);
-            usernameText = itemView.findViewById(R.id.username_text);
+            withText = itemView.findViewById(R.id.with_text);
+            reasonText = itemView.findViewById(R.id.reason_text);
+            timeText = itemView.findViewById(R.id.time_text);
+            moodImage = itemView.findViewById(R.id.mood_image);
+            emojiImage = itemView.findViewById(R.id.emoji_image);
         }
 
         public void bind(EmotionPost post) {
-            emotionText.setText(post.getEmotion());
-            explanationText.setText(post.getExplanation());
-            locationText.setText(post.getLocation());
-            socialSituationText.setText(post.getSocialSituation());
-            usernameText.setText(post.getUsername());
-
-            String imageUri = post.getImageUri();
-            if (imageUri != null) {
-                Glide.with(itemView.getContext())
-                        .load(Uri.parse(imageUri))
-                        .into(postImage);
+            userName.setText(post.getUsername() + " feels ");
+            moodText.setText(post.getEmotion());
+            userHandle.setText("@" + post.getUsername());
+            if (!post.getLocation().isEmpty()) {
+                locationText.setText(post.getLocation());
+                locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
             } else {
-                postImage.setImageResource(R.drawable.ic_placeholder);
+                locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
+            withText.setText(post.getSocialSituation());
+            if (!post.getExplanation().isEmpty()) {
+                reasonText.setText(post.getExplanation());
+                reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+            } else {
+                reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
+
+            timeText.setText(getTimeAgo(post.getTimestamp().toDate()));
+
+            // Load mood image
+            if (post.getImageUri() != null) {
+                Glide.with(itemView.getContext())
+                        .load(Uri.parse(post.getImageUri()))
+                        .into(moodImage);
+            } else {
+                moodImage.setImageResource(R.drawable.ic_placeholder);
+            }
+
+            // Load emoji based on mood
+            switch (post.getEmotion().toLowerCase()) {
+                case "happiness":
+                    emojiImage.setImageResource(R.drawable.ic_happiness);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorHappiness));
+                    break;
+                case "sadness":
+                    emojiImage.setImageResource(R.drawable.ic_sadness);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorSadness));
+                    break;
+                case "angry":
+                    emojiImage.setImageResource(R.drawable.ic_angry);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorAngry));
+                    break;
+                case "fear":
+                    emojiImage.setImageResource(R.drawable.ic_fear);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorFear));
+                    break;
+                case "disgust":
+                    emojiImage.setImageResource(R.drawable.ic_disgust);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorDisgust));
+                    break;
+                case "shame":
+                    emojiImage.setImageResource(R.drawable.ic_shame);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorShame));
+                    break;
+                case "surprise":
+                    emojiImage.setImageResource(R.drawable.ic_surprise);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorSurprise));
+                    break;
+                case "confused":
+                    emojiImage.setImageResource(R.drawable.ic_confused);
+                    moodText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorConfused));
+                    break;
+                default:
+                    emojiImage.setImageResource(R.drawable.ic_placeholder);
+                    break;
+            }
+        }
+
+        private String getTimeAgo(Date date) {
+            long timeDiff = System.currentTimeMillis() - date.getTime();
+
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
+            long hours = TimeUnit.MILLISECONDS.toHours(timeDiff);
+            long days = TimeUnit.MILLISECONDS.toDays(timeDiff);
+
+            if (minutes < 1) {
+                return "Just now";
+            } else if (minutes < 60) {
+                return minutes + " minutes ago";
+            } else if (hours < 24) {
+                return hours + " hours ago";
+            } else if (days < 5) {
+                return days + " days ago";
+            } else {
+                return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(date);
             }
         }
     }
