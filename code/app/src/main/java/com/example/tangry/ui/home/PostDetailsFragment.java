@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.appcompat.app.AlertDialog;
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
+import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.utils.TimeUtils;
@@ -38,7 +39,7 @@ public class PostDetailsFragment extends Fragment {
     private Button editButton, deleteButton;
     private EmotionPost post;
     private String postId;
-    private EmotionPostRepository repository;
+    private EmotionPostController controller;
 
     /**
      * Default empty constructor required for Fragments.
@@ -69,7 +70,7 @@ public class PostDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        repository = EmotionPostRepository.getInstance();
+        controller = new EmotionPostController();
 
         // Initialize Views
         userName = view.findViewById(R.id.user_name);
@@ -240,7 +241,7 @@ public class PostDetailsFragment extends Fragment {
      * Deletes the post document from Firestore.
      */
     private void deletePostFromFirestore() {
-        repository.deleteEmotionPost(postId,
+        controller.deleteEmotionPost(postId,
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
                     Navigation.findNavController(requireView()).popBackStack(R.id.navigation_home, false);
