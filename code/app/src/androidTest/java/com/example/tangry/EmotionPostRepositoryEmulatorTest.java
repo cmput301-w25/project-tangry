@@ -43,7 +43,7 @@ public class EmotionPostRepositoryEmulatorTest {
     @Before
     public void setup() {
         db = FirebaseFirestore.getInstance();
-        repository = EmotionPostRepository.getInstance();
+        repository = new EmotionPostRepository(db, "emotions");
     }
 
     @After

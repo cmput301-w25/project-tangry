@@ -110,7 +110,7 @@ public class PostDetailsFragment extends Fragment {
         moodText.setText(post.getEmotion());
         userHandle.setText("@" + post.getUsername());
         locationText.setText(post.getLocation().isEmpty() ? "No Location" : post.getLocation());
-        withText.setText(post.getSocialSituation());
+        withText.setText(post.getSocialSituation() == null ? "Not provided" : post.getSocialSituation());
         reasonText.setText(post.getExplanation().isEmpty() ? "No Explanation" : post.getExplanation());
         timeText.setText(TimeUtils.getTimeAgo(post.getTimestamp().toDate()));
 

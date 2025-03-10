@@ -9,6 +9,7 @@ public class Emotion {
         this.name = name;
         this.iconResId = iconResId;
         this.textColorResId = textColorResId;
+
     }
 
     public String getName() { return name; }
