@@ -207,6 +207,7 @@
     "Android App.app.executor": "Debug",
     "Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor": "Run",
     "Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor": "Run",
+    "Android Instrumented Tests.UserInterfaceTest.executor": "Run",
     "Android Instrumented Tests.testInvalidEmotionValues().executor": "Run",
     "Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor": "Run",
     "Gradle.EmotionPostRepositoryTest.executor": "Run",
@@ -226,7 +227,7 @@
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
-  <component name="RunManager" selected="Gradle.EmotionPostRepositoryTest">
+  <component name="RunManager" selected="Android Instrumented Tests.UserInterfaceTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="tangry.app" />
       <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
@@ -360,12 +361,12 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ImageStorageRepositoryEmulatorTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="UserInterfaceTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="tangry.app" />
-      <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="0" />
+      <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
-      <option name="CLASS_NAME" value="com.example.tangry.ImageStorageRepositoryEmulatorTest" />
+      <option name="CLASS_NAME" value="com.example.tangry.UserInterfaceTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -572,11 +573,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Android Instrumented Tests.UserInterfaceTest" />
         <item itemvalue="Gradle.EmotionPostRepositoryTest" />
         <item itemvalue="Android Instrumented Tests.EmotionPostRepositoryEmulatorTest" />
         <item itemvalue="Android Instrumented Tests.testInvalidEmotionValues()" />
         <item itemvalue="Android Instrumented Tests.testSavePostWithAllSocialSituationValues()" />
-        <item itemvalue="Android Instrumented Tests.ImageStorageRepositoryEmulatorTest" />
       </list>
     </recent_temporary>
   </component>
