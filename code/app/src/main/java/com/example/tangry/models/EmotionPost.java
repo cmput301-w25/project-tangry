@@ -35,6 +35,9 @@ public class EmotionPost implements Serializable {
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", "Alone",
             "With one other person", "With two to several people", "With a crowd");
 
+    private static final List<String> VALID_EMOTIONS = Arrays.asList("Angry", "Confused", "Disgust",
+            "Fear", "Happiness", "Sadness", "Shame", "Surprise");
+
     /**
      * Private constructor to create an EmotionPost object.
      *
@@ -65,7 +68,6 @@ public class EmotionPost implements Serializable {
      * @param location        The location where the mood event occurred.
      * @param socialSituation The social situation during the mood event.
      * @param username        The username of the person posting the emotion.
-     * @param imageStream     The InputStream of the image to validate its size.
      * @return A new EmotionPost object.
      * @throws IllegalArgumentException If any validation fails.
      * @throws IOException              If an I/O error occurs.
@@ -87,6 +89,10 @@ public class EmotionPost implements Serializable {
 
         if (socialSituation != null && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
             throw new IllegalArgumentException("Invalid social situation.");
+        }
+
+        if (!VALID_EMOTIONS.contains(emotion)) {
+            throw new IllegalArgumentException("Invalid emotion.");
         }
 
         return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);
