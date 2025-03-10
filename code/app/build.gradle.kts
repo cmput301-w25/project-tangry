@@ -69,7 +69,8 @@ dependencies {
 
     // Testing dependencies
     testImplementation(libs.junit)
-    // Add these new lines
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    androidTestImplementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
