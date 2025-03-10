@@ -10,7 +10,7 @@
  * which when selected shows a BottomSheetDialog with mood filter options.
  *
  * Outstanding Issues:
- * - Consider adding more robust error handling for navigation and argument retrieval.
+ * - We considering adding more robust error handling for navigation and argument retrieval.
  * - UI refinements for the BottomSheetDialog and RecyclerView animations could enhance user experience.
  */
 

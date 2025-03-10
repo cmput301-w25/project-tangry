@@ -7,7 +7,7 @@
  * to ensure a single instance is used throughout the application.
  *
  * Outstanding Issues:
- * - Consider implementing retry logic for network-related failures.
+ * - We considering implementing retry logic for network-related failures.
  * - Further customization for different storage buckets or advanced metadata handling might be added.
  */
 

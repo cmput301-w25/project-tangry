@@ -7,7 +7,7 @@
  * BottomSheetDialog, which applies the selected filters and optionally a recent-week filter.
  *
  * Outstanding Issues:
- * - Consider adding more robust error handling for Firestore listener updates.
+ * - We are considering adding more robust error handling for Firestore listener updates.
  * - UI enhancements such as loading indicators during filtering or network delays could improve UX.
  */
 

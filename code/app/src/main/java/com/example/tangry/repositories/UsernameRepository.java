@@ -8,7 +8,7 @@
  *
  * Outstanding Issues:
  * - Additional error handling or logging may be required in a production environment.
- * - Consider expanding the query capabilities as the application scales.
+ * - We are considering expanding the query capabilities as the application scales.
  */
 
 package com.example.tangry.repositories;

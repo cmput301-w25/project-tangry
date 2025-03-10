@@ -8,7 +8,7 @@
  *
  * Outstanding Issues:
  * - Further error handling and UI feedback (e.g., progress indicators) could enhance the user experience.
- * - Consider refactoring repetitive UI updates and Firestore operations for improved maintainability.
+ * - We considering refactoring repetitive UI updates and Firestore operations for improved maintainability.
  */
 
 package com.example.tangry.ui.home;
