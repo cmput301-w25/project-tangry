@@ -23,6 +23,7 @@ import androidx.navigation.Navigation;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.repositories.UsernameRepository;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.IOException;
@@ -81,12 +82,16 @@ public class DetailEmotionFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         navController = Navigation.findNavController(view);
 
+        
         emotionTextView = view.findViewById(R.id.emotion_text);
         explanationInput = view.findViewById(R.id.explanation_input);
         locationInput = view.findViewById(R.id.location_input);
         socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
         imageAttachment = view.findViewById(R.id.image_attachment);
         saveButton = view.findViewById(R.id.save_button);
+
+        ImageView filterIcon = view.findViewById(R.id.ic_filter);
+        filterIcon.setOnClickListener(v -> showMoodsBottomSheet());
 
         repository = EmotionPostRepository.getInstance(); // Get repository instance
 
@@ -180,5 +185,12 @@ public class DetailEmotionFragment extends Fragment {
             Toast.makeText(getContext(), "Failed to get username. " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Failed to get username", e);
         });
+    }
+
+    private void showMoodsBottomSheet() {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
+        View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.modal_bottom_sheet, null);
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
     }
 }
