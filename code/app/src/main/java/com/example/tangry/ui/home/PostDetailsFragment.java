@@ -1,3 +1,16 @@
+/**
+ * PostDetailsFragment.java
+ *
+ * This fragment is responsible for displaying the details of an emotion post. Users can view the post's
+ * content, including text, images, and associated metadata (such as time, location, and social situation).
+ * The fragment also allows users to navigate to an editing screen or delete the post. Firestore operations
+ * are managed through the EmotionPostController, and image operations (if any) are handled via Firebase Storage.
+ *
+ * Outstanding Issues:
+ * - Further error handling and UI feedback (e.g., progress indicators) could enhance the user experience.
+ * - Consider refactoring repetitive UI updates and Firestore operations for improved maintainability.
+ */
+
 package com.example.tangry.ui.home;
 
 import android.net.Uri;
@@ -21,18 +34,11 @@ import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.utils.TimeUtils;
-import com.google.gson.Gson;
-import java.util.Objects;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
+import java.util.Objects;
 
-/**
- * Fragment responsible for displaying details of an emotion post.
- * <p>
- * Users can view, edit, or delete their posts. Firestore operations are handled
- * through {@link EmotionPostRepository}.
- * <p>
- */
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
     private ImageView moodImage, emojiImage;
@@ -45,15 +51,16 @@ public class PostDetailsFragment extends Fragment {
      * Default empty constructor required for Fragments.
      */
     public PostDetailsFragment() {
+        // Required empty constructor
     }
 
     /**
      * Inflates the fragment layout.
      *
-     * @param inflater           Layout inflater.
-     * @param container          Parent view container.
-     * @param savedInstanceState Previous saved state.
-     * @return The root View.
+     * @param inflater           The LayoutInflater object used to inflate the view.
+     * @param container          The parent view container.
+     * @param savedInstanceState Previously saved state, if any.
+     * @return The root View for this fragment's UI.
      */
     @Nullable
     @Override
@@ -62,10 +69,10 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Initializes the fragment views and retrieves post data.
+     * Initializes UI components, retrieves post data from arguments, and sets up event listeners.
      *
-     * @param view               The root view.
-     * @param savedInstanceState Previously saved state.
+     * @param view               The root view returned by onCreateView.
+     * @param savedInstanceState Previously saved state, if any.
      */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -89,7 +96,6 @@ public class PostDetailsFragment extends Fragment {
         if (getArguments() != null) {
             String postJson = getArguments().getString("post");
             postId = getArguments().getString("postId");
-
             if (postJson != null) {
                 post = new Gson().fromJson(postJson, EmotionPost.class);
                 bindPostDetails(post);
@@ -101,9 +107,9 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Binds the emotion post details to the UI.
+     * Binds the details of the given emotion post to the UI components.
      *
-     * @param post The emotion post object.
+     * @param post The emotion post object containing details to be displayed.
      */
     private void bindPostDetails(EmotionPost post) {
         userName.setText(post.getUsername() + " feels ");
@@ -123,14 +129,14 @@ public class PostDetailsFragment extends Fragment {
             moodImage.setVisibility(View.GONE);
         }
 
-        // Load emoji & mood color
+        // Set emoji and mood color based on emotion
         setEmojiAndColor(post.getEmotion());
     }
 
     /**
-     * Sets the appropriate emoji and text color based on emotion.
+     * Sets the appropriate emoji and text color based on the emotion string.
      *
-     * @param emotion The emotion string.
+     * @param emotion The emotion string from the post.
      */
     private void setEmojiAndColor(String emotion) {
         int emojiResId, colorResId;
@@ -178,7 +184,7 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Navigates to the Edit Emotion screen.
+     * Navigates to the edit screen, passing the current post data via arguments.
      */
     private void editPost() {
         if (post != null) {
@@ -187,8 +193,8 @@ public class PostDetailsFragment extends Fragment {
             bundle.putString("postId", postId);
             bundle.putBoolean("isEditing", true);
 
-            Navigation.findNavController(requireView()).navigate(R.id.action_postDetailsFragment_to_emotionsFragment,
-                    bundle);
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
         }
     }
 
@@ -205,46 +211,45 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Deletes the post and its associated image from Firebase.
+     * Deletes the post by first attempting to remove the associated image (if any) from Firebase Storage,
+     * then deleting the post document from Firestore.
      */
     private void deletePost() {
         if (postId != null) {
-            // First check if the post has an image
+            // Check if the post has an associated image
             if (post.getImageUri() != null && !post.getImageUri().isEmpty()) {
-                // Get a Firebase Storage reference from the URL
                 try {
                     StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(post.getImageUri());
-
                     // Delete the image file
                     imageRef.delete().addOnSuccessListener(aVoid -> {
                         Log.d("PostDetails", "Image deleted successfully");
-                        // After image is deleted, delete the post
+                        // After image deletion, delete the post
                         deletePostFromFirestore();
                     }).addOnFailureListener(e -> {
                         Log.e("PostDetails", "Error deleting image", e);
-                        // Even if image deletion fails, still try to delete the post
+                        // Even if image deletion fails, try deleting the post
                         deletePostFromFirestore();
                     });
                 } catch (IllegalArgumentException e) {
                     Log.e("PostDetails", "Invalid storage URL", e);
-                    // If URL parsing fails, still delete the post
                     deletePostFromFirestore();
                 }
             } else {
-                // No image to delete, just delete the post
+                // No image to delete; directly delete the post
                 deletePostFromFirestore();
             }
         }
     }
 
     /**
-     * Deletes the post document from Firestore.
+     * Deletes the post document from Firestore using the EmotionPostController.
      */
     private void deletePostFromFirestore() {
         controller.deleteEmotionPost(postId,
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
-                    Navigation.findNavController(requireView()).popBackStack(R.id.navigation_home, false);
+                    Navigation.findNavController(requireView())
+                            .popBackStack(R.id.navigation_home, false);
                 },
                 e -> Log.e("PostDetails", "Error deleting post", e));
     }

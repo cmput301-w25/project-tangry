@@ -1,3 +1,15 @@
+/**
+ * AddUserFragment.java
+ *
+ * This fragment provides the UI for creating a new user account. It binds input fields for email,
+ * username, password, and confirm password, and interacts with AddUserViewModel to handle account
+ * creation. On successful account creation, it navigates back by popping the fragment back stack.
+ *
+ * Outstanding Issues:
+ * - Consider adding more robust input validation and error handling.
+ * - UI improvements could include progress indicators while account creation is in progress.
+ */
+
 package com.example.tangry.ui.add_user;
 
 import android.os.Bundle;
@@ -19,6 +31,14 @@ public class AddUserFragment extends Fragment {
     private FragmentAddUserBinding binding;
     private AddUserViewModel viewModel;
 
+    /**
+     * Inflates the fragment layout, initializes the ViewModel, and sets up observers for UI events.
+     *
+     * @param inflater           the LayoutInflater object that can be used to inflate any views in the fragment
+     * @param container          the parent ViewGroup (if non-null) that the fragment's UI should be attached to
+     * @param savedInstanceState a Bundle containing previous saved state, if any
+     * @return the root View of the inflated layout
+     */
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAddUserBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -26,7 +46,7 @@ public class AddUserFragment extends Fragment {
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this).get(AddUserViewModel.class);
 
-        // Observe message updates from ViewModel
+        // Observe message updates from ViewModel to display user notifications
         viewModel.getMessage().observe(getViewLifecycleOwner(), message -> {
             if (message != null) {
                 Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
@@ -40,7 +60,7 @@ public class AddUserFragment extends Fragment {
             }
         });
 
-        // Set click listener for the "Create Account" button
+        // Set click listener for the "Create Account" button to initiate user creation
         binding.createAccountButton.setOnClickListener(v -> {
             String email = binding.emailInput.getText().toString().trim();
             String username = binding.usernameInput.getText().toString().trim();
@@ -53,6 +73,9 @@ public class AddUserFragment extends Fragment {
         return root;
     }
 
+    /**
+     * Hides the support action bar and toolbars when the fragment resumes.
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -70,11 +93,14 @@ public class AddUserFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows the support action bar and toolbars when the fragment pauses.
+     */
     @Override
     public void onPause() {
         super.onPause();
         if (getActivity() instanceof AppCompatActivity) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().show();
+            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
         }
         // Show primary and secondary toolbars when the fragment pauses
         View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
@@ -87,6 +113,9 @@ public class AddUserFragment extends Fragment {
         }
     }
 
+    /**
+     * Cleans up the binding when the view is destroyed to avoid memory leaks.
+     */
     @Override
     public void onDestroyView() {
         super.onDestroyView();

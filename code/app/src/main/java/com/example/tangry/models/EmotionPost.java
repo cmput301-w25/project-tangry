@@ -1,3 +1,17 @@
+/**
+ * EmotionPost.java
+ *
+ * This model class represents a mood event (or emotion post) with attributes such as emotion,
+ * explanation, image URI, location, social situation, username, and timestamp. It includes
+ * validation via a factory method to ensure that only valid EmotionPost instances are created.
+ * The class is Serializable to facilitate passing instances between Android components.
+ *
+ * Outstanding Issues:
+ * - The validation rules in the create() factory method are currently strict (e.g., explanation length).
+ *   Adjust the validations if more flexibility is needed.
+ * - Image size validation is mentioned in comments but not implemented.
+ */
+
 package com.example.tangry.models;
 
 import android.net.Uri;
@@ -29,24 +43,27 @@ public class EmotionPost implements Serializable {
     private Timestamp timestamp;
     private String postId; // Firestore Document ID
 
+    /**
+     * Default constructor required for deserialization.
+     */
     public EmotionPost() {
-    };
+    }
 
-    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList("Select social situation", "Alone",
-            "With one other person", "With two to several people", "With a crowd");
+    private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
+            "Select social situation", "Alone", "With one other person", "With two to several people", "With a crowd");
 
     /**
      * Private constructor to create an EmotionPost object.
      *
-     * @param emotion         The emotion associated with the mood event.
-     * @param explanation     A brief textual explanation for the mood event.
-     * @param imageUri        The URI of the image associated with the mood event.
-     * @param location        The location where the mood event occurred.
-     * @param socialSituation The social situation during the mood event.
-     * @param username        The username of the person posting the emotion.
+     * @param emotion         the emotion associated with the mood event
+     * @param explanation     a brief textual explanation for the mood event
+     * @param imageUri        the URI of the image associated with the mood event
+     * @param location        the location where the mood event occurred
+     * @param socialSituation the social situation during the mood event
+     * @param username        the username of the person posting the emotion
      */
     private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation,
-            String username) {
+                        String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -59,43 +76,41 @@ public class EmotionPost implements Serializable {
     /**
      * Factory method to create an EmotionPost object with validation.
      *
-     * @param emotion         The emotion associated with the mood event.
-     * @param explanation     A brief textual explanation for the mood event.
-     * @param imageUri        The URI of the image associated with the mood event.
-     * @param location        The location where the mood event occurred.
-     * @param socialSituation The social situation during the mood event.
-     * @param username        The username of the person posting the emotion.
-     * @param imageStream     The InputStream of the image to validate its size.
-     * @return A new EmotionPost object.
-     * @throws IllegalArgumentException If any validation fails.
-     * @throws IOException              If an I/O error occurs.
+     * @param emotion         the emotion associated with the mood event
+     * @param explanation     a brief textual explanation for the mood event; must be max 20 characters or 3 words
+     * @param imageUri        the URI of the image associated with the mood event
+     * @param location        the location where the mood event occurred
+     * @param socialSituation the social situation during the mood event; must be one of the valid options
+     * @param username        the username of the person posting the emotion
+     * @return a new EmotionPost object
+     * @throws IllegalArgumentException if any validation fails
      */
     public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
-            String socialSituation, String username) throws IllegalArgumentException {
-        // Existing validations except image size
+                                     String socialSituation, String username) throws IllegalArgumentException {
+        // Validate emotion
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
-
+        // Validate explanation length and word count
         if (explanation.length() > 20 || explanation.split("\\s+").length > 3) {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
-
+        // Validate that either explanation or image is provided
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
             throw new IllegalArgumentException("Emotion post requires text or image.");
         }
-
+        // Validate social situation if provided
         if (socialSituation != null && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
             throw new IllegalArgumentException("Invalid social situation.");
         }
-
+        // Note: Image size validation (if imageStream is provided) is not implemented.
         return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);
     }
 
     /**
      * Gets the emotion associated with the mood event.
      *
-     * @return The emotion.
+     * @return the emotion
      */
     public String getEmotion() {
         return emotion;
@@ -104,7 +119,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the emotion associated with the mood event.
      *
-     * @param emotion The emotion to set.
+     * @param emotion the emotion to set
      */
     public void setEmotion(String emotion) {
         this.emotion = emotion;
@@ -113,7 +128,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the explanation for the mood event.
      *
-     * @return The explanation.
+     * @return the explanation
      */
     public String getExplanation() {
         return explanation;
@@ -122,7 +137,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the explanation for the mood event.
      *
-     * @param explanation The explanation to set.
+     * @param explanation the explanation to set
      */
     public void setExplanation(String explanation) {
         this.explanation = explanation;
@@ -131,7 +146,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the URI of the image associated with the mood event.
      *
-     * @return The image URI.
+     * @return the image URI
      */
     public String getImageUri() {
         return imageUri;
@@ -140,7 +155,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the URI of the image associated with the mood event.
      *
-     * @param imageUri The image URI to set.
+     * @param imageUri the image URI to set
      */
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
@@ -149,7 +164,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the location where the mood event occurred.
      *
-     * @return The location.
+     * @return the location
      */
     public String getLocation() {
         return location;
@@ -158,7 +173,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the location where the mood event occurred.
      *
-     * @param location The location to set.
+     * @param location the location to set
      */
     public void setLocation(String location) {
         this.location = location;
@@ -167,7 +182,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the social situation during the mood event.
      *
-     * @return The social situation.
+     * @return the social situation
      */
     public String getSocialSituation() {
         return socialSituation;
@@ -176,7 +191,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the social situation during the mood event.
      *
-     * @param socialSituation The social situation to set.
+     * @param socialSituation the social situation to set
      */
     public void setSocialSituation(String socialSituation) {
         this.socialSituation = socialSituation;
@@ -185,7 +200,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the username of the person posting the emotion.
      *
-     * @return The username.
+     * @return the username
      */
     public String getUsername() {
         return username;
@@ -194,7 +209,7 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the username of the person posting the emotion.
      *
-     * @param username The username to set.
+     * @param username the username to set
      */
     public void setUsername(String username) {
         this.username = username;
@@ -203,7 +218,7 @@ public class EmotionPost implements Serializable {
     /**
      * Gets the timestamp of the mood event.
      *
-     * @return The timestamp.
+     * @return the timestamp
      */
     public Timestamp getTimestamp() {
         return timestamp;
@@ -212,19 +227,34 @@ public class EmotionPost implements Serializable {
     /**
      * Sets the timestamp of the mood event.
      *
-     * @param timestamp The timestamp to set.
+     * @param timestamp the timestamp to set
      */
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
 
-    public String getPostId() { return postId; }
-    public void setPostId(String postId) { this.postId = postId; }
+    /**
+     * Gets the Firestore document ID (postId) of the mood event.
+     *
+     * @return the postId
+     */
+    public String getPostId() {
+        return postId;
+    }
+
+    /**
+     * Sets the Firestore document ID (postId) of the mood event.
+     *
+     * @param postId the postId to set
+     */
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
 
     /**
      * Returns a string representation of the EmotionPost object.
      *
-     * @return A string representation of the EmotionPost object.
+     * @return a string representation of the EmotionPost
      */
     @Override
     public String toString() {

@@ -1,3 +1,15 @@
+/**
+ * LoginFragment.java
+ *
+ * This fragment provides the user interface for logging into the application. It handles user input for email
+ * and password, supports "Remember Me" functionality via SharedPreferences, and performs both manual and auto-login
+ * using the LoginViewModel. Successful login navigates the user to the home screen.
+ *
+ * Outstanding Issues:
+ * - Further input validation (e.g., email format) and error handling can be implemented.
+ * - UI improvements such as loading indicators during authentication may enhance the user experience.
+ */
+
 package com.example.tangry.ui.login;
 
 import android.content.Context;
@@ -15,7 +27,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +34,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import com.example.tangry.MainActivity;
 import com.example.tangry.R;
 
@@ -37,6 +47,14 @@ public class LoginFragment extends Fragment {
     private boolean manualLoginAttempted = false;
     private static final String TAG = "LoginFragment";
 
+    /**
+     * Inflates the layout for the login fragment and initializes UI components.
+     *
+     * @param inflater           The LayoutInflater used to inflate the view.
+     * @param container          The parent container.
+     * @param savedInstanceState Previously saved state, if any.
+     * @return The root view of the inflated layout.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -83,7 +101,7 @@ public class LoginFragment extends Fragment {
         // Set IME option for username to advance to next field.
         emailEditText.setImeOptions(EditorInfo.IME_ACTION_NEXT);
 
-        // Set listener on the password field for "Done" to hide the keyboard.
+        // Set listener on the password field to hide the keyboard on "Done".
         passwordEditText.setOnEditorActionListener((TextView textView, int actionId, KeyEvent event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 InputMethodManager imm = (InputMethodManager) requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -95,7 +113,7 @@ public class LoginFragment extends Fragment {
             return false;
         });
 
-        // Manual login click listener
+        // Manual login click listener.
         loginButton.setOnClickListener(v -> {
             String email = emailEditText.getText().toString().trim();
             String pass = passwordEditText.getText().toString();
@@ -115,13 +133,13 @@ public class LoginFragment extends Fragment {
             viewModel.login();
         });
 
-        // "Create account" click listener
+        // "Create account" click listener.
         createButton.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
             navController.navigate(R.id.action_navigation_login_to_navigation_add_user);
         });
 
-        // Auto–login: if "Remember Me" was checked and saved credentials are not empty.
+        // Auto–login: if "Remember Me" was checked and saved credentials are available.
         if (savedRemember && !savedEmail.isEmpty() && !savedPassword.isEmpty()) {
             Log.d(TAG, "Attempting auto-login with saved credentials");
             viewModel.setEmail(savedEmail.trim());
@@ -131,39 +149,45 @@ public class LoginFragment extends Fragment {
         }
 
         return view;
-        }
+    }
 
-        @Override
-        public void onResume() {
-            super.onResume();
-            if (getActivity() instanceof AppCompatActivity) {
-                ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
-            }
-            // Hide primary and secondary toolbars
-            View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
-            if (toolbarPrimary != null) {
-                toolbarPrimary.setVisibility(View.GONE);
-            }
-            View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
-            if (toolbarSecondary != null) {
-                toolbarSecondary.setVisibility(View.GONE);
-            }
+    /**
+     * Hides the action bar and toolbars when the fragment resumes.
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
         }
-
-        @Override
-        public void onPause() {
-            super.onPause();
-            if (getActivity() instanceof AppCompatActivity) {
-                ((AppCompatActivity) getActivity()).getSupportActionBar().show();
-            }
-            // Show primary and secondary toolbars when the fragment pauses
-            View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
-            if (toolbarPrimary != null) {
-                toolbarPrimary.setVisibility(View.VISIBLE);
-            }
-            View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
-            if (toolbarSecondary != null) {
-                toolbarSecondary.setVisibility(View.VISIBLE);
-            }
+        // Hide primary and secondary toolbars.
+        View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
+        if (toolbarPrimary != null) {
+            toolbarPrimary.setVisibility(View.GONE);
+        }
+        View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
+        if (toolbarSecondary != null) {
+            toolbarSecondary.setVisibility(View.GONE);
         }
     }
+
+    /**
+     * Shows the action bar and toolbars when the fragment is paused.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (getActivity() instanceof AppCompatActivity) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+        }
+        // Show primary and secondary toolbars.
+        View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
+        if (toolbarPrimary != null) {
+            toolbarPrimary.setVisibility(View.VISIBLE);
+        }
+        View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
+        if (toolbarSecondary != null) {
+            toolbarSecondary.setVisibility(View.VISIBLE);
+        }
+    }
+}

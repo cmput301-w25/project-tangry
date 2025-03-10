@@ -1,3 +1,16 @@
+/**
+ * EmotionPostViewHolder.java
+ *
+ * This ViewHolder is responsible for binding EmotionPost model data to the UI components of
+ * a RecyclerView item. It serves as an adapter between the data model and the presentation layer,
+ * displaying the user's emotion along with related details such as location, social situation, and
+ * an appropriate emoji representation.
+ *
+ * Outstanding Issues:
+ * - The null/empty checks for location and explanation could be improved for more robust error handling.
+ * - The time formatting logic in getTimeAgo may be refactored into a utility class for reuse.
+ */
+
 package com.example.tangry.adapters.viewholders;
 
 import android.content.Context;
@@ -32,6 +45,11 @@ public class EmotionPostViewHolder extends RecyclerView.ViewHolder {
     private final ImageView emojiImage;
     private final Context context;
 
+    /**
+     * Constructs a new EmotionPostViewHolder by initializing all view components.
+     *
+     * @param itemView the root view of the RecyclerView item layout
+     */
     public EmotionPostViewHolder(@NonNull View itemView) {
         super(itemView);
         context = itemView.getContext();
@@ -46,6 +64,11 @@ public class EmotionPostViewHolder extends RecyclerView.ViewHolder {
         emojiImage = itemView.findViewById(R.id.emoji_image);
     }
 
+    /**
+     * Binds the EmotionPost model data to the corresponding UI components.
+     *
+     * @param post the EmotionPost object containing the data to be displayed
+     */
     public void bind(EmotionPost post) {
         // Bind text views
         userName.setText(post.getUsername() + " feels ");
@@ -83,6 +106,12 @@ public class EmotionPostViewHolder extends RecyclerView.ViewHolder {
         setEmojiAndColor(post.getEmotion());
     }
 
+    /**
+     * Maps the given emotion string to an emoji image resource and a text color, then applies these
+     * settings to the view components.
+     *
+     * @param emotion the emotion string from the EmotionPost
+     */
     private void setEmojiAndColor(String emotion) {
         String e = emotion.toLowerCase();
         int emojiRes;
@@ -129,6 +158,12 @@ public class EmotionPostViewHolder extends RecyclerView.ViewHolder {
         moodText.setTextColor(ContextCompat.getColor(context, colorRes));
     }
 
+    /**
+     * Computes a human-readable relative time string based on the elapsed time since the given date.
+     *
+     * @param date the date to compare with the current time
+     * @return a formatted string representing how long ago the date was (e.g., "Just now", "5 minutes ago")
+     */
     private String getTimeAgo(Date date) {
         long timeDiff = System.currentTimeMillis() - date.getTime();
         long minutes = TimeUnit.MILLISECONDS.toMinutes(timeDiff);
