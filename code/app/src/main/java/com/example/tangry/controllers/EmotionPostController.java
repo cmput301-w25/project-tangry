@@ -8,6 +8,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.Timestamp;
+
+import java.util.List;
+
 public class EmotionPostController {
     private final EmotionPostRepository repository;
 
@@ -38,6 +42,21 @@ public class EmotionPostController {
      */
     public Query getPostsQuery() {
         return repository.getPostsQuery();
+    }
+
+    public Query getFilteredPostsQuery(List<String> emotions, boolean filterRecent) {
+        if (emotions.isEmpty() && !filterRecent) {
+            return repository.getPostsQuery(); // No filters, return all posts
+        }
+
+        Query query = repository.getFilteredPostsQuery(emotions);
+
+        if (filterRecent) {
+            Timestamp oneWeekAgo = new Timestamp(Timestamp.now().getSeconds() - (7 * 24 * 60 * 60), 0);
+            query = query.whereGreaterThanOrEqualTo("timestamp", oneWeekAgo);
+        }
+
+        return query;
     }
 
     /**

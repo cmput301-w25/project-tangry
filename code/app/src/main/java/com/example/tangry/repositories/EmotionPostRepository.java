@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -45,8 +46,8 @@ public class EmotionPostRepository {
      * @param failureListener Callback for failure
      */
     public void saveEmotionPostToFirestore(EmotionPost post,
-            OnSuccessListener<DocumentReference> successListener,
-            OnFailureListener failureListener) {
+                                           OnSuccessListener<DocumentReference> successListener,
+                                           OnFailureListener failureListener) {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
@@ -66,6 +67,18 @@ public class EmotionPostRepository {
      */
     public Query getPostsQuery() {
         return firebaseDataSource.getQuery();
+    }
+
+    public Query getFilteredPostsQuery(List<String> emotions) {
+        Query query = firebaseDataSource.getCollectionReference();
+
+        if (!emotions.isEmpty()) {
+            query = query.whereIn("emotion", emotions);
+        }
+
+        query = query.orderBy("timestamp", Query.Direction.DESCENDING); // 🔥 Sort by latest posts
+
+        return query;
     }
 
     /**
