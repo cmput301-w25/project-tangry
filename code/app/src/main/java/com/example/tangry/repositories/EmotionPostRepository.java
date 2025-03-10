@@ -25,17 +25,10 @@ public class EmotionPostRepository {
         this.firebaseDataSource = new FirebaseDataSource("emotions");
     }
 
+    //Testing environment
     public EmotionPostRepository(FirebaseFirestore db, String collection1) {
         firebaseDataSource = new FirebaseDataSource(db, collection1);
     }
-
-
-    public FirebaseFirestore getDB() {
-        return this.firebaseDataSource.getDBDataSource();
-    }
-
-    public EmotionPostRepository(FirebaseFirestore db) {}
-
 
     public static synchronized EmotionPostRepository getInstance() {
         if (instance == null) {
