@@ -85,17 +85,28 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             userName.setText(post.getUsername() + " feels ");
             moodText.setText(post.getEmotion());
             userHandle.setText("@" + post.getUsername());
+
             if (!post.getLocation().isEmpty()) {
                 locationText.setText(post.getLocation());
                 locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
             } else {
+                locationText.setText("Not Provided");
                 locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             }
-            withText.setText(post.getSocialSituation());
+
+            if (post.getSocialSituation() != null) {
+                withText.setText(post.getSocialSituation());
+                withText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+            } else {
+                withText.setText("Not Provided");
+                withText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
+
             if (!post.getExplanation().isEmpty()) {
                 reasonText.setText(post.getExplanation());
                 reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
             } else {
+                reasonText.setText("Not Provided");
                 reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             }
 
