@@ -14,6 +14,11 @@ public class FirebaseDataSource {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final String collectionName;
 
+    public FirebaseFirestore getDBDataSource() {
+        return db;
+    }
+
+
     public FirebaseDataSource(String collectionName) {
         this.collectionName = collectionName;
     }

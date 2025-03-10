@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import java.util.HashMap;
@@ -23,6 +24,13 @@ public class EmotionPostRepository {
     public EmotionPostRepository() {
         this.firebaseDataSource = new FirebaseDataSource("emotions");
     }
+
+    public FirebaseFirestore getDB() {
+        return this.firebaseDataSource.getDBDataSource();
+    }
+
+
+
 
     public static synchronized EmotionPostRepository getInstance() {
         if (instance == null) {
