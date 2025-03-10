@@ -33,8 +33,7 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar_primary"
         app:layout_constraintBottom_toTopOf="@id/nav_host_fragment_activity_main"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/menu_profile" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Fragment container below the secondary toolbar -->
     <fragment
