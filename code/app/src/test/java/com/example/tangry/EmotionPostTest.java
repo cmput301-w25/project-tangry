@@ -12,15 +12,15 @@ public class EmotionPostTest {
     public void testCreateValidEmotionPost() {
         // Valid inputs
         EmotionPost post = EmotionPost.create(
-                "happiness",     // emotion
-                "I'm happy",     // explanation
-                "image_uri",     // imageUri
-                "Home",          // location
-                "Alone",         // socialSituation
-                "testUser"       // username
+                "Happiness", // emotion
+                "I'm happy", // explanation
+                "image_uri", // imageUri
+                "Home", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
 
-        assertEquals("happiness", post.getEmotion());
+        assertEquals("Happiness", post.getEmotion());
         assertEquals("I'm happy", post.getExplanation());
         assertEquals("image_uri", post.getImageUri());
         assertEquals("Home", post.getLocation());
@@ -32,15 +32,15 @@ public class EmotionPostTest {
     public void testCreateWithImageNoText() {
         // Valid case: no explanation but has image
         EmotionPost post = EmotionPost.create(
-                "happiness",     // emotion
-                "",              // explanation - empty but valid because we have image
-                "image_uri",     // imageUri
-                "Home",          // location
-                "Alone",         // socialSituation
-                "testUser"       // username
+                "Happiness", // emotion
+                "", // explanation - empty but valid because we have image
+                "image_uri", // imageUri
+                "Home", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
 
-        assertEquals("happiness", post.getEmotion());
+        assertEquals("Happiness", post.getEmotion());
         assertEquals("", post.getExplanation());
         assertEquals("image_uri", post.getImageUri());
     }
@@ -49,12 +49,12 @@ public class EmotionPostTest {
     public void testCreateWithEmptyEmotion() {
         // Should throw exception for empty emotion
         EmotionPost.create(
-                "",              // emotion - empty (invalid)
-                "Test",          // explanation
-                "image_uri",     // imageUri
-                "Location",      // location
-                "Alone",         // socialSituation
-                "testUser"       // username
+                "", // emotion - empty (invalid)
+                "Test", // explanation
+                "image_uri", // imageUri
+                "Location", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
     }
 
@@ -62,12 +62,12 @@ public class EmotionPostTest {
     public void testCreateWithNullEmotion() {
         // Should throw exception for null emotion
         EmotionPost.create(
-                null,            // emotion - null (invalid)
-                "Test",          // explanation
-                "image_uri",     // imageUri
-                "Location",      // location
-                "Alone",         // socialSituation
-                "testUser"       // username
+                null, // emotion - null (invalid)
+                "Test", // explanation
+                "image_uri", // imageUri
+                "Location", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
     }
 
@@ -75,12 +75,12 @@ public class EmotionPostTest {
     public void testCreateWithTooLongExplanation() {
         // Should throw exception for explanation that exceeds 20 chars
         EmotionPost.create(
-                "happiness",                             // emotion
-                "This explanation is way too long",      // explanation - too many words/chars
-                "image_uri",                             // imageUri
-                "Location",                              // location
-                "Alone",                                 // socialSituation
-                "testUser"                               // username
+                "Happiness", // emotion
+                "This explanation is way too long", // explanation - too many words/chars
+                "image_uri", // imageUri
+                "Location", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
     }
 
@@ -88,12 +88,12 @@ public class EmotionPostTest {
     public void testCreateWithNoExplanationOrImage() {
         // Should throw exception when both explanation is empty and image is null
         EmotionPost.create(
-                "happiness",     // emotion
-                "",              // explanation - empty
-                null,            // imageUri - null
-                "Location",      // location
-                "Alone",         // socialSituation
-                "testUser"       // username
+                "Happiness", // emotion
+                "", // explanation - empty
+                null, // imageUri - null
+                "Location", // location
+                "Alone", // socialSituation
+                "testUser" // username
         );
     }
 
@@ -101,12 +101,12 @@ public class EmotionPostTest {
     public void testCreateWithInvalidSocialSituation() {
         // Should throw exception for invalid social situation
         EmotionPost.create(
-                "happiness",         // emotion
-                "Test",              // explanation
-                "image_uri",         // imageUri
-                "Location",          // location
+                "Happiness", // emotion
+                "Test", // explanation
+                "image_uri", // imageUri
+                "Location", // location
                 "Invalid Situation", // socialSituation - invalid
-                "testUser"           // username
+                "testUser" // username
         );
     }
 
@@ -114,15 +114,15 @@ public class EmotionPostTest {
     public void testCreateWithNullSocialSituation() {
         // Valid case: social situation can be null
         EmotionPost post = EmotionPost.create(
-                "happiness",     // emotion
-                "Test",          // explanation
-                "image_uri",     // imageUri
-                "Location",      // location
-                null,            // socialSituation - null but valid
-                "testUser"       // username
+                "Happiness", // emotion
+                "Test", // explanation
+                "image_uri", // imageUri
+                "Location", // location
+                null, // socialSituation - null but valid
+                "testUser" // username
         );
 
-        assertEquals("happiness", post.getEmotion());
+        assertEquals("Happiness", post.getEmotion());
         assertNull(post.getSocialSituation());
     }
 
@@ -130,15 +130,15 @@ public class EmotionPostTest {
     public void testCreateWithNullLocation() {
         // Valid case: location can be null
         EmotionPost post = EmotionPost.create(
-                "happiness",     // emotion
-                "Test",          // explanation
-                "image_uri",     // imageUri
-                null,            // location - null
-                "Alone",         // socialSituation
-                "testUser"       // username
+                "Happiness", // emotion
+                "Test", // explanation
+                "image_uri", // imageUri
+                null, // location - null
+                "Alone", // socialSituation
+                "testUser" // username
         );
 
-        assertEquals("happiness", post.getEmotion());
+        assertEquals("Happiness", post.getEmotion());
         assertNull(post.getLocation());
     }
 }
