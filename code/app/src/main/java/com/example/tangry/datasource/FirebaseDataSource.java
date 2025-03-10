@@ -31,6 +31,7 @@ public class FirebaseDataSource {
 
     public FirebaseDataSource(String collectionName) {
         this.collectionName = collectionName;
+        this.db = FirebaseFirestore.getInstance();
     }
 
     public void saveData(Map<String, Object> data,
