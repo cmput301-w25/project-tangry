@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tangry.R;
 import com.example.tangry.adapters.EmotionPostAdapter;
+import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,7 +23,7 @@ public class YourMoodFragment extends Fragment {
     private RecyclerView recyclerView;
     private EmotionPostAdapter adapter;
     private final List<EmotionPost> posts = new ArrayList<>();
-    private EmotionPostRepository repository;
+    private EmotionPostController controller;
 
     public YourMoodFragment() {
         // Required empty constructor
@@ -35,22 +36,26 @@ public class YourMoodFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new EmotionPostAdapter(posts);
         recyclerView.setAdapter(adapter);
-        repository = EmotionPostRepository.getInstance();
+        controller = new EmotionPostController();
         setupFirestoreListener();
         return root;
     }
 
     private void setupFirestoreListener() {
-        repository.getPostsQuery().addSnapshotListener((value, error) -> {
+        controller.getPostsQuery().addSnapshotListener((value, error) -> {
             if (error != null) {
-                Log.e("YourMoodFragment", "Listen failed", error);
+                Log.e("HomeFragment", "Listen failed", error);
                 return;
             }
+
             if (value != null) {
                 posts.clear();
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     EmotionPost post = doc.toObject(EmotionPost.class);
-                    posts.add(post);
+                    if (post != null) {
+                        post.setPostId(doc.getId());
+                        posts.add(post);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }

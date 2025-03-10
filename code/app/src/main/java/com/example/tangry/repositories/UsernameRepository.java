@@ -1,26 +1,23 @@
 package com.example.tangry.repositories;
 
+import com.example.tangry.datasource.FirebaseDataSource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.Query.Direction;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 public class UsernameRepository {
     private static UsernameRepository instance;
-    private final FirebaseFirestore db;
+    private FirebaseDataSource firebaseDataSource;
     private static final String COLLECTION_NAME = "usernames";
 
     private UsernameRepository() {
-        db = FirebaseFirestore.getInstance();
+        // Initialize the data source with the "usernames" collection.
+        firebaseDataSource = new FirebaseDataSource(COLLECTION_NAME);
     }
 
     public static synchronized UsernameRepository getInstance() {
@@ -37,20 +34,18 @@ public class UsernameRepository {
         data.put("username", username);
         data.put("email", email);
 
-        db.collection(COLLECTION_NAME)
-                .add(data)
-                .addOnSuccessListener(successListener)
-                .addOnFailureListener(failureListener);
+        firebaseDataSource.saveData(data, successListener, failureListener);
     }
 
     public Query getPostsQuery() {
-        return db.collection(COLLECTION_NAME)
-                .orderBy("username", Query.Direction.DESCENDING);
+        // Return a query that orders usernames in descending order.
+        return firebaseDataSource.getCollectionReference().orderBy("username", Direction.DESCENDING);
     }
 
-    public void getUsernameFromEmail(String email, OnSuccessListener<String> successListener, OnFailureListener failureListener) {
-        FirebaseFirestore.getInstance()
-                .collection(COLLECTION_NAME)
+    public void getUsernameFromEmail(String email,
+                                     OnSuccessListener<String> successListener,
+                                     OnFailureListener failureListener) {
+        firebaseDataSource.getCollectionReference()
                 .whereEqualTo("email", email)
                 .limit(1)
                 .get()

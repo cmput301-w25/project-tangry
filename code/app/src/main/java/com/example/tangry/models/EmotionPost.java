@@ -9,6 +9,7 @@ import com.google.firebase.Timestamp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * Represents a mood event with various attributes such as emotion, explanation,
  * image, location, social situation, and username.
  */
-public class EmotionPost {
+public class EmotionPost implements Serializable {
     private static final String TAG = "EmotionPost";
 
     private String emotion;
@@ -26,6 +27,7 @@ public class EmotionPost {
     private String socialSituation;
     private String username;
     private Timestamp timestamp;
+    private String postId; // Firestore Document ID
 
     public EmotionPost() {
     };
@@ -43,7 +45,8 @@ public class EmotionPost {
      * @param socialSituation The social situation during the mood event.
      * @param username        The username of the person posting the emotion.
      */
-    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation, String username) {
+    private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation,
+            String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -68,7 +71,8 @@ public class EmotionPost {
      * @throws IOException              If an I/O error occurs.
      */
     public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
-                                     String socialSituation, String username, InputStream imageStream) throws IllegalArgumentException, IOException {
+            String socialSituation, String username) throws IllegalArgumentException {
+        // Existing validations except image size
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
@@ -77,19 +81,12 @@ public class EmotionPost {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
 
-        if (explanation.length() == 0 && (imageUri == null || imageUri.length() == 0)) {
-            throw new IllegalArgumentException("Emotion post should have a text or image at least");
+        if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
+            throw new IllegalArgumentException("Emotion post requires text or image.");
         }
 
-        if (!VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
+        if (socialSituation != null && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
             throw new IllegalArgumentException("Invalid social situation.");
-        }
-
-        if (imageStream != null) {
-            int imageSizeInBytes = imageStream.available();
-            if (imageSizeInBytes > 65536) {
-                throw new IllegalArgumentException("Image size must be under 65536 bytes.");
-            }
         }
 
         return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);
@@ -220,6 +217,9 @@ public class EmotionPost {
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
     }
+
+    public String getPostId() { return postId; }
+    public void setPostId(String postId) { this.postId = postId; }
 
     /**
      * Returns a string representation of the EmotionPost object.
