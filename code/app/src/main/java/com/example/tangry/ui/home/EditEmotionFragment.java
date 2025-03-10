@@ -55,7 +55,7 @@ public class EditEmotionFragment extends Fragment {
     private String postId, imageUri;
     private boolean isNewImageSelected = false;
     private EmotionPost updatedPost;
-//    private EmotionPostRepository repository;
+    // private EmotionPostRepository repository;
 
     private EmotionPostController emotionPostController;
     private NavController navController;
@@ -174,9 +174,8 @@ public class EditEmotionFragment extends Fragment {
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
         String emotion = emotionTextView.getText().toString();
 
-        if (socialSituation.equals("Select social situation")) {
-            Toast.makeText(getContext(), "Please select a valid social situation.", Toast.LENGTH_SHORT).show();
-            return;
+        if ("Select social situation".equals(socialSituation)) {
+            socialSituation = null;
         }
 
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
@@ -237,7 +236,7 @@ public class EditEmotionFragment extends Fragment {
         // Save to Firestore
         emotionPostController.updateEmotionPost(postId, updatedPost, () -> {
             Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
-            navController.popBackStack(R.id.navigation_home, true); //changed from false to true to test it
+            navController.popBackStack(R.id.navigation_home, true); // changed from false to true to test it
         }, e -> {
             Toast.makeText(getContext(), "Failed to update. " + e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.e(TAG, "Failed to update post", e);
