@@ -93,7 +93,7 @@ public class EmotionPostRepositoryTest {
     @Test
     public void testSaveEmotionPostToFirestore() {
         EmotionPost post = EmotionPost.create(
-                "happiness",
+                "Happiness",
                 "Test",
                 "image_uri",
                 "Location",
@@ -109,7 +109,7 @@ public class EmotionPostRepositoryTest {
         ArgumentCaptor<Map<String, Object>> mapCaptor = ArgumentCaptor.forClass(Map.class);
         verify(mockCollection).add(mapCaptor.capture());
         Map<String, Object> capturedMap = mapCaptor.getValue();
-        assertEquals("happiness", capturedMap.get("emotion"));
+        assertEquals("Happiness", capturedMap.get("emotion"));
         assertEquals("Test", capturedMap.get("explanation"));
         assertEquals("image_uri", capturedMap.get("imageUri"));
         assertEquals("Location", capturedMap.get("location"));
@@ -124,7 +124,7 @@ public class EmotionPostRepositoryTest {
     public void testGetEmotionPostWhenExists() {
         String postId = "test_post_id";
         EmotionPost expectedPost = EmotionPost.create(
-                "sadness",
+                "Sadness",
                 "Feeling sad",
                 null,
                 "Home",
@@ -193,7 +193,7 @@ public class EmotionPostRepositoryTest {
     public void testUpdateEmotionPostSuccess() {
         String postId = "test_post_id";
         EmotionPost post = EmotionPost.create(
-                "fear",
+                "Fear",
                 "Scary",
                 "image_uri",
                 "Outside",
@@ -222,7 +222,7 @@ public class EmotionPostRepositoryTest {
     public void testUpdateEmotionPostFailure() {
         String postId = "test_post_id";
         EmotionPost post = EmotionPost.create(
-                "anger",
+                "Angry",
                 "Angry",
                 null,
                 "Work",
