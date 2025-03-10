@@ -103,7 +103,7 @@ jobs:
         fi
         
     - name: Start Firebase Emulator
-      run: firebase emulators:start
+      run: firebase emulators:start &
       working-directory: code
       
     - name: Wait for emulators
