@@ -45,8 +45,8 @@ public class EmotionPostRepository {
      * @param failureListener Callback for failure
      */
     public void saveEmotionPostToFirestore(EmotionPost post,
-                                           OnSuccessListener<DocumentReference> successListener,
-                                           OnFailureListener failureListener) {
+            OnSuccessListener<DocumentReference> successListener,
+            OnFailureListener failureListener) {
         Map<String, Object> data = new HashMap<>();
         data.put("emotion", post.getEmotion());
         data.put("explanation", post.getExplanation());
