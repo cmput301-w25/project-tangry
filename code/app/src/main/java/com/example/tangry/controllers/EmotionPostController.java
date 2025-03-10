@@ -7,7 +7,7 @@
  *
  * Outstanding Issues:
  * - Error handling could be further improved for asynchronous operations.
- * - Additional logging and user feedback mechanisms may be required for production use.
+ * - Additional logging and user feedback mechanisms may be required.
  */
 
 package com.example.tangry.controllers;

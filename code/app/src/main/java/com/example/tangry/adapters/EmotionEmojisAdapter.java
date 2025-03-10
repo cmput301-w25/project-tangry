@@ -6,7 +6,7 @@
  * interface for handling item click events. This class is a key part of the emotion selection feature.
  *
  * Outstanding Issues:
- * - Consider implementing DiffUtil for improved performance when updating the list.
+ * - We considering implementing DiffUtil for improved performance when updating the list.
  * - Additional error handling may be needed if the emotion list is modified concurrently.
  */
 

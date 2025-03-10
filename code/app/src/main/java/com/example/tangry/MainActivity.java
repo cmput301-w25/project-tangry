@@ -8,7 +8,7 @@
  *
  * Outstanding Issues:
  * - Additional error handling for navigation and UI updates could be implemented.
- * - Consider adding animations or transitions when showing/hiding UI elements.
+ * - We considering adding animations or transitions when showing/hiding UI elements.
  */
 
 package com.example.tangry;
