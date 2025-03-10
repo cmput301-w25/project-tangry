@@ -179,18 +179,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Mabdalla-1608"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Mabdalla-1608&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/cmput301-w25/project-tangry.git",
-    "accountId": "f27e71de-a3b2-47a8-9c88-8cb885353d8a"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/cmput301-w25/project-tangry.git&quot;,
+    &quot;accountId&quot;: &quot;f27e71de-a3b2-47a8-9c88-8cb885353d8a&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -209,6 +209,8 @@
     "Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor": "Run",
     "Android Instrumented Tests.testInvalidEmotionValues().executor": "Run",
     "Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor": "Run",
+    "Gradle.EmotionPostRepositoryTest.executor": "Run",
+    "Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor": "Debug",
     "ResourceManagerPrefKey.ModuleName": "tangry.app.main",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -224,7 +226,7 @@
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
-  <component name="RunManager" selected="Android Instrumented Tests.EmotionPostRepositoryEmulatorTest">
+  <component name="RunManager" selected="Gradle.EmotionPostRepositoryTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="tangry.app" />
       <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
@@ -544,8 +546,33 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="EmotionPostRepositoryTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.example.tangry.EmotionPostRepositoryTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Gradle.EmotionPostRepositoryTest" />
         <item itemvalue="Android Instrumented Tests.EmotionPostRepositoryEmulatorTest" />
         <item itemvalue="Android Instrumented Tests.testInvalidEmotionValues()" />
         <item itemvalue="Android Instrumented Tests.testSavePostWithAllSocialSituationValues()" />
@@ -585,6 +612,17 @@
     <MESSAGE value="Merge with main" />
     <MESSAGE value="merge" />
     <option name="LAST_COMMIT_MESSAGE" value="merge" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java</url>
+          <line>94</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">
