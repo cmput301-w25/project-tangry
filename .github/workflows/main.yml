@@ -117,7 +117,7 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
-        script: ./gradlew connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.notPackage="com.example.tangry.uitests"
+        script: ./gradlew connectedAndroidTest
         working-directory: code
         
     - name: Upload instrumentation test results
