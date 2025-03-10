@@ -21,6 +21,7 @@ public class FirebaseDataSource {
 
     public FirebaseDataSource() {
         db = FirebaseFirestore.getInstance();
+        collectionName = "emotions";
     }
 
     public FirebaseFirestore getDBDataSource() {
