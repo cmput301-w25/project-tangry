@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 
 public class EmotionPostRepository {
     private static EmotionPostRepository instance;
-    private final FirebaseDataSource firebaseDataSource;
+    private FirebaseDataSource firebaseDataSource;
 
     private static final String TAG = "EmotionPostRepository";
 
@@ -29,7 +29,7 @@ public class EmotionPostRepository {
         return this.firebaseDataSource.getDBDataSource();
     }
 
-
+    public EmotionPostRepository(FirebaseFirestore db) {}
 
 
     public static synchronized EmotionPostRepository getInstance() {
