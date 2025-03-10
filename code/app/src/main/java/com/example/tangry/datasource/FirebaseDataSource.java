@@ -11,11 +11,27 @@ import com.google.firebase.firestore.Query;
 import java.util.Map;
 
 public class FirebaseDataSource {
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String collectionName;
+    private FirebaseFirestore db;
+    private String collectionName;
+
+    public FirebaseDataSource(FirebaseFirestore db1, String collectionName) {
+        db = db1;
+        this.collectionName = collectionName;
+    }
+
+    public FirebaseDataSource() {
+        db = FirebaseFirestore.getInstance();
+        collectionName = "emotions";
+    }
+
+    public FirebaseFirestore getDBDataSource() {
+        return db;
+    }
+
 
     public FirebaseDataSource(String collectionName) {
         this.collectionName = collectionName;
+        this.db = FirebaseFirestore.getInstance();
     }
 
     public void saveData(Map<String, Object> data,

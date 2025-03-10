@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class UsernameRepository {
     private static UsernameRepository instance;
-    private final FirebaseDataSource firebaseDataSource;
+    private FirebaseDataSource firebaseDataSource;
     private static final String COLLECTION_NAME = "usernames";
 
     private UsernameRepository() {
