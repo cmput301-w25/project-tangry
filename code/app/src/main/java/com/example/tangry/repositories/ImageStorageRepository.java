@@ -1,12 +1,23 @@
+/**
+ * ImageStorageRepository.java
+ *
+ * This repository class provides an abstraction layer for interacting with Firebase Storage.
+ * It supports common image operations such as uploading images (with or without progress tracking),
+ * retrieving download URLs, and deleting images. The class follows the singleton design pattern
+ * to ensure a single instance is used throughout the application.
+ *
+ * Outstanding Issues:
+ * - Consider implementing retry logic for network-related failures.
+ * - Further customization for different storage buckets or advanced metadata handling might be added.
+ */
+
 package com.example.tangry.repositories;
 
 import android.net.Uri;
 import android.util.Log;
-
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.util.function.Consumer;
 
 public class ImageStorageRepository {
@@ -15,12 +26,19 @@ public class ImageStorageRepository {
     private static ImageStorageRepository instance;
     private final FirebaseStorage storage;
 
-    // Private constructor for singleton
+    /**
+     * Private constructor for singleton instantiation.
+     * Initializes the repository with the default FirebaseStorage instance.
+     */
     private ImageStorageRepository() {
         storage = FirebaseStorage.getInstance();
     }
 
-    // Get singleton instance
+    /**
+     * Returns the singleton instance of ImageStorageRepository.
+     *
+     * @return the ImageStorageRepository instance
+     */
     public static synchronized ImageStorageRepository getInstance() {
         if (instance == null) {
             instance = new ImageStorageRepository();
@@ -28,18 +46,22 @@ public class ImageStorageRepository {
         return instance;
     }
 
-    // For testing
+    /**
+     * Constructor for testing purposes that accepts a custom FirebaseStorage instance.
+     *
+     * @param storageInstance the FirebaseStorage instance to use
+     */
     ImageStorageRepository(FirebaseStorage storageInstance) {
         storage = storageInstance;
     }
 
     /**
-     * Uploads an image to Firebase Storage
+     * Uploads an image to Firebase Storage.
      *
-     * @param imageUri The local URI of the image
-     * @param storagePath The path in Firebase Storage where the image should be stored
-     * @param onSuccess Callback with the download URL on success
-     * @param onFailure Callback with the exception on failure
+     * @param imageUri     the local URI of the image to upload
+     * @param storagePath  the path in Firebase Storage where the image should be stored
+     * @param onSuccess    callback that receives the download URL as a String upon success
+     * @param onFailure    callback that receives an Exception upon failure
      */
     public void uploadImage(Uri imageUri, String storagePath, Consumer<String> onSuccess, Consumer<Exception> onFailure) {
         StorageReference imageRef = storage.getReference().child(storagePath);
@@ -64,7 +86,13 @@ public class ImageStorageRepository {
     }
 
     /**
-     * Upload an image with progress tracking
+     * Uploads an image to Firebase Storage with progress tracking.
+     *
+     * @param imageUri         the local URI of the image to upload
+     * @param storagePath      the path in Firebase Storage where the image should be stored
+     * @param progressListener callback that receives the current progress percentage as an Integer
+     * @param onSuccess        callback that receives the download URL as a String upon success
+     * @param onFailure        callback that receives an Exception upon failure
      */
     public void uploadImageWithProgress(
             Uri imageUri,
@@ -87,7 +115,6 @@ public class ImageStorageRepository {
             if (!task.isSuccessful()) {
                 throw task.getException();
             }
-
             // Continue with the task to get the download URL
             return imageRef.getDownloadUrl();
         }).addOnCompleteListener(task -> {
@@ -101,11 +128,11 @@ public class ImageStorageRepository {
     }
 
     /**
-     * Gets the download URL for an image in Firebase Storage
+     * Retrieves the download URL for an image stored in Firebase Storage.
      *
-     * @param storagePath The path in Firebase Storage where the image is stored
-     * @param onSuccess Callback with the download URL on success
-     * @param onFailure Callback with the exception on failure
+     * @param storagePath the path in Firebase Storage where the image is stored
+     * @param onSuccess   callback that receives the download URL as a String upon success
+     * @param onFailure   callback that receives an Exception upon failure
      */
     public void getImageUrl(String storagePath, Consumer<String> onSuccess, Consumer<Exception> onFailure) {
         StorageReference imageRef = storage.getReference().child(storagePath);
@@ -122,11 +149,11 @@ public class ImageStorageRepository {
     }
 
     /**
-     * Deletes an image from Firebase Storage
+     * Deletes an image from Firebase Storage.
      *
-     * @param storagePath The path in Firebase Storage where the image is stored
-     * @param onSuccess Callback when the deletion is successful
-     * @param onFailure Callback with the exception when deletion fails
+     * @param storagePath the path in Firebase Storage where the image is stored
+     * @param onSuccess   callback invoked when deletion is successful
+     * @param onFailure   callback that receives an Exception upon failure
      */
     public void deleteImage(String storagePath, Runnable onSuccess, Consumer<Exception> onFailure) {
         StorageReference imageRef = storage.getReference().child(storagePath);

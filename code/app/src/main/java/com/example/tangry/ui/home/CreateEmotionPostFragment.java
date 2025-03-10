@@ -1,3 +1,16 @@
+/**
+ * CreateEmotionPostFragment.java
+ *
+ * This fragment allows the user to create a new emotion post by entering details such as an explanation,
+ * location, and social situation, as well as attaching an optional image. It retrieves the current user's
+ * email via FirebaseAuth and uses a UsernameController and EmotionPostController to handle post creation.
+ * The fragment also provides image selection and compression functionality via the ImageHelper utility.
+ *
+ * Outstanding Issues:
+ * - Additional input validation and error handling can be implemented.
+ * - The user experience could be enhanced with progress indicators during image upload.
+ */
+
 package com.example.tangry.ui.home;
 
 import android.app.Activity;
@@ -21,7 +34,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.controllers.UsernameController;
@@ -29,7 +41,6 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -52,11 +63,25 @@ public class CreateEmotionPostFragment extends Fragment {
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
             "Select social situation", "Alone", "With one other person", "With two to several people", "With a crowd");
 
+    /**
+     * Inflates the fragment layout.
+     *
+     * @param inflater           the LayoutInflater to use
+     * @param container          the parent container
+     * @param savedInstanceState the previously saved state, if any
+     * @return the root view of the inflated layout
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_detail_emotion, container, false);
     }
 
+    /**
+     * Initializes UI components, controllers, and sets up event listeners.
+     *
+     * @param view               the root view returned by onCreateView
+     * @param savedInstanceState the previously saved state, if any
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -79,8 +104,9 @@ public class CreateEmotionPostFragment extends Fragment {
             emotionTextView.setText(emotionText);
         }
 
-        // Populate the spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, VALID_SOCIAL_SITUATIONS);
+        // Populate the social situation spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_item, VALID_SOCIAL_SITUATIONS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         socialSituationSpinner.setAdapter(adapter);
         socialSituationSpinner.setSelection(0);
@@ -89,12 +115,22 @@ public class CreateEmotionPostFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveMoodEvent());
     }
 
+    /**
+     * Launches an intent to select an image from the device's gallery.
+     */
     private void selectImage() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Handles the result from the image selection intent.
+     *
+     * @param requestCode the request code identifying the request
+     * @param resultCode  the result code returned by the activity
+     * @param data        the Intent data containing the selected image URI
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -110,6 +146,10 @@ public class CreateEmotionPostFragment extends Fragment {
         }
     }
 
+    /**
+     * Validates input fields and initiates the process of saving a new emotion post.
+     * It retrieves the username associated with the current user's email and handles image upload if present.
+     */
     private void saveMoodEvent() {
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
         usernameController.getUsername(email,
@@ -138,12 +178,33 @@ public class CreateEmotionPostFragment extends Fragment {
                 e -> Toast.makeText(getContext(), "Failed to get username.", Toast.LENGTH_SHORT).show());
     }
 
+    /**
+     * Uploads an image using ImageHelper and creates an emotion post upon successful upload.
+     *
+     * @param imageUri         the URI of the processed image
+     * @param emotion          the emotion text
+     * @param explanation      the explanation text
+     * @param location         the location string
+     * @param socialSituation  the social situation string (nullable)
+     * @param username         the username associated with the current user
+     */
     private void uploadImage(Uri imageUri, String emotion, String explanation,
                              String location, String socialSituation, String username) {
         ImageHelper.uploadImage(imageUri,
                 downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(), location, socialSituation, username),
                 e -> Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
+    /**
+     * Creates an EmotionPost object and saves it to Firestore using the EmotionPostController.
+     *
+     * @param emotion         the emotion text
+     * @param explanation     the explanation text
+     * @param imageUrl        the download URL of the uploaded image (nullable)
+     * @param location        the location string
+     * @param socialSituation the social situation string (nullable)
+     * @param username        the username associated with the current user
+     */
     private void createEmotionPost(String emotion, String explanation, String imageUrl, String location,
                                    String socialSituation, String username) {
         try {

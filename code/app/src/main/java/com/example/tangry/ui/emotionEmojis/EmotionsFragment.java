@@ -1,7 +1,28 @@
+/**
+ * EmotionsFragment.java
+ *
+ * This fragment displays a list of emotion emojis retrieved from the EmotionProvider.
+ * It sets up a RecyclerView with an EmotionEmojisAdapter to display sample emotions.
+ * When an emotion is selected, the fragment either passes the selection for editing an existing post
+ * or navigates to the detail screen for creating a new post, based on the provided arguments.
+ *
+ * Additionally, this fragment adds a menu provider to display a filter icon,
+ * which when selected shows a BottomSheetDialog with mood filter options.
+ *
+ * Outstanding Issues:
+ * - Consider adding more robust error handling for navigation and argument retrieval.
+ * - UI refinements for the BottomSheetDialog and RecyclerView animations could enhance user experience.
+ */
+
 package com.example.tangry.ui.emotionEmojis;
 
 import android.os.Bundle;
-
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.MenuProvider;
@@ -11,28 +32,27 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.tangry.models.EmotionProvider;
 import com.example.tangry.ui.emotionEmojis.EmotionsFragmentDirections;
 import com.example.tangry.R;
 import com.example.tangry.adapters.EmotionEmojisAdapter;
 import com.example.tangry.models.Emotion;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
-import java.util.Arrays;
 import java.util.List;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
 
 public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.ItemClickListener {
 
     private NavController navController;
 
+    /**
+     * Inflates the layout for this fragment, initializes the RecyclerView with sample emotions,
+     * and sets up navigation for item clicks.
+     *
+     * @param inflater           the LayoutInflater object that can be used to inflate views in the fragment
+     * @param container          the parent container for the fragment's UI
+     * @param savedInstanceState a Bundle containing previous state data, if any
+     * @return the root View of the inflated layout
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_emotions, container, false);
@@ -48,6 +68,13 @@ public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.I
         return view;
     }
 
+    /**
+     * Handles click events on emotion items.
+     * Depending on the fragment's arguments, it either navigates to the edit screen with updated emotion data
+     * or navigates to the detail screen for adding a new post.
+     *
+     * @param emotion the selected Emotion object
+     */
     @Override
     public void onItemClick(Emotion emotion) {
         Bundle args = getArguments();
@@ -67,8 +94,13 @@ public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.I
         }
     }
 
-    //Testing feature
-
+    /**
+     * Called immediately after onCreateView() and sets up the MenuProvider to handle menu creation and selection.
+     * The menu includes a filter icon that displays a BottomSheetDialog when selected.
+     *
+     * @param view               the View returned by onCreateView()
+     * @param savedInstanceState a Bundle containing previous state data, if any
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -91,6 +123,9 @@ public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.I
         }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
     }
 
+    /**
+     * Displays a BottomSheetDialog with mood filter options.
+     */
     private void showMoodsBottomSheet() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         View bottomSheetView = LayoutInflater.from(requireContext()).inflate(R.layout.modal_bottom_sheet, null);
@@ -98,4 +133,3 @@ public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.I
         bottomSheetDialog.show();
     }
 }
-

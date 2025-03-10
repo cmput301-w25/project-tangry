@@ -1,9 +1,27 @@
+/**
+ * EmotionProvider.java
+ *
+ * This class provides a static method to supply a list of sample Emotion objects.
+ * These sample emotions can be used for populating UI elements, such as dropdown menus
+ * or RecyclerViews, in the application.
+ *
+ * Outstanding Issues:
+ * - Consider externalizing the list of emotions (e.g., via a configuration file) for easier customization.
+ */
+
 package com.example.tangry.models;
+
 import com.example.tangry.R;
 import java.util.Arrays;
 import java.util.List;
 
 public class EmotionProvider {
+
+    /**
+     * Returns a list of sample Emotion objects.
+     *
+     * @return a List of Emotion instances representing different emotions.
+     */
     public static List<Emotion> getSampleEmotions() {
         return Arrays.asList(
                 new Emotion("Angry",     R.drawable.ic_angry_selector,     R.color.colorAngry),

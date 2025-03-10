@@ -1,3 +1,15 @@
+/**
+ * EmotionPostController.java
+ *
+ * This controller mediates between the view layer and the EmotionPostRepository for operations on EmotionPost objects.
+ * It provides methods to create, retrieve, update, and delete EmotionPosts in Firestore, and to query posts with optional
+ * filters. The controller uses a singleton instance of the repository for data persistence.
+ *
+ * Outstanding Issues:
+ * - Error handling could be further improved for asynchronous operations.
+ * - Additional logging and user feedback mechanisms may be required for production use.
+ */
+
 package com.example.tangry.controllers;
 
 import android.util.Log;
@@ -15,17 +27,19 @@ import java.util.List;
 public class EmotionPostController {
     private final EmotionPostRepository repository;
 
-    // Use Singleton Repository
+    /**
+     * Constructs a new EmotionPostController using the singleton instance of EmotionPostRepository.
+     */
     public EmotionPostController() {
         this.repository = EmotionPostRepository.getInstance();
     }
 
     /**
-     * Creates a new EmotionPost and saves it to Firestore
+     * Creates a new EmotionPost and saves it to Firestore.
      *
-     * @param post            The EmotionPost object
-     * @param onSuccess       Callback for successful Firestore save
-     * @param onFailure       Callback for failure scenario
+     * @param post      the EmotionPost object to be saved
+     * @param onSuccess callback for successful Firestore save, receiving the DocumentReference of the saved post
+     * @param onFailure callback for failure scenario
      */
     public void createPost(EmotionPost post,
                            OnSuccessListener<DocumentReference> onSuccess,
@@ -34,16 +48,23 @@ public class EmotionPostController {
     }
 
     /**
-     * Retrieves a Query for all EmotionPosts.
+     * Retrieves a Firestore Query for all EmotionPosts.
      *
-     * This can be used by the view (e.g., in a RecyclerView adapter) to display posts.
+     * This query can be used by views (e.g., in a RecyclerView adapter) to display posts.
      *
-     * @return A Firestore Query for retrieving EmotionPosts.
+     * @return a Query object for retrieving all EmotionPosts
      */
     public Query getPostsQuery() {
         return repository.getPostsQuery();
     }
 
+    /**
+     * Retrieves a Firestore Query for EmotionPosts filtered by specified emotions and an optional recent time filter.
+     *
+     * @param emotions   a list of emotion strings to filter posts; if empty, no emotion filter is applied
+     * @param filterRecent if true, the query will be filtered to only include posts from the past week
+     * @return a Query object for retrieving filtered EmotionPosts
+     */
     public Query getFilteredPostsQuery(List<String> emotions, boolean filterRecent) {
         if (emotions.isEmpty() && !filterRecent) {
             return repository.getPostsQuery(); // No filters, return all posts
@@ -60,11 +81,11 @@ public class EmotionPostController {
     }
 
     /**
-     * Deletes an EmotionPost by ID.
+     * Deletes an EmotionPost by its document ID.
      *
-     * @param postId     The Firestore document ID of the post to delete.
-     * @param onSuccess  Callback for successful deletion.
-     * @param onFailure  Callback for failure scenario.
+     * @param postId    the Firestore document ID of the post to delete
+     * @param onSuccess callback invoked upon successful deletion
+     * @param onFailure callback for failure scenario
      */
     public void deleteEmotionPost(String postId,
                                   Runnable onSuccess,
@@ -79,10 +100,10 @@ public class EmotionPostController {
     /**
      * Updates an existing EmotionPost in Firestore.
      *
-     * @param postId    The Firestore document ID of the post to update.
-     * @param updatedPost The updated EmotionPost object.
-     * @param onSuccess  Callback for successful update.
-     * @param onFailure  Callback for failure scenario.
+     * @param postId      the Firestore document ID of the post to update
+     * @param updatedPost the updated EmotionPost object
+     * @param onSuccess   callback invoked upon successful update
+     * @param onFailure   callback for failure scenario
      */
     public void updateEmotionPost(String postId,
                                   EmotionPost updatedPost,
@@ -96,5 +117,3 @@ public class EmotionPostController {
         repository.updateEmotionPost(postId, updatedPost, onSuccess, onFailure);
     }
 }
-
-

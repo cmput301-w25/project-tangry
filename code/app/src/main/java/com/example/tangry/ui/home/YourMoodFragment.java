@@ -1,3 +1,16 @@
+/**
+ * YourMoodFragment.java
+ *
+ * This fragment displays a list of emotion posts representing the user's own mood.
+ * It uses a RecyclerView with an EmotionPostAdapter to render posts retrieved from Firestore via
+ * an EmotionPostController. Users can filter the displayed posts by selecting mood filters from a
+ * BottomSheetDialog, which applies the selected filters and optionally a recent-week filter.
+ *
+ * Outstanding Issues:
+ * - Consider adding more robust error handling for Firestore listener updates.
+ * - UI enhancements such as loading indicators during filtering or network delays could improve UX.
+ */
+
 package com.example.tangry.ui.home;
 
 import android.os.Bundle;
@@ -20,7 +33,6 @@ import com.example.tangry.models.EmotionPost;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,10 +44,21 @@ public class YourMoodFragment extends Fragment {
     private EmotionPostController controller;
     private List<String> selectedFilters = new ArrayList<>();
 
+    /**
+     * Default empty constructor required for fragment instantiation.
+     */
     public YourMoodFragment() {
         // Required empty constructor
     }
 
+    /**
+     * Inflates the fragment layout and initializes the RecyclerView and Firestore listener.
+     *
+     * @param inflater           The LayoutInflater object used to inflate the layout.
+     * @param container          The parent view container.
+     * @param savedInstanceState Previously saved state, if any.
+     * @return The root View of the inflated layout.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_your_mood, container, false);
@@ -45,13 +68,11 @@ public class YourMoodFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         controller = new EmotionPostController();
 
+        // Setup toolbar filter menu
         Toolbar toolbar = requireActivity().findViewById(R.id.toolbar_primary);
-
         // Ensure menu is not duplicated
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.menu_profile);
-
-        // Set click listener if not already set
         toolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.ic_filter) {
                 showFilterBottomSheet();
@@ -60,15 +81,23 @@ public class YourMoodFragment extends Fragment {
             return false;
         });
 
-        setupFirestoreListener(null, false); // Load all posts initially
+        // Initialize Firestore listener to load all posts initially.
+        setupFirestoreListener(null, false);
         return root;
     }
 
+    /**
+     * Sets up a Firestore listener to retrieve emotion posts, optionally filtering by
+     * specified emotions and a recent-week flag.
+     *
+     * @param filters      A list of emotion filters to apply; if null, an empty list is used.
+     * @param filterRecent If true, only posts from the recent week are retrieved.
+     */
     private void setupFirestoreListener(@Nullable List<String> filters, boolean filterRecent) {
         if (filters == null) {
             filters = new ArrayList<>();
         }
-        Query query = controller.getFilteredPostsQuery(filters, filterRecent); // 🔥 Use updated method
+        Query query = controller.getFilteredPostsQuery(filters, filterRecent);
 
         query.addSnapshotListener((value, error) -> {
             if (error != null) {
@@ -90,6 +119,10 @@ public class YourMoodFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays a BottomSheetDialog with mood filter options. Selected filters are applied
+     * when the "Apply" button is pressed.
+     */
     private void showFilterBottomSheet() {
         View view = getLayoutInflater().inflate(R.layout.modal_bottom_sheet, null);
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
@@ -118,7 +151,6 @@ public class YourMoodFragment extends Fragment {
             if (filterConfused.isChecked()) selectedFilters.add("Confused");
 
             boolean filterRecent = filterRecentWeek.isChecked();
-
             setupFirestoreListener(selectedFilters, filterRecent);  // Fetch filtered posts from Firestore
             dialog.dismiss();
         });

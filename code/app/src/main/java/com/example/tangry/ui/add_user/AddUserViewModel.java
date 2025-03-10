@@ -1,3 +1,15 @@
+/**
+ * AddUserViewModel.java
+ *
+ * This ViewModel handles the logic for creating a new user account. It performs basic input validation,
+ * checks for duplicate usernames and emails in Firestore, and uses FirebaseAuth to register the user.
+ * Upon successful registration, it stores the username in Firestore via the UsernameRepository.
+ *
+ * Outstanding Issues:
+ * - Input validation could be further enhanced (e.g., email format verification).
+ * - Additional error handling may be required to handle edge cases during asynchronous operations.
+ */
+
 package com.example.tangry.ui.add_user;
 
 import android.text.TextUtils;
@@ -14,14 +26,34 @@ public class AddUserViewModel extends ViewModel {
     private final MutableLiveData<Boolean> accountCreated = new MutableLiveData<>();
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
+    /**
+     * Returns a LiveData instance that holds messages for user notifications.
+     *
+     * @return a LiveData of String messages
+     */
     public LiveData<String> getMessage() {
         return message;
     }
 
+    /**
+     * Returns a LiveData instance that indicates whether an account has been successfully created.
+     *
+     * @return a LiveData of Boolean status for account creation
+     */
     public LiveData<Boolean> getAccountCreated() {
         return accountCreated;
     }
 
+    /**
+     * Attempts to create a new user account after performing basic input validation.
+     * It checks for empty fields, password requirements, and duplicate usernames or emails in Firestore.
+     * If all checks pass, the method registers the user with FirebaseAuth and saves the username to Firestore.
+     *
+     * @param email          the email address for the new account
+     * @param password       the password for the new account
+     * @param confirmPassword the confirmation of the password
+     * @param username       the desired username
+     */
     public void createUser(String email, String password, String confirmPassword, String username) {
 
         // Basic validation
@@ -41,39 +73,39 @@ public class AddUserViewModel extends ViewModel {
             message.setValue("Passwords do not match");
             return;
         }
-        
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("usernames")
-            .whereEqualTo("username", username)
-            .get()
-            .addOnCompleteListener(usernameTask -> {
-                if (usernameTask.isSuccessful() && !usernameTask.getResult().isEmpty()) {
-                    message.setValue("Username already exists");
-                } else {
-                    db.collection("usernames")
-                        .whereEqualTo("email", email)
-                        .get()
-                        .addOnCompleteListener(emailTask -> {
-                            if (emailTask.isSuccessful() && !emailTask.getResult().isEmpty()) {
-                                message.setValue("Email already in use");
-                            } else {
-                                mAuth.createUserWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener(task -> {
-                                        if (task.isSuccessful()) {
-                                            UsernameRepository.getInstance().saveUsernameToFirestore(username, email,
-                                                docRef -> {
-                                                    message.setValue("Account created successfully. Please login");
-                                                    accountCreated.setValue(true);
-                                                },
-                                                e -> message.setValue("Registration failed: " + e.getMessage())
-                                            );
-                                        } else {
-                                            message.setValue("Registration failed: " + task.getException().getMessage());
-                                        }
-                                    });
-                            }
-                        });
-                }
-            });
+                .whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(usernameTask -> {
+                    if (usernameTask.isSuccessful() && !usernameTask.getResult().isEmpty()) {
+                        message.setValue("Username already exists");
+                    } else {
+                        db.collection("usernames")
+                                .whereEqualTo("email", email)
+                                .get()
+                                .addOnCompleteListener(emailTask -> {
+                                    if (emailTask.isSuccessful() && !emailTask.getResult().isEmpty()) {
+                                        message.setValue("Email already in use");
+                                    } else {
+                                        mAuth.createUserWithEmailAndPassword(email, password)
+                                                .addOnCompleteListener(task -> {
+                                                    if (task.isSuccessful()) {
+                                                        UsernameRepository.getInstance().saveUsernameToFirestore(username, email,
+                                                                docRef -> {
+                                                                    message.setValue("Account created successfully. Please login");
+                                                                    accountCreated.setValue(true);
+                                                                },
+                                                                e -> message.setValue("Registration failed: " + e.getMessage())
+                                                        );
+                                                    } else {
+                                                        message.setValue("Registration failed: " + task.getException().getMessage());
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                });
     }
 }
