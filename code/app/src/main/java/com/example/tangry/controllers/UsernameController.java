@@ -7,7 +7,7 @@
  * singleton instance of the repository to ensure consistent access to username data.
  *
  * Outstanding Issues:
- * - Consider implementing caching mechanisms for username lookups to reduce repeated network calls.
+ * - We are considering implementing caching mechanisms for username lookups to reduce repeated network calls.
  * - Enhance error handling and logging to provide more detailed feedback to the view layer.
  */
 

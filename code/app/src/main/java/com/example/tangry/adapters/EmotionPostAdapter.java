@@ -8,7 +8,7 @@
  *
  * Outstanding Issues:
  * - Additional error handling may be required if post data is missing or malformed.
- * - Consider refactoring some of the binding logic in the PostViewHolder for improved readability and testability.
+ * - We might consider refactoring some of the binding logic in the PostViewHolder for improved readability and testability.
  */
 
 package com.example.tangry.adapters;

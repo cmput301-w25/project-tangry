@@ -7,7 +7,7 @@
  *
  * Outstanding Issues:
  * - Future iterations might include more dynamic tab titles or additional tabs.
- * - Consider enhancing page transition animations and tab customization.
+ * - We are consider enhancing page transition animations and tab customization.
  */
 
 package com.example.tangry.ui.home;

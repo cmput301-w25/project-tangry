@@ -6,7 +6,7 @@
  * creation. On successful account creation, it navigates back by popping the fragment back stack.
  *
  * Outstanding Issues:
- * - Consider adding more robust input validation and error handling.
+ * - We considering adding more robust input validation and error handling.
  * - UI improvements could include progress indicators while account creation is in progress.
  */
 

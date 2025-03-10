@@ -6,7 +6,7 @@
  * or RecyclerViews, in the application.
  *
  * Outstanding Issues:
- * - Consider externalizing the list of emotions (e.g., via a configuration file) for easier customization.
+ * - We considering externalizing the list of emotions (e.g., via a configuration file) for easier customization.
  */
 
 package com.example.tangry.models;
