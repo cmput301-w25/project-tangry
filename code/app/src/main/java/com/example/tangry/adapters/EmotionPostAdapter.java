@@ -91,7 +91,12 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             } else {
                 locationText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
             }
-            withText.setText(post.getSocialSituation());
+            if (post.getSocialSituation() != null) {
+                withText.setText(post.getSocialSituation());
+                withText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
+            } else {
+                withText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.gray));
+            }
             if (!post.getExplanation().isEmpty()) {
                 reasonText.setText(post.getExplanation());
                 reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.black));
