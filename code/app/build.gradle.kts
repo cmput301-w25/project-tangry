@@ -47,6 +47,7 @@ android {
 }
 
 dependencies {
+    implementation ("org.osmdroid:osmdroid-android:6.1.14")
     implementation(libs.androidx.recyclerview)
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -55,6 +56,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
