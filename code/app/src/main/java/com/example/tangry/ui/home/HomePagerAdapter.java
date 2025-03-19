@@ -7,7 +7,7 @@
  * dynamic fragment lifecycles and efficient memory usage.
  *
  * Outstanding Issues:
- * - Consider refactoring if additional tabs are required in the future.
+ * - We considering refactoring if additional tabs are required in the future.
  * - The "Your Mood" fragment logic may need to be separated into a dedicated fragment (e.g., YourMoodFragment).
  */
 

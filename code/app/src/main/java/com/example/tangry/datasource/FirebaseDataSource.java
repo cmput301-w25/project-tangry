@@ -6,7 +6,7 @@
  * allowing the application to easily save, retrieve, update, and delete data.
  *
  * Outstanding Issues:
- * - Consider adding more robust error handling and logging for production use.
+ * - We considering adding more robust error handling and logging.
  * - Support for more complex queries and transaction operations could be added in future iterations.
  */
 
