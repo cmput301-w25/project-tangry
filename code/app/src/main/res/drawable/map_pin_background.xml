@@ -1,0 +1,19 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- Set the overall size of the pin background -->
+    <size
+        android:width="40dp"
+        android:height="40dp" />
+    <!-- Fill color for the background -->
+    <solid android:color="#FFFFFF" />
+    <!-- Optional: add a border stroke -->
+    <stroke
+        android:width="1dp"
+        android:color="#CCCCCC" />
+    <!-- Optional: add some padding if desired -->
+    <padding
+        android:left="4dp"
+        android:top="4dp"
+        android:right="4dp"
+        android:bottom="4dp" />
+</shape>
