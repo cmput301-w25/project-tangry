@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@id/emotion_text"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
-
+    <!-- hardcode text to black/grey due to white image background -->
     <EditText
         android:id="@+id/explanation_input"
         android:layout_width="0dp"
@@ -39,7 +39,9 @@
         android:hint="Max 20 characters or 3 words. (Optional)"
         android:maxLength="20"
         android:padding="12dp"
-        android:background="@drawable/input_background"
+        android:background="@android:drawable/editbox_background"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black"
         app:layout_constraintTop_toBottomOf="@id/reason_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -56,6 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
 
+    <!-- hardcode text to black/grey due to white image background -->
     <EditText
         android:id="@+id/location_input"
         android:layout_width="0dp"
@@ -63,6 +66,8 @@
         android:hint="Enter location (Optional)"
         android:padding="12dp"
         android:background="@drawable/input_background"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black"
         app:layout_constraintTop_toBottomOf="@id/location_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

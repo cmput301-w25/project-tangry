@@ -169,4 +169,10 @@ public class EmotionPostRepository {
                 onFailure
         );
     }
+
+    public Query getPostsByUser(String username) {
+        return firebaseDataSource.getCollectionReference()
+                .whereEqualTo("username", username)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+    }
 }

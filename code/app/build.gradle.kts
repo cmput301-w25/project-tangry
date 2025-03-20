@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

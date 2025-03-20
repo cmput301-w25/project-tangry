@@ -1,16 +1,3 @@
-/**
- * YourMoodFragment.java
- *
- * This fragment displays a list of emotion posts representing the user's own mood.
- * It uses a RecyclerView with an EmotionPostAdapter to render posts retrieved from Firestore via
- * an EmotionPostController. Users can filter the displayed posts by selecting mood filters from a
- * BottomSheetDialog, which applies the selected filters and optionally a recent-week filter.
- *
- * Outstanding Issues:
- * - We are considering adding more robust error handling for Firestore listener updates.
- * - UI enhancements such as loading indicators during filtering or network delays could improve UX.
- */
-
 package com.example.tangry.ui.home;
 
 import android.os.Bundle;
@@ -20,12 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.tangry.R;
 import com.example.tangry.adapters.EmotionPostAdapter;
 import com.example.tangry.controllers.EmotionPostController;
@@ -33,6 +23,8 @@ import com.example.tangry.models.EmotionPost;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,13 +56,24 @@ public class YourMoodFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_your_mood, container, false);
         recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EmotionPostAdapter(posts);
+
+        // Updated adapter instantiation with two arguments.
+        // Instead of calling action_yourMoodFragment_to_postDetailsFragment, we use the HomeFragment action.
+        adapter = new EmotionPostAdapter(posts, (post, itemView) -> {
+            Bundle bundle = new Bundle();
+            Gson gson = new Gson();
+            String postJson = gson.toJson(post);
+            bundle.putString("post", postJson);
+            bundle.putString("postId", post.getPostId());
+            Navigation.findNavController(itemView)
+                    .navigate(R.id.action_homeFragment_to_postDetailsFragment, bundle);
+        });
         recyclerView.setAdapter(adapter);
         controller = new EmotionPostController();
 
         // Setup toolbar filter menu
         Toolbar toolbar = requireActivity().findViewById(R.id.toolbar_primary);
-        // Ensure menu is not duplicated
+        // Ensure menu is not duplicated.
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.menu_profile);
         toolbar.setOnMenuItemClickListener(item -> {
@@ -151,7 +154,7 @@ public class YourMoodFragment extends Fragment {
             if (filterConfused.isChecked()) selectedFilters.add("Confused");
 
             boolean filterRecent = filterRecentWeek.isChecked();
-            setupFirestoreListener(selectedFilters, filterRecent);  // Fetch filtered posts from Firestore
+            setupFirestoreListener(selectedFilters, filterRecent);  // Fetch filtered posts from Firestore.
             dialog.dismiss();
         });
 

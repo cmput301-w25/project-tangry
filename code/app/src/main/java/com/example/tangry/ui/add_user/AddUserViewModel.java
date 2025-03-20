@@ -1,111 +1,84 @@
-/**
- * AddUserViewModel.java
- *
- * This ViewModel handles the logic for creating a new user account. It performs basic input validation,
- * checks for duplicate usernames and emails in Firestore, and uses FirebaseAuth to register the user.
- * Upon successful registration, it stores the username in Firestore via the UsernameRepository.
- *
- * Outstanding Issues:
- * - Input validation could be further enhanced (e.g., email format verification).
- * - Additional error handling may be required to handle edge cases during asynchronous operations.
- */
-
 package com.example.tangry.ui.add_user;
 
-import android.text.TextUtils;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.example.tangry.repositories.UsernameRepository;
+
+import com.example.tangry.repositories.UserRepository;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AddUserViewModel extends ViewModel {
+    private final MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
+    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<String> followSuccessMessage = new MutableLiveData<>();
 
-    private final MutableLiveData<String> message = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> accountCreated = new MutableLiveData<>();
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    public LiveData<List<String>> getSearchResults() {
+        return searchResults;
+    }
 
-    /**
-     * Returns a LiveData instance that holds messages for user notifications.
-     *
-     * @return a LiveData of String messages
-     */
-    public LiveData<String> getMessage() {
-        return message;
+    public LiveData<String> getErrorMessage() {
+        return errorMessage;
+    }
+
+    public LiveData<String> getFollowSuccessMessage() {
+        return followSuccessMessage;
     }
 
     /**
-     * Returns a LiveData instance that indicates whether an account has been successfully created.
-     *
-     * @return a LiveData of Boolean status for account creation
+     * Search for users by prefix.
      */
-    public LiveData<Boolean> getAccountCreated() {
-        return accountCreated;
-    }
-
-    /**
-     * Attempts to create a new user account after performing basic input validation.
-     * It checks for empty fields, password requirements, and duplicate usernames or emails in Firestore.
-     * If all checks pass, the method registers the user with FirebaseAuth and saves the username to Firestore.
-     *
-     * @param email          the email address for the new account
-     * @param password       the password for the new account
-     * @param confirmPassword the confirmation of the password
-     * @param username       the desired username
-     */
-    public void createUser(String email, String password, String confirmPassword, String username) {
-
-        // Basic validation
-        if (TextUtils.isEmpty(email)) {
-            message.setValue("Email is required");
-            return;
-        }
-        if (TextUtils.isEmpty(username)) {
-            message.setValue("Username is required");
-            return;
-        }
-        if (password.length() < 8) {
-            message.setValue("Password must be at least 8 characters");
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            message.setValue("Passwords do not match");
-            return;
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("usernames")
-                .whereEqualTo("username", username)
-                .get()
-                .addOnCompleteListener(usernameTask -> {
-                    if (usernameTask.isSuccessful() && !usernameTask.getResult().isEmpty()) {
-                        message.setValue("Username already exists");
-                    } else {
-                        db.collection("usernames")
-                                .whereEqualTo("email", email)
-                                .get()
-                                .addOnCompleteListener(emailTask -> {
-                                    if (emailTask.isSuccessful() && !emailTask.getResult().isEmpty()) {
-                                        message.setValue("Email already in use");
-                                    } else {
-                                        mAuth.createUserWithEmailAndPassword(email, password)
-                                                .addOnCompleteListener(task -> {
-                                                    if (task.isSuccessful()) {
-                                                        UsernameRepository.getInstance().saveUsernameToFirestore(username, email,
-                                                                docRef -> {
-                                                                    message.setValue("Account created successfully. Please login");
-                                                                    accountCreated.setValue(true);
-                                                                },
-                                                                e -> message.setValue("Registration failed: " + e.getMessage())
-                                                        );
-                                                    } else {
-                                                        message.setValue("Registration failed: " + task.getException().getMessage());
-                                                    }
-                                                });
-                                    }
-                                });
+    public void searchUser(String query) {
+        UserRepository.getInstance().searchUsersByPrefix(query,
+                querySnapshot -> {
+                    List<String> results = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        String username = doc.getString("username");
+                        if (username != null) {
+                            results.add(username);
+                        }
                     }
-                });
+                    searchResults.setValue(results);
+                },
+                e -> errorMessage.setValue("Search failed: " + e.getMessage())
+        );
+    }
+
+    /**
+     * Sends a follow request.
+     * Retrieves the current user's username from Firestore ("users" collection) using their email.
+     * Prevents the user from following themselves.
+     */
+    public void followUser(String targetUsername) {
+        String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
+        if (currentUserEmail == null || currentUserEmail.isEmpty()) {
+            errorMessage.setValue("Current user has no email set.");
+            return;
+        }
+
+        // Query the user database to get the current user's username.
+        UserRepository.getInstance().getUsernameFromEmail(currentUserEmail,
+                currentUsername -> {
+                    if (currentUsername == null || currentUsername.isEmpty()) {
+                        errorMessage.setValue("Current user's username not found.");
+                    } else if (currentUsername.equals(targetUsername)) {
+                        errorMessage.setValue("You cannot follow yourself.");
+                    } else {
+                        // Send the follow request using the retrieved username.
+                        UserRepository.getInstance().sendFollowRequest(currentUsername, targetUsername,
+                                documentReference -> followSuccessMessage.setValue("Follow request sent to " + targetUsername),
+                                e -> errorMessage.setValue("Follow request failed: " + e.getMessage())
+                        );
+                    }
+                },
+                e -> errorMessage.setValue("Error retrieving current user's username: " + e.getMessage())
+        );
     }
 }
