@@ -13,6 +13,10 @@ import com.google.firebase.firestore.FieldValue;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for handling user profile follow functionalities.
+ * It manages follow status, follow requests, and updates the UI accordingly.
+ */
 public class UserProfileViewModel extends ViewModel {
 
     private final MutableLiveData<Boolean> followButtonEnabled = new MutableLiveData<>(true);
@@ -21,16 +25,30 @@ public class UserProfileViewModel extends ViewModel {
     private final MutableLiveData<List<String>> mySentFollowRequests = new MutableLiveData<>(new ArrayList<>());
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    /**
+     * Gets the LiveData for the follow button enabled state.
+     *
+     * @return LiveData<Boolean> representing if follow button is enabled.
+     */
     public LiveData<Boolean> getFollowButtonEnabled() {
         return followButtonEnabled;
     }
 
+    /**
+     * Gets the LiveData for follow-related messages.
+     *
+     * @return LiveData<String> representing follow messages.
+     */
     public LiveData<String> getFollowMessage() {
         return followMessage;
     }
 
-    // Loads the current user’s "followings" and sent follow requests,
-    // then updates the follow button state relative to the target username.
+    /**
+     * Loads the current user's followings and sent follow requests from Firebase,
+     * then updates the follow button state with respect to the target username.
+     *
+     * @param targetUsername the username of the profile being viewed.
+     */
     public void loadFollowStatus(String targetUsername) {
         String currentEmail = FirebaseAuth.getInstance().getCurrentUser() != null ?
                 FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
@@ -73,8 +91,12 @@ public class UserProfileViewModel extends ViewModel {
                 });
     }
 
-    // Update the follow button state based on whether the target user is already followed
-    // or a follow request was already sent.
+    /**
+     * Updates the state of the follow button based on whether the target user is already 
+     * followed or if a follow request has already been sent.
+     *
+     * @param targetUsername the username of the target profile.
+     */
     private void updateFollowButtonState(String targetUsername) {
         List<String> followings = myFollowings.getValue();
         List<String> requests = mySentFollowRequests.getValue();
@@ -86,7 +108,12 @@ public class UserProfileViewModel extends ViewModel {
         }
     }
 
-    // Sends a follow request from the current user to the target username.
+    /**
+     * Sends a follow request from the current user to the target username.
+     * Displays messages based on success or failure.
+     *
+     * @param targetUsername the username of the user to follow.
+     */
     public void sendFollowRequest(String targetUsername) {
         String currentUser = FirebaseAuth.getInstance().getCurrentUser() != null ?
                 FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
@@ -109,14 +136,26 @@ public class UserProfileViewModel extends ViewModel {
                         followMessage.setValue("Error sending follow request: " + e.getMessage()));
     }
 
-    // Model for a follow request.
+    /**
+     * Model representing a follow request.
+     */
     public static class FollowRequest {
         public String from;
         public String to;
         public boolean accepted;
 
+        /**
+         * Default constructor required for Firebase data deserialization.
+         */
         public FollowRequest() { }
 
+        /**
+         * Constructs a new FollowRequest with the specified details.
+         *
+         * @param from the username sending the follow request.
+         * @param to the username receiving the follow request.
+         * @param accepted the acceptance status of the request.
+         */
         public FollowRequest(String from, String to, boolean accepted) {
             this.from = from;
             this.to = to;

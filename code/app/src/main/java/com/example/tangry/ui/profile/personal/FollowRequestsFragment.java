@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tangry.R;
+import com.example.tangry.controllers.FollowController;
+import com.example.tangry.controllers.FollowController.FollowRequest;
 import com.example.tangry.ui.profile.personal.FollowRequestsViewModel;
 
 import java.util.ArrayList;
@@ -52,10 +54,8 @@ public class FollowRequestsFragment extends Fragment {
 
         viewModel.getSentRequests().observe(getViewLifecycleOwner(), requests ->
                 sentAdapter.setData(requests));
-
         viewModel.getReceivedRequests().observe(getViewLifecycleOwner(), requests ->
                 receivedAdapter.setData(requests));
-
         viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
             if (msg != null && !msg.isEmpty()) {
                 Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -63,15 +63,14 @@ public class FollowRequestsFragment extends Fragment {
         });
     }
 
-    // Adapter for sent requests
     private class SentAdapter extends RecyclerView.Adapter<SentAdapter.SentViewHolder> {
-        private List<FollowRequestsViewModel.FollowRequest> data;
+        private List<FollowRequest> data;
 
-        SentAdapter(List<FollowRequestsViewModel.FollowRequest> data) {
+        SentAdapter(List<FollowRequest> data) {
             this.data = data;
         }
 
-        void setData(List<FollowRequestsViewModel.FollowRequest> newData) {
+        void setData(List<FollowRequest> newData) {
             this.data = newData;
             notifyDataSetChanged();
         }
@@ -86,7 +85,7 @@ public class FollowRequestsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull SentViewHolder holder, int position) {
-            FollowRequestsViewModel.FollowRequest req = data.get(position);
+            FollowRequest req = data.get(position);
             holder.bind(req);
         }
 
@@ -98,27 +97,28 @@ public class FollowRequestsFragment extends Fragment {
         class SentViewHolder extends RecyclerView.ViewHolder {
             private final android.widget.TextView textTo;
             private final android.widget.TextView textStatus;
+
             SentViewHolder(@NonNull View itemView) {
                 super(itemView);
                 textTo = itemView.findViewById(R.id.text_to);
                 textStatus = itemView.findViewById(R.id.text_status);
             }
-            void bind(FollowRequestsViewModel.FollowRequest req) {
+
+            void bind(FollowRequest req) {
                 textTo.setText("To: " + req.to);
                 textStatus.setText("Status: " + (req.accepted ? "Accepted" : "Pending"));
             }
         }
     }
 
-    // Adapter for received requests
     private class ReceivedAdapter extends RecyclerView.Adapter<ReceivedAdapter.ReceivedViewHolder> {
-        private List<FollowRequestsViewModel.FollowRequest> data;
+        private List<FollowRequest> data;
 
-        ReceivedAdapter(List<FollowRequestsViewModel.FollowRequest> data) {
+        ReceivedAdapter(List<FollowRequest> data) {
             this.data = data;
         }
 
-        void setData(List<FollowRequestsViewModel.FollowRequest> newData) {
+        void setData(List<FollowRequest> newData) {
             this.data = newData;
             notifyDataSetChanged();
         }
@@ -133,7 +133,7 @@ public class FollowRequestsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull ReceivedViewHolder holder, int position) {
-            FollowRequestsViewModel.FollowRequest req = data.get(position);
+            FollowRequest req = data.get(position);
             holder.bind(req);
         }
 
@@ -146,6 +146,7 @@ public class FollowRequestsFragment extends Fragment {
             private final android.widget.TextView textFrom;
             private final android.widget.TextView textStatus;
             private final android.widget.Button btnAccept, btnDeny;
+
             ReceivedViewHolder(@NonNull View itemView) {
                 super(itemView);
                 textFrom = itemView.findViewById(R.id.text_from);
@@ -153,7 +154,8 @@ public class FollowRequestsFragment extends Fragment {
                 btnAccept = itemView.findViewById(R.id.btn_accept);
                 btnDeny = itemView.findViewById(R.id.btn_deny);
             }
-            void bind(FollowRequestsViewModel.FollowRequest req) {
+
+            void bind(FollowRequest req) {
                 textFrom.setText("From: " + req.from);
                 textStatus.setText("Status: " + (req.accepted ? "Accepted" : "Pending"));
                 if (req.accepted) {

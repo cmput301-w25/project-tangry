@@ -13,6 +13,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ViewModel for managing user interactions in the Add User screen.
+ * It handles searching users, sending follow requests, and tracking follow statuses.
+ */
 public class AddUserViewModel extends ViewModel {
 
     private final MutableLiveData<List<String>> searchResults = new MutableLiveData<>(new ArrayList<>());
@@ -23,25 +27,46 @@ public class AddUserViewModel extends ViewModel {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FollowController followController = new FollowController();
 
+    /**
+     * Gets the LiveData for the list of usernames found from a search.
+     *
+     * @return LiveData list of usernames matching the search criteria.
+     */
     public LiveData<List<String>> getSearchResults() {
         return searchResults;
     }
 
+    /**
+     * Gets the LiveData for the list of usernames that the current user is following.
+     *
+     * @return LiveData list of followed usernames.
+     */
     public LiveData<List<String>> getFollowings() {
         return followings;
     }
 
+    /**
+     * Gets the LiveData for the list of usernames to whom the current user has sent follow requests.
+     *
+     * @return LiveData list of usernames with pending follow requests.
+     */
     public LiveData<List<String>> getSentFollowRequests() {
         return sentFollowRequests;
     }
 
+    /**
+     * Gets the LiveData for messages or notifications.
+     *
+     * @return LiveData containing message strings for UI display.
+     */
     public LiveData<String> getMessage() {
         return message;
     }
 
     /**
-     * Loads the current user's follow status (both followed users and pending follow requests)
-     * by delegating to FollowController.
+     * Loads the current user's follow status.
+     * Delegates to FollowController to fetch both followed users and sent follow requests.
+     * Sets an error message if the user is not logged in or if an error occurs.
      */
     public void loadFollowStatus() {
         String currentEmail = FirebaseAuth.getInstance().getCurrentUser() != null ?
@@ -62,7 +87,11 @@ public class AddUserViewModel extends ViewModel {
     }
 
     /**
-     * Searches for a user by username.
+     * Searches for a user by their username.
+     * Queries the Firestore "users" collection for a matching username.
+     * On success, updates the searchResults LiveData and sets a message if no user is found.
+     *
+     * @param query the username to search for.
      */
     public void searchUser(String query) {
         db.collection("users")
@@ -85,7 +114,11 @@ public class AddUserViewModel extends ViewModel {
     }
 
     /**
-     * Sends a follow request to the target user by delegating to FollowController.
+     * Sends a follow request to the specified target user.
+     * Validates that the current user is logged in and is not trying to follow themselves.
+     * On success, notifies the UI and reloads follow status.
+     *
+     * @param targetUsername the username of the user to send a follow request to.
      */
     public void followUser(String targetUsername) {
         String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
@@ -108,7 +141,10 @@ public class AddUserViewModel extends ViewModel {
     }
 
     /**
-     * Checks whether the current user is already following or has requested to follow the target user.
+     * Checks if the current user is already following or has already sent a follow request to the target user.
+     *
+     * @param targetUsername the username to check against followings and sent follow requests.
+     * @return true if the target username is already in the followings or sent follow requests; false otherwise.
      */
     public boolean isAlreadyFollowingOrRequested(String targetUsername) {
         List<String> followingList = followings.getValue();

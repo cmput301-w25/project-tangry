@@ -17,12 +17,26 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.tangry.databinding.ActivityMainBinding;
 
+/**
+ * Main activity that sets up the app's navigation and UI elements.
+ * This activity initializes the binding, toolbars, navigation controller,
+ * AppBar configuration, and floating action button.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
 
+    /**
+     * Called when the activity is starting. This sets up the UI elements, including
+     * primary and secondary toolbars, navigation controller, bottom navigation view,
+     * and floating action button.
+     *
+     * @param savedInstanceState if the activity is being re-initialized after previously
+     *                           being shut down then this Bundle contains the data it most
+     *                           recently supplied in onSaveInstanceState(Bundle). Note: Otherwise it is null.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
         secondaryToolbar.inflateMenu(R.menu.menu_profile);
         // Handle profile icon clicks.
         secondaryToolbar.setOnMenuItemClickListener(new MaterialToolbar.OnMenuItemClickListener() {
+            /**
+             * Called when a menu item in the secondary toolbar is clicked.
+             *
+             * @param item the menu item that was clicked
+             * @return true if the event was handled, false otherwise
+             */
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if (item.getItemId() == R.id.action_profile) {
@@ -81,12 +101,22 @@ public class MainActivity extends AppCompatActivity {
         fab.setVisibility(View.GONE);
     }
 
+    /**
+     * Handles navigation when the up button is pressed.
+     *
+     * @return true if navigation was successful or the super method returns true, false otherwise.
+     */
     @Override
     public boolean onSupportNavigateUp() {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
     }
 
+    /**
+     * Called when the user has successfully logged in.
+     * This method makes the bottom navigation view and floating action button visible
+     * and navigates to the home destination.
+     */
     public void onLoginSuccess() {
         // Reveal UI after successful login.
         binding.navView.setVisibility(View.VISIBLE);

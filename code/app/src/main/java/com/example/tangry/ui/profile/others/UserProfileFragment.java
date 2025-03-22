@@ -23,6 +23,13 @@ import com.google.gson.Gson;
 
 import java.util.List;
 
+/**
+ * Fragment to display a user's profile information and emotion posts.
+ * <p>
+ * This fragment loads the user's details, sets up follower functionality,
+ * and displays a list of emotion posts submitted by the user.
+ * </p>
+ */
 public class UserProfileFragment extends Fragment {
 
     private FragmentUserProfileBinding binding;
@@ -30,6 +37,14 @@ public class UserProfileFragment extends Fragment {
     private EmotionPostAdapter adapter;
     private String profileUsername; // The username of the profile being viewed
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     * @return The View for the fragment's UI.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -39,6 +54,17 @@ public class UserProfileFragment extends Fragment {
         return binding.getRoot();
     }
 
+    /**
+     * Called immediately after onCreateView has returned.
+     * <p>
+     * This method initializes the view model, retrieves the username for the profile,
+     * sets the username text, configures the follow button and RecyclerView, and loads the
+     * user's posts from the EmotionPostRepository.
+     * </p>
+     *
+     * @param view               The View returned by onCreateView.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state.
+     */
     @Override
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {

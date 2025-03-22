@@ -22,9 +22,21 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapter class for displaying EmotionPost objects in a RecyclerView.
+ */
 public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.PostViewHolder> {
 
+    /**
+     * Callback interface for handling click events on EmotionPost items.
+     */
     public interface OnItemClickListener {
+        /**
+         * Called when an EmotionPost item is clicked.
+         *
+         * @param post the EmotionPost that was clicked
+         * @param view the View associated with the clicked item
+         */
         void onItemClick(EmotionPost post, View view);
     }
 
@@ -32,10 +44,10 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     private OnItemClickListener listener;
 
     /**
-     * Constructs a new EmotionPostAdapter with the specified list of posts and click listener.
+     * Constructs a new EmotionPostAdapter.
      *
-     * @param posts    the list of EmotionPost objects to be displayed
-     * @param listener a callback for item clicks
+     * @param posts    the list of EmotionPost objects to be displayed; if null, an empty list is used
+     * @param listener a callback to handle item click events
      */
     public EmotionPostAdapter(List<EmotionPost> posts, OnItemClickListener listener) {
         this.posts = (posts != null) ? posts : new ArrayList<>();
@@ -43,15 +55,22 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     }
 
     /**
-     * Updates the adapter's list of posts.
+     * Updates the list of EmotionPost objects and notifies the adapter of data changes.
      *
-     * @param posts the new list of posts
+     * @param posts the new list of EmotionPost objects; if null, an empty list is used
      */
     public void setPosts(List<EmotionPost> posts) {
         this.posts = (posts != null) ? posts : new ArrayList<>();
         notifyDataSetChanged();
     }
 
+    /**
+     * Called when RecyclerView needs a new PostViewHolder.
+     *
+     * @param parent   the parent ViewGroup into which the new view will be added
+     * @param viewType the view type of the new view
+     * @return a new PostViewHolder for an EmotionPost item
+     */
     @NonNull
     @Override
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -60,6 +79,12 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
         return new PostViewHolder(view);
     }
 
+    /**
+     * Called by RecyclerView to display data at the specified position.
+     *
+     * @param holder   the PostViewHolder which should be updated to represent the contents of the item
+     * @param position the position of the item within the adapter's data set
+     */
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         EmotionPost post = posts.get(position);
@@ -71,15 +96,28 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
         });
     }
 
+    /**
+     * Returns the total number of items in the data set held by the adapter.
+     *
+     * @return the number of EmotionPost items
+     */
     @Override
     public int getItemCount() {
         return (posts != null) ? posts.size() : 0;
     }
 
+    /**
+     * ViewHolder class for holding and binding the UI elements of an EmotionPost item.
+     */
     static class PostViewHolder extends RecyclerView.ViewHolder {
         private final TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
         private final ImageView moodImage, emojiImage;
 
+        /**
+         * Constructs a new PostViewHolder.
+         *
+         * @param itemView the View representing an item in the RecyclerView
+         */
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.user_name);
@@ -93,6 +131,11 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             emojiImage = itemView.findViewById(R.id.emoji_image);
         }
 
+        /**
+         * Binds the EmotionPost data to the UI elements of the ViewHolder.
+         *
+         * @param post the EmotionPost object containing the data to bind
+         */
         public void bind(EmotionPost post) {
             // Use default text if any field is missing.
             String username = (post.getUsername() != null) ? post.getUsername() : "Anonymous";
