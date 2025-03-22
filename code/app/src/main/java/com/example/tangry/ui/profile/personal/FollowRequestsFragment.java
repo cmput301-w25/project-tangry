@@ -144,15 +144,18 @@ public class FollowRequestsFragment extends Fragment {
 
         class ReceivedViewHolder extends RecyclerView.ViewHolder {
             private final android.widget.TextView textFrom;
+            private final android.widget.TextView textStatus;
             private final android.widget.Button btnAccept, btnDeny;
             ReceivedViewHolder(@NonNull View itemView) {
                 super(itemView);
                 textFrom = itemView.findViewById(R.id.text_from);
+                textStatus = itemView.findViewById(R.id.text_status);
                 btnAccept = itemView.findViewById(R.id.btn_accept);
                 btnDeny = itemView.findViewById(R.id.btn_deny);
             }
             void bind(FollowRequestsViewModel.FollowRequest req) {
                 textFrom.setText("From: " + req.from);
+                textStatus.setText("Status: " + (req.accepted ? "Accepted" : "Pending"));
                 if (req.accepted) {
                     btnAccept.setVisibility(View.GONE);
                     btnDeny.setVisibility(View.GONE);

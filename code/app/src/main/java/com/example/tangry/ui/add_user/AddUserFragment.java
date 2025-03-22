@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tangry.R;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +24,8 @@ import java.util.List;
 public class AddUserFragment extends Fragment {
 
     private AddUserViewModel viewModel;
-    private EditText usernameInput;
-    private Button searchButton;
+    private TextInputEditText usernameInput;
+    private MaterialButton searchButton;
     private RecyclerView resultsRecyclerView;
     private SearchResultsAdapter adapter;
 
@@ -39,17 +38,17 @@ public class AddUserFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(this).get(AddUserViewModel.class);
         usernameInput = view.findViewById(R.id.username_input);
         searchButton = view.findViewById(R.id.search_button);
         resultsRecyclerView = view.findViewById(R.id.results_recycler_view);
 
-        adapter = new SearchResultsAdapter(new ArrayList<>(), new SearchResultsAdapter.ProfileClickListener() {
+        adapter = new SearchResultsAdapter(new ArrayList<>(), viewModel, new SearchResultsAdapter.ProfileClickListener() {
             @Override
             public void onViewProfileClicked(String username) {
-                // Navigate to the UserProfileFragment, passing the username as an argument.
                 Bundle bundle = new Bundle();
                 bundle.putString("username", username);
                 Navigation.findNavController(view)
@@ -66,7 +65,7 @@ public class AddUserFragment extends Fragment {
 
         searchButton.setOnClickListener(v -> {
             String query = usernameInput.getText().toString().trim();
-            if(query.isEmpty()){
+            if (query.isEmpty()) {
                 Toast.makeText(getContext(), "Please enter a username", Toast.LENGTH_SHORT).show();
             } else {
                 viewModel.searchUser(query);
@@ -74,31 +73,33 @@ public class AddUserFragment extends Fragment {
         });
 
         viewModel.getSearchResults().observe(getViewLifecycleOwner(), results -> adapter.setResults(results));
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
-            if (error != null) {
-                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+        viewModel.getMessage().observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null) {
+                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
             }
         });
-        viewModel.getFollowSuccessMessage().observe(getViewLifecycleOwner(), message -> {
-            if(message != null){
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        // Load follow status for the current user.
+        viewModel.loadFollowStatus();
+        viewModel.getFollowings().observe(getViewLifecycleOwner(), list -> adapter.notifyDataSetChanged());
+        viewModel.getSentFollowRequests().observe(getViewLifecycleOwner(), list -> adapter.notifyDataSetChanged());
     }
 
     public static class SearchResultsAdapter extends RecyclerView.Adapter<SearchResultsAdapter.ResultViewHolder> {
 
         private List<String> results;
-        private final ProfileClickListener clickListener;
+        private final ProfileClickListener listener;
+        private final AddUserViewModel viewModel;
 
         public interface ProfileClickListener {
             void onViewProfileClicked(String username);
             void onFollowClicked(String username);
         }
 
-        public SearchResultsAdapter(List<String> results, ProfileClickListener listener) {
+        public SearchResultsAdapter(List<String> results, AddUserViewModel viewModel, ProfileClickListener listener) {
             this.results = results;
-            this.clickListener = listener;
+            this.viewModel = viewModel;
+            this.listener = listener;
         }
 
         public void setResults(List<String> newResults) {
@@ -111,7 +112,7 @@ public class AddUserFragment extends Fragment {
         public ResultViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_user_result, parent, false);
-            return new ResultViewHolder(view, clickListener);
+            return new ResultViewHolder(view, viewModel, listener);
         }
 
         @Override
@@ -126,33 +127,37 @@ public class AddUserFragment extends Fragment {
         }
 
         static class ResultViewHolder extends RecyclerView.ViewHolder {
-            private final TextView usernameText;
-            private final Button viewProfileButton;
-            private final Button followButton;
+            private final android.widget.TextView usernameText;
+            private final android.widget.Button viewProfileButton;
+            private final android.widget.Button followButton;
+            private final AddUserViewModel viewModel;
+            private final ProfileClickListener listener;
 
-            public ResultViewHolder(@NonNull View itemView, ProfileClickListener listener) {
+            public ResultViewHolder(@NonNull View itemView, AddUserViewModel viewModel, ProfileClickListener listener) {
                 super(itemView);
                 usernameText = itemView.findViewById(R.id.username_text);
                 viewProfileButton = itemView.findViewById(R.id.view_profile_button);
-                // If you have a follow button in your item layout; otherwise remove.
                 followButton = itemView.findViewById(R.id.follow_button);
+                this.viewModel = viewModel;
+                this.listener = listener;
 
                 viewProfileButton.setOnClickListener(v -> {
-                    if(getAdapterPosition() != RecyclerView.NO_POSITION){
+                    if (getAdapterPosition() != RecyclerView.NO_POSITION) {
                         listener.onViewProfileClicked(usernameText.getText().toString());
                     }
                 });
-                if(followButton != null){
-                    followButton.setOnClickListener(v -> {
-                        if(getAdapterPosition() != RecyclerView.NO_POSITION){
-                            listener.onFollowClicked(usernameText.getText().toString());
-                        }
-                    });
-                }
+                followButton.setOnClickListener(v -> {
+                    if (getAdapterPosition() != RecyclerView.NO_POSITION) {
+                        listener.onFollowClicked(usernameText.getText().toString());
+                    }
+                });
             }
 
             void bind(String username) {
                 usernameText.setText(username);
+                // Disable the follow button if already following or if a follow request was sent.
+                boolean disabled = viewModel.isAlreadyFollowingOrRequested(username);
+                followButton.setEnabled(!disabled);
             }
         }
     }

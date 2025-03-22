@@ -1,37 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/username_input"
-        android:layout_width="0dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter username to search"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:hint="Username">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/username_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/search_button"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Search"
-        app:layout_constraintTop_toBottomOf="@id/username_input"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        android:text="Search" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results_recycler_view"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/search_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="16dp"/>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_weight="1"
+        android:paddingTop="16dp"/>
+</LinearLayout>

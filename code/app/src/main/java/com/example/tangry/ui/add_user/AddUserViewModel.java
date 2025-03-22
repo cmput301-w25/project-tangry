@@ -4,39 +4,71 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.tangry.repositories.UserRepository;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.tangry.controllers.FollowController;
+import com.example.tangry.controllers.FollowController.FollowStatus;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AddUserViewModel extends ViewModel {
-    private final MutableLiveData<List<String>> searchResults = new MutableLiveData<>();
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<String> followSuccessMessage = new MutableLiveData<>();
+
+    private final MutableLiveData<List<String>> searchResults = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<String>> followings = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<String>> sentFollowRequests = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<String> message = new MutableLiveData<>();
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FollowController followController = new FollowController();
 
     public LiveData<List<String>> getSearchResults() {
         return searchResults;
     }
 
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
+    public LiveData<List<String>> getFollowings() {
+        return followings;
     }
 
-    public LiveData<String> getFollowSuccessMessage() {
-        return followSuccessMessage;
+    public LiveData<List<String>> getSentFollowRequests() {
+        return sentFollowRequests;
+    }
+
+    public LiveData<String> getMessage() {
+        return message;
     }
 
     /**
-     * Search for users by prefix.
+     * Loads the current user's follow status (both followed users and pending follow requests)
+     * by delegating to FollowController.
+     */
+    public void loadFollowStatus() {
+        String currentEmail = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
+        if (currentEmail == null || currentUsername == null) {
+            message.setValue("User not logged in");
+            return;
+        }
+        followController.loadFollowStatus(currentEmail, currentUsername,
+                status -> {
+                    followings.setValue(status.getFollowings());
+                    sentFollowRequests.setValue(status.getSentFollowRequests());
+                },
+                e -> message.setValue("Error loading follow status: " + e.getMessage())
+        );
+    }
+
+    /**
+     * Searches for a user by username.
      */
     public void searchUser(String query) {
-        UserRepository.getInstance().searchUsersByPrefix(query,
-                querySnapshot -> {
+        db.collection("users")
+                .whereEqualTo("username", query)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
                     List<String> results = new ArrayList<>();
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                         String username = doc.getString("username");
@@ -45,40 +77,43 @@ public class AddUserViewModel extends ViewModel {
                         }
                     }
                     searchResults.setValue(results);
+                    if (results.isEmpty()) {
+                        message.setValue("No user found with username: " + query);
+                    }
+                })
+                .addOnFailureListener(e -> message.setValue("Error searching user: " + e.getMessage()));
+    }
+
+    /**
+     * Sends a follow request to the target user by delegating to FollowController.
+     */
+    public void followUser(String targetUsername) {
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
+        if (currentUsername == null) {
+            message.setValue("User not logged in");
+            return;
+        }
+        if (currentUsername.equals(targetUsername)) {
+            message.setValue("You cannot follow yourself");
+            return;
+        }
+        followController.sendFollowRequest(currentUsername, targetUsername,
+                documentReference -> {
+                    message.setValue("Follow request sent");
+                    loadFollowStatus();
                 },
-                e -> errorMessage.setValue("Search failed: " + e.getMessage())
+                e -> message.setValue("Error sending follow request: " + e.getMessage())
         );
     }
 
     /**
-     * Sends a follow request.
-     * Retrieves the current user's username from Firestore ("users" collection) using their email.
-     * Prevents the user from following themselves.
+     * Checks whether the current user is already following or has requested to follow the target user.
      */
-    public void followUser(String targetUsername) {
-        String currentUserEmail = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
-        if (currentUserEmail == null || currentUserEmail.isEmpty()) {
-            errorMessage.setValue("Current user has no email set.");
-            return;
-        }
-
-        // Query the user database to get the current user's username.
-        UserRepository.getInstance().getUsernameFromEmail(currentUserEmail,
-                currentUsername -> {
-                    if (currentUsername == null || currentUsername.isEmpty()) {
-                        errorMessage.setValue("Current user's username not found.");
-                    } else if (currentUsername.equals(targetUsername)) {
-                        errorMessage.setValue("You cannot follow yourself.");
-                    } else {
-                        // Send the follow request using the retrieved username.
-                        UserRepository.getInstance().sendFollowRequest(currentUsername, targetUsername,
-                                documentReference -> followSuccessMessage.setValue("Follow request sent to " + targetUsername),
-                                e -> errorMessage.setValue("Follow request failed: " + e.getMessage())
-                        );
-                    }
-                },
-                e -> errorMessage.setValue("Error retrieving current user's username: " + e.getMessage())
-        );
+    public boolean isAlreadyFollowingOrRequested(String targetUsername) {
+        List<String> followingList = followings.getValue();
+        List<String> requests = sentFollowRequests.getValue();
+        return (followingList != null && followingList.contains(targetUsername)) ||
+                (requests != null && requests.contains(targetUsername));
     }
 }

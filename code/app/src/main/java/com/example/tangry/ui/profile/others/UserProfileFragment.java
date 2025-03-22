@@ -28,7 +28,7 @@ public class UserProfileFragment extends Fragment {
     private FragmentUserProfileBinding binding;
     private UserProfileViewModel viewModel;
     private EmotionPostAdapter adapter;
-    private String profileUsername; // The username of the user whose profile is being viewed
+    private String profileUsername; // The username of the profile being viewed
 
     @Nullable
     @Override
@@ -54,6 +54,26 @@ public class UserProfileFragment extends Fragment {
         Log.d("UserProfileFragment", "Profile username: " + profileUsername);
         binding.usernameText.setText(profileUsername);
 
+        // Set up follower button.
+        binding.followButton.setOnClickListener(v ->
+                viewModel.sendFollowRequest(profileUsername)
+        );
+
+        // Observe button enabled state.
+        viewModel.getFollowButtonEnabled().observe(getViewLifecycleOwner(), enabled ->
+                binding.followButton.setEnabled(enabled)
+        );
+
+        // Observe follow request messages.
+        viewModel.getFollowMessage().observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Load the follow status for the current user relative to this profile.
+        viewModel.loadFollowStatus(profileUsername);
+
         // Setup RecyclerView for a scrollable list of posts.
         binding.postsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new EmotionPostAdapter(null, (post, itemView) -> {
@@ -61,22 +81,11 @@ public class UserProfileFragment extends Fragment {
             Gson gson = new Gson();
             String postJson = gson.toJson(post);
             bundle.putString("post", postJson);
-            bundle.putString("postId", post.getPostId());
+            bundle.putString("postId", String.valueOf(post.getPostId()));
             Navigation.findNavController(itemView)
                     .navigate(R.id.action_userProfileFragment_to_postDetailsFragment, bundle);
         });
         binding.postsRecyclerView.setAdapter(adapter);
-
-        // Follow button sends a follow request.
-        binding.followButton.setOnClickListener(v ->
-                viewModel.sendFollowRequest(profileUsername)
-        );
-
-        viewModel.getFollowMessage().observe(getViewLifecycleOwner(), message -> {
-            if (message != null) {
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            }
-        });
 
         // Load the user's posts (using EmotionPostRepository).
         EmotionPostRepository.getInstance().getPostsByUser(profileUsername)

@@ -5,13 +5,13 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class UsernameController {
+public class UserController {
     private final UserRepository repository;
 
     /**
-     * Constructs a new UsernameController and initializes the UserRepository instance.
+     * Constructs a new UserController and initializes the UserRepository instance.
      */
-    public UsernameController() {
+    public UserController() {
         this.repository = UserRepository.getInstance();
     }
 
