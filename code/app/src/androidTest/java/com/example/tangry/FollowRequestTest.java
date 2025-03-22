@@ -9,8 +9,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 import com.example.tangry.controllers.FollowController;
 import com.example.tangry.controllers.FollowController.FollowRequest;
+import com.example.tangry.controllers.FollowController.FollowStatus;
 import com.example.tangry.test.EmulatorTestHelper;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -109,6 +112,13 @@ public class FollowRequestTest {
 
     @Test
     public void testAcceptFollowRequest() throws Exception {
+        // Sign in as currentUser so that FirebaseAuth returns a non-null user with displayName.
+        Tasks.await(FirebaseAuth.getInstance().signInAnonymously(), 5, TimeUnit.SECONDS);
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                .setDisplayName(currentUsername)
+                .build();
+        Tasks.await(FirebaseAuth.getInstance().getCurrentUser().updateProfile(profileUpdates), 5, TimeUnit.SECONDS);
+
         // Create a follow request document from senderUser to testUser.
         Map<String, Object> requestData = new HashMap<>();
         requestData.put("from", senderUsername);
@@ -126,7 +136,7 @@ public class FollowRequestTest {
         followController.acceptFollowRequest(request,
                 aVoid -> latch.countDown(),
                 e -> latch.countDown());
-        assertTrue(latch.await(5, TimeUnit.SECONDS));
+        assertTrue("Follow request acceptance did not complete in time", latch.await(5, TimeUnit.SECONDS));
 
         // Verify the follow request is now marked as accepted.
         DocumentSnapshot requestSnapshot = Tasks.await(
@@ -143,9 +153,9 @@ public class FollowRequestTest {
         // Verify that senderUser's document contains testUser in "followings".
         DocumentSnapshot senderDoc = Tasks.await(
                 db.collection("users").document(senderUsername).get(), 5, TimeUnit.SECONDS);
-        List<String> followings = (List<String>) senderDoc.get("followings");
-        assertNotNull(followings);
-        assertTrue(followings.contains(currentUsername));
+        List<String> followingList = (List<String>) senderDoc.get("followings");
+        assertNotNull(followingList);
+        assertTrue(followingList.contains(currentUsername));
     }
 
     @Test
