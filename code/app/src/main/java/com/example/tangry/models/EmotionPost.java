@@ -10,6 +10,7 @@ import com.google.firebase.Timestamp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class EmotionPost implements Serializable {
     private String username;
     private Timestamp timestamp;
     private String postId; // Firestore Document ID
+    private List<Comment> comments = new ArrayList<>();
 
     public EmotionPost() {
     };
@@ -222,6 +224,26 @@ public class EmotionPost implements Serializable {
      */
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    /**
+     * Retrieves all comments associated with this emotion post.
+     *
+     * @return A list of Comment objects.
+     */
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    /**
+     * Adds a comment to this emotion post.
+     *
+     * @param comment The Comment object to add.
+     */
+    public void addComment(Comment comment) {
+        if (comment != null) {
+            comments.add(comment);
+        }
     }
 
     public String getPostId() { return postId; }
