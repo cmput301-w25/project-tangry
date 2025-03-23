@@ -12,6 +12,7 @@
  */
 
 package com.example.tangry.controllers;
+import com.google.firebase.firestore.Query;
 
 import com.example.tangry.repositories.UsernameRepository;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -38,5 +39,17 @@ public class UsernameController {
                             OnSuccessListener<String> onSuccess,
                             OnFailureListener onFailure) {
         repository.getUsernameFromEmail(email, onSuccess, onFailure);
+    }
+
+    //Increment karma using email (should be username once constraint done)
+    public void incrementKarma(String email,
+                               OnSuccessListener<Void> onSuccess,
+                               OnFailureListener onFailure, int incrementAmount) {
+        repository.incrementKarmaByEmail(email, onSuccess, onFailure, incrementAmount);
+    }
+
+    // Expose the top users query for the leaderboard.
+    public Query getTopUsersQuery() {
+        return repository.getTopUsersQuery();
     }
 }

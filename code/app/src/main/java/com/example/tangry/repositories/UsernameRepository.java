@@ -17,6 +17,7 @@ import com.example.tangry.datasource.FirebaseDataSource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query.Direction;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class UsernameRepository {
     private static UsernameRepository instance;
     private FirebaseDataSource firebaseDataSource;
-    private static final String COLLECTION_NAME = "usernames";
+    private static final String COLLECTION_NAME = "users";
 
     /**
      * Private constructor initializes the FirebaseDataSource with the "usernames" collection.
@@ -61,6 +62,8 @@ public class UsernameRepository {
         Map<String, Object> data = new HashMap<>();
         data.put("username", username);
         data.put("email", email);
+        //Setting karma to 0 initially always when creating username
+        data.put("karma", 0);
 
         firebaseDataSource.saveData(data, successListener, failureListener);
     }
@@ -97,5 +100,36 @@ public class UsernameRepository {
                     }
                 })
                 .addOnFailureListener(failureListener);
+    }
+
+
+    //Increment karma for a user identified by email
+    public void incrementKarmaByEmail(String email,
+                                      OnSuccessListener<Void> successListener,
+                                      OnFailureListener failureListener, int incrementAmount) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        String docId = querySnapshot.getDocuments().get(0).getId();
+                        firebaseDataSource.getCollectionReference().document(docId)
+                                .update("karma", FieldValue.increment(incrementAmount))
+                                .addOnSuccessListener(successListener)
+                                .addOnFailureListener(failureListener);
+                    } else {
+                        failureListener.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(failureListener);
+    }
+
+
+   //Get top 10 users ordered by karma
+    public Query getTopUsersQuery() {
+        return firebaseDataSource.getCollectionReference()
+                .orderBy("karma", Query.Direction.DESCENDING)
+                .limit(10);
     }
 }
