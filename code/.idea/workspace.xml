@@ -146,23 +146,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/FollowRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/adapters/EmotionPostAdapter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/adapters/EmotionPostAdapter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/controllers/FollowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/controllers/FollowController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/add_user/AddUserFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/add_user/AddUserFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/add_user/AddUserViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/add_user/AddUserViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/FollowRequestsFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/FollowRequestsFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/FollowRequestsViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/FollowRequestsViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileViewModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileViewModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/firebase-debug.log" beforeDir="false" />
-    </list>
+    <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -171,7 +155,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\jakeu\.android\avd\Medium_Phone.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=37151FDJG00FUR)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -260,34 +244,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Android App.app.executor": "Run",
-    "Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor": "Run",
-    "Android Instrumented Tests.FollowRequestTest.executor": "Run",
-    "Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor": "Run",
-    "Android Instrumented Tests.UserInterfaceTest.executor": "Run",
-    "Android Instrumented Tests.testInvalidEmotionValues().executor": "Run",
-    "Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor": "Debug",
-    "Gradle.EmotionPostTest.testCreateWithNullLocation.executor": "Run",
-    "Gradle.EmotionPostTest.testCreateWithNullSocialSituation.executor": "Run",
-    "ResourceManagerPrefKey.ModuleName": "tangry.app.main",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "com.google.services.firebase.aqiPopupShown": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "private-public",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ddeju/AndroidStudioProjects/project-tangry/code",
-    "settings.editor.selected.configurable": "editor.preferences.tabs",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.FollowRequestTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.UserInterfaceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testInvalidEmotionValues().executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor&quot;: &quot;Debug&quot;,
+    &quot;Gradle.EmotionPostTest.testCreateWithNullLocation.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostTest.testCreateWithNullSocialSituation.executor&quot;: &quot;Run&quot;,
+    &quot;ResourceManagerPrefKey.ModuleName&quot;: &quot;tangry.app.main&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;private-public&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ddeju/AndroidStudioProjects/project-tangry/code&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Android Instrumented Tests.FollowRequestTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="tangry.app" />
