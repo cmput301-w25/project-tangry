@@ -51,6 +51,12 @@
         android:label="@string/title_friends"
         tools:layout="@layout/fragment_friends" />
 
+    <fragment
+        android:id="@+id/navigation_leaderboard"
+        android:name="com.example.tangry.ui.leaderboard.LeaderboardFragment"
+        android:label="Leaderboard"
+        tools:layout="@layout/fragment_leaderboard" />
+
 <!-- Redirect to Emotions List after +Mood Button clicked-->
     <fragment
         android:id="@+id/emotionsFragment"

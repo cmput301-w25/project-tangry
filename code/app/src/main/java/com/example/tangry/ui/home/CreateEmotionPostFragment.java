@@ -212,6 +212,16 @@ public class CreateEmotionPostFragment extends Fragment {
             Log.d(TAG, "Saving mood event: " + post.toString());
             emotionPostController.createPost(post,
                     (DocumentReference docRef) -> {
+                        // Post saved successfully – now increment user karma
+                        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                        //If post with no images posted karma increase by 10. Else by 20
+                        int incrementAmount = calculateKarmaIncrement(post);
+                        usernameController.incrementKarma(email,
+                                aVoid -> Log.d(TAG, "User karma incremented by " + incrementAmount),
+                                e -> Log.e(TAG, "Failed to increment karma", e),
+                                incrementAmount
+                        );
+
                         Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
                         navController.popBackStack();
                         navController.popBackStack();
@@ -225,4 +235,26 @@ public class CreateEmotionPostFragment extends Fragment {
             Log.e(TAG, "Error saving mood event", e);
         }
     }
+
+    private int calculateKarmaIncrement(EmotionPost post) {
+        int karma = 0; // Base karma
+
+        if (post.getImageUri() == null) {
+            karma += 5; // Bonus for no image
+        } else {
+            karma += 10; // Bonus for posting an image
+            if (post.getLocation() != null || !post.getLocation().isEmpty()) {
+                karma += 5;
+            }
+            if (post.getExplanation() != null || !post.getExplanation().isEmpty()) {
+                karma += 5;
+            }
+            if (post.getSocialSituation() != null || !post.getSocialSituation().isEmpty()) {
+                karma += 5;
+            }
+        }
+
+        return karma;
+    }
+
 }
