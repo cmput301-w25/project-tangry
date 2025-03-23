@@ -75,14 +75,14 @@ public class AddUserViewModel extends ViewModel {
         }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("usernames")
-                .whereEqualTo("usernames", username)
+        db.collection("users")
+                .whereEqualTo("users", username)
                 .get()
                 .addOnCompleteListener(usernameTask -> {
                     if (usernameTask.isSuccessful() && !usernameTask.getResult().isEmpty()) {
                         message.setValue("Username already exists");
                     } else {
-                        db.collection("usernames")
+                        db.collection("users")
                                 .whereEqualTo("email", email)
                                 .get()
                                 .addOnCompleteListener(emailTask -> {
