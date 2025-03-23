@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.play.services.maps)
     testImplementation(libs.junit)
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     androidTestImplementation(libs.ext.junit)

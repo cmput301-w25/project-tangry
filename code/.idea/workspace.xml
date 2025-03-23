@@ -112,9 +112,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/map_pin_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/drawable/map_pin_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/CreateEmotionPostFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/CreateEmotionPostFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -640,12 +642,12 @@
       <map>
         <entry key="com.example.tangry">
           <value>
-            <CheckInfo lastCheckTimestamp="1742513020237" />
+            <CheckInfo lastCheckTimestamp="1742677364992" />
           </value>
         </entry>
         <entry key="com.example.tangry.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1742513020237" />
+            <CheckInfo lastCheckTimestamp="1742677364992" />
           </value>
         </entry>
       </map>

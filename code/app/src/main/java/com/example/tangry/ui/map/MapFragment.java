@@ -3,6 +3,7 @@ package com.example.tangry.ui.map;
 import android.Manifest;
 import com.bumptech.glide.Glide;
 import android.view.LayoutInflater;
+import org.osmdroid.util.BoundingBox;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -67,6 +68,10 @@ public class MapFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         mapView = view.findViewById(R.id.map);
 
+        // Disable map repetition.
+        mapView.setHorizontalMapRepetitionEnabled(false);
+        mapView.setVerticalMapRepetitionEnabled(false);
+
         // Enable multi-touch and disable built-in zoom buttons.
         mapView.setMultiTouchControls(true);
         mapView.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.NEVER);
@@ -77,7 +82,7 @@ public class MapFragment extends Fragment {
         mapView.setTileSource(cartoVoyager);
         mapView.getController().setZoom(DEFAULT_ZOOM);
 
-        // Add overlays: Scale bar and compass.
+        // Add overlays.
         ScaleBarOverlay scaleBarOverlay = new ScaleBarOverlay(mapView);
         scaleBarOverlay.setCentred(true);
         scaleBarOverlay.setScaleBarOffset(10, 10);
@@ -96,7 +101,31 @@ public class MapFragment extends Fragment {
             btnZoomOut.setOnClickListener(v -> mapView.getController().zoomOut());
         }
 
-        // Optional: Set a MapListener if you want to update markers on scroll/zoom.
+        mapView.post(() -> {
+            // Define a fixed area around your center coordinate.
+            double centerLat = FALLBACK_LOCATION.getLatitude();
+            double centerLon = FALLBACK_LOCATION.getLongitude();
+            // delta: half the width/height in degrees (adjust as needed)
+            double delta = 0.5; // This creates a 1° x 1° area
+
+            BoundingBox fixedBB = new BoundingBox(
+                    centerLat + delta,   // North
+                    centerLon + delta,   // East
+                    centerLat - delta,   // South
+                    centerLon - delta    // West
+            );
+
+            mapView.setScrollableAreaLimitDouble(fixedBB);
+
+            // Lock zoom-out by setting the minimum zoom level to the current zoom level.
+            double currentZoom = mapView.getZoomLevelDouble();
+            mapView.setMinZoomLevel(currentZoom);
+        });
+
+
+
+
+        // Set a MapListener if you need to handle zoom or scroll events.
         mapView.setMapListener(new MapListener() {
             @Override
             public boolean onScroll(ScrollEvent event) {
@@ -104,7 +133,7 @@ public class MapFragment extends Fragment {
             }
             @Override
             public boolean onZoom(ZoomEvent event) {
-                // If you wish to update markers dynamically, do it here.
+                // Optionally update markers dynamically on zoom.
                 return false;
             }
         });
@@ -126,6 +155,7 @@ public class MapFragment extends Fragment {
         return view;
     }
 
+
     private void setupLocationOverlay() {
         myLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getActivity()), mapView);
         myLocationOverlay.enableMyLocation();
@@ -133,16 +163,40 @@ public class MapFragment extends Fragment {
         myLocationOverlay.runOnFirstFix(() -> {
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
+                    // Get the current location; if not available, use the fallback.
                     GeoPoint currentLocation = myLocationOverlay.getMyLocation();
-                    if (currentLocation != null) {
-                        mapView.getController().animateTo(currentLocation);
-                    } else {
-                        mapView.getController().animateTo(FALLBACK_LOCATION);
+                    if (currentLocation == null) {
+                        currentLocation = FALLBACK_LOCATION;
                     }
+
+                    // Calculate a 5km radius in degrees.
+                    // 1 degree of latitude is approximately 111km.
+                    double deltaLat = 5.0 / 111.0; // approx 0.045 degrees
+                    // For longitude, the distance per degree is 111km * cos(latitude)
+                    double deltaLon = 5.0 / (111.0 * Math.cos(Math.toRadians(currentLocation.getLatitude())));
+
+                    // Create the bounding box (north, east, south, west).
+                    BoundingBox fixedBB = new BoundingBox(
+                            currentLocation.getLatitude() + deltaLat,   // North
+                            currentLocation.getLongitude() + deltaLon,    // East
+                            currentLocation.getLatitude() - deltaLat,   // South
+                            currentLocation.getLongitude() - deltaLon     // West
+                    );
+
+                    // Set the scrollable area limit to this bounding box.
+                    mapView.setScrollableAreaLimitDouble(fixedBB);
+
+                    // Optionally, lock zoom out by setting the minimum zoom level to the current zoom.
+                    double currentZoom = mapView.getZoomLevelDouble();
+                    mapView.setMinZoomLevel(currentZoom);
+
+                    // Optionally, center the map at the current location.
+                    mapView.getController().animateTo(currentLocation);
                 });
             }
         });
     }
+
 
     private void loadEmotionPostPins() {
         EmotionPostController controller = new EmotionPostController();

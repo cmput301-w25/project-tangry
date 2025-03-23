@@ -56,13 +56,15 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <EditText
+    <!-- Updated location input as AutoCompleteTextView -->
+    <AutoCompleteTextView
         android:id="@+id/location_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Enter location (Optional)"
         android:padding="12dp"
         android:background="@drawable/input_background"
+        android:inputType="text"
         app:layout_constraintTop_toBottomOf="@id/location_label"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
