@@ -20,11 +20,6 @@
           <theme>@style/Theme.Tangry</theme>
         </config>
       </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_create_user.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
@@ -36,11 +31,6 @@
         </config>
       </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_emotions.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_follow_requests.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
         </config>
@@ -60,6 +50,11 @@
           <theme>@style/Theme.Tangry</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_leaderboard.xml">
+        <config>
+          <theme>@style/Theme.Tangry</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_login.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
@@ -71,16 +66,6 @@
         </config>
       </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_mood_details.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_personal_profile.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_user_profile.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
         </config>
@@ -100,22 +85,12 @@
           <theme>@style/Theme.Tangry</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_leaderboard.xml">
+        <config>
+          <theme>@style/Theme.Tangry</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_mood.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_received_request.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_sent_request.xml">
-        <config>
-          <theme>@style/Theme.Tangry</theme>
-        </config>
-      </layout>
-      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_user_result.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
         </config>
@@ -155,7 +130,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=37151FDJG00FUR)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\Carlos\.android\avd\Pixel_9_Pro_XL_API_35.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -205,11 +180,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="resourceFile" />
         <option value="Interface" />
-        <option value="valueResourceFile" />
-        <option value="layoutResourceFile" />
         <option value="Class" />
+        <option value="layoutResourceFile" />
+        <option value="resourceFile" />
       </list>
     </option>
   </component>
@@ -248,15 +222,12 @@
   &quot;keyToString&quot;: {
     &quot;Android App.app.executor&quot;: &quot;Run&quot;,
     &quot;Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
-    &quot;Android Instrumented Tests.FollowRequestTest.executor&quot;: &quot;Run&quot;,
     &quot;Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
     &quot;Android Instrumented Tests.UserInterfaceTest.executor&quot;: &quot;Run&quot;,
     &quot;Android Instrumented Tests.testInvalidEmotionValues().executor&quot;: &quot;Run&quot;,
     &quot;Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor&quot;: &quot;Run&quot;,
     &quot;Gradle.EmotionPostRepositoryTest.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor&quot;: &quot;Debug&quot;,
-    &quot;Gradle.EmotionPostTest.testCreateWithNullLocation.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EmotionPostTest.testCreateWithNullSocialSituation.executor&quot;: &quot;Run&quot;,
     &quot;ResourceManagerPrefKey.ModuleName&quot;: &quot;tangry.app.main&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
@@ -265,17 +236,16 @@
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
     &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;private-public&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;carlitos-branch&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/ddeju/AndroidStudioProjects/project-tangry/code&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
 }</component>
-  <component name="RunManager" selected="Android Instrumented Tests.FollowRequestTest">
+  <component name="RunManager" selected="Android App.app">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
-      <module name="tangry.app" />
-      <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
+      <module name="tangry.app.main" />
       <option name="DEPLOY" value="true" />
       <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
       <option name="DEPLOY_AS_INSTANT" value="false" />
@@ -283,7 +253,6 @@
       <option name="PM_INSTALL_OPTIONS" value="" />
       <option name="ALL_USERS" value="false" />
       <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
-      <option name="ALLOW_ASSUME_VERIFIED" value="false" />
       <option name="CLEAR_APP_STORAGE" value="false" />
       <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
       <option name="ACTIVITY_EXTRA_FLAGS" value="" />
@@ -336,7 +305,6 @@
         <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
       </Profilers>
       <option name="DEEP_LINK" value="" />
-      <option name="ACTIVITY" value="" />
       <option name="ACTIVITY_CLASS" value="" />
       <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
       <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
@@ -344,12 +312,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="FollowRequestTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="EmotionPostRepositoryEmulatorTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="tangry.app" />
-      <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
-      <option name="CLASS_NAME" value="com.example.tangry.FollowRequestTest" />
+      <option name="CLASS_NAME" value="com.example.tangry.EmotionPostRepositoryEmulatorTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -408,10 +375,131 @@
     </configuration>
     <configuration name="UserInterfaceTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="tangry.app" />
-      <option name="ANDROID_TEST_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
       <option name="CLASS_NAME" value="com.example.tangry.UserInterfaceTest" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_NAME_REGEX" value="" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="RETENTION_ENABLED" value="No" />
+      <option name="RETENTION_MAX_SNAPSHOTS" value="2" />
+      <option name="RETENTION_COMPRESS_SNAPSHOTS" value="false" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Hybrid>
+      <Java>
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Java>
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="testInvalidEmotionValues()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="tangry.app" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="testInvalidEmotionValues" />
+      <option name="CLASS_NAME" value="com.example.tangry.EmotionPostRepositoryEmulatorTest" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_NAME_REGEX" value="" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="RETENTION_ENABLED" value="No" />
+      <option name="RETENTION_MAX_SNAPSHOTS" value="2" />
+      <option name="RETENTION_COMPRESS_SNAPSHOTS" value="false" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
+      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
+      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
+      <option name="DEBUGGER_TYPE" value="Auto" />
+      <Auto>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Auto>
+      <Hybrid>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Hybrid>
+      <Java>
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Java>
+      <Native>
+        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
+        <option name="SHOW_STATIC_VARS" value="true" />
+        <option name="WORKING_DIR" value="" />
+        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
+        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
+        <option name="ATTACH_ON_WAIT_FOR_DEBUGGER" value="false" />
+        <option name="DEBUG_SANDBOX_SDK" value="false" />
+      </Native>
+      <Profilers>
+        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
+        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
+        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
+        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
+      </Profilers>
+      <method v="2">
+        <option name="Android.Gradle.BeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="testSavePostWithAllSocialSituationValues()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="tangry.app" />
+      <option name="TESTING_TYPE" value="3" />
+      <option name="METHOD_NAME" value="testSavePostWithAllSocialSituationValues" />
+      <option name="CLASS_NAME" value="com.example.tangry.EmotionPostRepositoryEmulatorTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -492,61 +580,13 @@
       <RunAsTest>true</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="EmotionPostTest.testCreateWithNullLocation" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":app:testDebugUnitTest" />
-            <option value="--tests" />
-            <option value="&quot;com.example.tangry.EmotionPostTest.testCreateWithNullLocation&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
-    <configuration name="EmotionPostTest.testCreateWithNullSocialSituation" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value=":app:testDebugUnitTest" />
-            <option value="--tests" />
-            <option value="&quot;com.example.tangry.EmotionPostTest.testCreateWithNullSocialSituation&quot;" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Android Instrumented Tests.FollowRequestTest" />
-        <item itemvalue="Gradle.EmotionPostTest.testCreateWithNullLocation" />
-        <item itemvalue="Gradle.EmotionPostTest.testCreateWithNullSocialSituation" />
         <item itemvalue="Android Instrumented Tests.UserInterfaceTest" />
         <item itemvalue="Gradle.EmotionPostRepositoryTest" />
+        <item itemvalue="Android Instrumented Tests.EmotionPostRepositoryEmulatorTest" />
+        <item itemvalue="Android Instrumented Tests.testInvalidEmotionValues()" />
+        <item itemvalue="Android Instrumented Tests.testSavePostWithAllSocialSituationValues()" />
       </list>
     </recent_temporary>
   </component>
@@ -583,17 +623,33 @@
     <MESSAGE value="merge" />
     <option name="LAST_COMMIT_MESSAGE" value="merge" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/EmotionPost.java</url>
+          <line>94</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/CreateEmotionPostFragment.java</url>
+          <line>241</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">
       <map>
         <entry key="com.example.tangry">
           <value>
-            <CheckInfo lastCheckTimestamp="1742664285242" />
+            <CheckInfo lastCheckTimestamp="1742146802597" />
           </value>
         </entry>
         <entry key="com.example.tangry.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1742664285244" />
+            <CheckInfo lastCheckTimestamp="1742146802597" />
           </value>
         </entry>
       </map>
