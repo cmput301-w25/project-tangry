@@ -106,7 +106,7 @@ public class UserCreateTest {
         duplicateRecord.put("email", "duplicate@example.com");
         // Use Tasks.await to synchronously insert the duplicate document.
         DocumentReference ref = Tasks.await(
-                db.collection("users").add(duplicateRecord),
+                db.collection("usernames").add(duplicateRecord),
                 5,
                 TimeUnit.SECONDS
         );
@@ -128,7 +128,7 @@ public class UserCreateTest {
         duplicateRecord.put("email", "duplicate@example.com");
         // Use Tasks.await to synchronously insert the duplicate document.
         DocumentReference ref = Tasks.await(
-                db.collection("users").add(duplicateRecord),
+                db.collection("usernames").add(duplicateRecord),
                 5,
                 TimeUnit.SECONDS
         );
