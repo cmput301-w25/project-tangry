@@ -1,5 +1,5 @@
 *.iml
-.idea/
+/.idea/
 .gradle
 /local.properties
 /.idea/caches
@@ -14,7 +14,8 @@
 .externalNativeBuild
 .cxx
 local.properties
-
+./firebase-debug.log
+./firestore-debug.log
 
 # Firebase emulator
 firebase-tools-instant-win.exe
