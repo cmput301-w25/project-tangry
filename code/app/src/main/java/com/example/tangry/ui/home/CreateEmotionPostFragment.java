@@ -3,7 +3,7 @@
  *
  * This fragment allows the user to create a new emotion post by entering details such as an explanation,
  * location, and social situation, as well as attaching an optional image. It retrieves the current user's
- * email via FirebaseAuth and uses a UsernameController and EmotionPostController to handle post creation.
+ * email via FirebaseAuth and uses a UserController and EmotionPostController to handle post creation.
  * The fragment also provides image selection and compression functionality via the ImageHelper utility.
  *
  * Outstanding Issues:
@@ -17,7 +17,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +35,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
-import com.example.tangry.controllers.UsernameController;
+import com.example.tangry.controllers.UserController;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
@@ -58,7 +57,7 @@ public class CreateEmotionPostFragment extends Fragment {
     private NavController navController;
 
     private EmotionPostController emotionPostController;
-    private UsernameController usernameController;
+    private UserController usernameController;
 
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
             "Select social situation", "Alone", "With one other person", "With two to several people", "With a crowd");
@@ -96,7 +95,7 @@ public class CreateEmotionPostFragment extends Fragment {
 
         // Initialize controllers
         emotionPostController = new EmotionPostController();
-        usernameController = new UsernameController();
+        usernameController = new UserController();
 
         // Retrieve passed arguments (using Safe Args if applicable)
         if (getArguments() != null) {

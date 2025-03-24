@@ -1,31 +1,19 @@
-/**
- * UsernameController.java
- *
- * This controller provides a simple interface for retrieving a username based on an email address.
- * It acts as a mediator between the view layer and the UsernameRepository, abstracting the underlying
- * logic of fetching the username data from the data source (e.g., Firestore). The controller uses the
- * singleton instance of the repository to ensure consistent access to username data.
- *
- * Outstanding Issues:
- * - We are considering implementing caching mechanisms for username lookups to reduce repeated network calls.
- * - Enhance error handling and logging to provide more detailed feedback to the view layer.
- */
-
 package com.example.tangry.controllers;
-import com.google.firebase.firestore.Query;
 
-import com.example.tangry.repositories.UsernameRepository;
+import com.example.tangry.repositories.UserRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.Query;
 
-public class UsernameController {
-    private final UsernameRepository repository;
+public class UserController {
+    private final UserRepository repository;
 
     /**
-     * Constructs a new UsernameController and initializes the UsernameRepository instance.
+     * Constructs a new UserController and initializes the UserRepository instance.
      */
-    public UsernameController() {
-        this.repository = UsernameRepository.getInstance();
+    public UserController() {
+        this.repository = UserRepository.getInstance();
     }
 
     /**

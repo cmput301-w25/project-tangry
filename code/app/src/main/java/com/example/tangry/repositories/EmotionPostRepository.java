@@ -171,6 +171,12 @@ public class EmotionPostRepository {
         );
     }
 
+    public Query getPostsByUser(String username) {
+        return firebaseDataSource.getCollectionReference()
+                .whereEqualTo("username", username)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+    }
+
     /**
      * Adds a comment to an existing EmotionPost in Firestore.
      *

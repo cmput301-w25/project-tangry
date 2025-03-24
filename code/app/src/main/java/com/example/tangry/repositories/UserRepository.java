@@ -1,51 +1,60 @@
-/**
- * UsernameRepository.java
- *
- * This repository class manages the persistence of username information in Firestore.
- * It provides methods to save a username with its associated email and to retrieve a username
- * based on the email address. The class uses a FirebaseDataSource instance initialized with the
- * "usernames" collection and follows the singleton design pattern.
- *
- * Outstanding Issues:
- * - Additional error handling or logging may be required in a production environment.
- * - We are considering expanding the query capabilities as the application scales.
- */
-
 package com.example.tangry.repositories;
 
 import com.example.tangry.datasource.FirebaseDataSource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query.Direction;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class UsernameRepository {
-    private static UsernameRepository instance;
+public class UserRepository {
+    private static UserRepository instance;
     private FirebaseDataSource firebaseDataSource;
+    private FirebaseAuth mAuth;
     private static final String COLLECTION_NAME = "users";
 
     /**
      * Private constructor initializes the FirebaseDataSource with the "usernames" collection.
      */
-    private UsernameRepository() {
-        // Initialize the data source with the "usernames" collection.
+    private UserRepository() {
         firebaseDataSource = new FirebaseDataSource(COLLECTION_NAME);
     }
 
     /**
-     * Returns the singleton instance of UsernameRepository.
+     * Returns the singleton instance of UserRepository.
      *
-     * @return the UsernameRepository instance
+     * @return the UserRepository instance
      */
-    public static synchronized UsernameRepository getInstance() {
+    public static synchronized UserRepository getInstance() {
         if (instance == null) {
-            instance = new UsernameRepository();
+            instance = new UserRepository();
         }
         return instance;
+    }
+
+    /**
+     * Searches for usernames that start with the provided prefix.
+     *
+     * @param prefix            the username prefix
+     * @param onSuccessListener callback invoked on a successful query with a QuerySnapshot
+     * @param onFailureListener callback invoked if the query fails
+     */
+    public void searchUsersByPrefix(String prefix,
+                                    OnSuccessListener<QuerySnapshot> onSuccessListener,
+                                    OnFailureListener onFailureListener) {
+        firebaseDataSource.getCollectionReference()
+                .orderBy("username")
+                .startAt(prefix)
+                .endAt(prefix + "\uf8ff")
+                .get()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     /**
@@ -53,7 +62,7 @@ public class UsernameRepository {
      *
      * @param username        the username to save
      * @param email           the email address associated with the username
-     * @param successListener callback invoked on successful save with a DocumentReference of the saved document
+     * @param successListener callback invoked on a successful save with a DocumentReference of the saved document
      * @param failureListener callback invoked if the save operation fails
      */
     public void saveUsernameToFirestore(String username, String email,
@@ -62,8 +71,6 @@ public class UsernameRepository {
         Map<String, Object> data = new HashMap<>();
         data.put("username", username);
         data.put("email", email);
-        //Setting karma to 0 initially always when creating username
-        data.put("karma", 0);
 
         firebaseDataSource.saveData(data, successListener, failureListener);
     }
@@ -74,7 +81,6 @@ public class UsernameRepository {
      * @return a Query object for retrieving username documents ordered by the "username" field in descending order
      */
     public Query getPostsQuery() {
-        // Return a query that orders usernames in descending order.
         return firebaseDataSource.getCollectionReference().orderBy("username", Direction.DESCENDING);
     }
 
@@ -102,7 +108,6 @@ public class UsernameRepository {
                 .addOnFailureListener(failureListener);
     }
 
-
     //Increment karma for a user identified by email
     public void incrementKarmaByEmail(String email,
                                       OnSuccessListener<Void> successListener,
@@ -126,10 +131,11 @@ public class UsernameRepository {
     }
 
 
-   //Get top 10 users ordered by karma
+    //Get top 10 users ordered by karma
     public Query getTopUsersQuery() {
         return firebaseDataSource.getCollectionReference()
                 .orderBy("karma", Query.Direction.DESCENDING)
                 .limit(10);
     }
+
 }
