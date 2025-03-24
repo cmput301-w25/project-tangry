@@ -77,8 +77,13 @@ public class YourMoodFragment extends Fragment {
         toolbar.getMenu().clear();
         toolbar.inflateMenu(R.menu.menu_profile);
         toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.ic_filter) {
+            int id = item.getItemId();
+            if (id == R.id.ic_filter) {
                 showFilterBottomSheet();
+                return true;
+            } else if (id == R.id.action_profile) {
+                Navigation.findNavController(getView())
+                        .navigate(R.id.action_global_personal_profile);
                 return true;
             }
             return false;

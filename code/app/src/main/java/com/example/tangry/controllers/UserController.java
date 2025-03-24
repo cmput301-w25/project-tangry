@@ -4,6 +4,7 @@ import com.example.tangry.repositories.UserRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.Query;
 
 public class UserController {
     private final UserRepository repository;
@@ -28,20 +29,15 @@ public class UserController {
         repository.getUsernameFromEmail(email, onSuccess, onFailure);
     }
 
-    /**
-     * Retrieves the username of the currently authenticated user.
-     * It fetches the email from FirebaseAuth and then retrieves the username using the repository.
-     *
-     * @param onSuccess callback invoked upon successful retrieval, returning the username as a String
-     * @param onFailure callback invoked if the retrieval fails or the user is not authenticated
-     */
-    public void getCurrentUsername(OnSuccessListener<String> onSuccess,
-                                   OnFailureListener onFailure) {
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-            getUsername(email, onSuccess, onFailure);
-        } else {
-            onFailure.onFailure(new Exception("User not authenticated"));
-        }
+    //Increment karma using email (should be username once constraint done)
+    public void incrementKarma(String email,
+                               OnSuccessListener<Void> onSuccess,
+                               OnFailureListener onFailure, int incrementAmount) {
+        repository.incrementKarmaByEmail(email, onSuccess, onFailure, incrementAmount);
+    }
+
+    // Expose the top users query for the leaderboard.
+    public Query getTopUsersQuery() {
+        return repository.getTopUsersQuery();
     }
 }

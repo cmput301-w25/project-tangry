@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query.Direction;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -107,45 +108,34 @@ public class UserRepository {
                 .addOnFailureListener(failureListener);
     }
 
-    /**
-     * Retrieves the username of the currently authenticated user.
-     *
-     * @param successListener callback invoked with the username String if found, or null if not found
-     * @param failureListener callback invoked if the query fails or the user is not authenticated
-     */
-    public void getCurrentUsername(OnSuccessListener<String> successListener,
-                                   OnFailureListener failureListener) {
-        if (FirebaseAuth.getInstance().getCurrentUser() == null ||
-                FirebaseAuth.getInstance().getCurrentUser().getEmail() == null) {
-            failureListener.onFailure(new Exception("User not authenticated"));
-            return;
-        }
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-        getUsernameFromEmail(email, successListener, failureListener);
+    //Increment karma for a user identified by email
+    public void incrementKarmaByEmail(String email,
+                                      OnSuccessListener<Void> successListener,
+                                      OnFailureListener failureListener, int incrementAmount) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        String docId = querySnapshot.getDocuments().get(0).getId();
+                        firebaseDataSource.getCollectionReference().document(docId)
+                                .update("karma", FieldValue.increment(incrementAmount))
+                                .addOnSuccessListener(successListener)
+                                .addOnFailureListener(failureListener);
+                    } else {
+                        failureListener.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(failureListener);
     }
 
-    /**
-     * Sends a follow request by creating a new document in the "followrequests" collection.
-     * The document will contain:
-     *   from: current user's username
-     *   to: target user's username
-     *   accepted: false
-     *
-     * @param fromUser         the username of the current user sending the request
-     * @param toUser           the username of the target user to follow
-     * @param successListener  callback invoked on a successful document creation
-     * @param failureListener  callback invoked if the creation fails
-     */
-    public void sendFollowRequest(String fromUser, String toUser,
-                                  OnSuccessListener<DocumentReference> successListener,
-                                  OnFailureListener failureListener) {
-        FirebaseDataSource followRequestDataSource = new FirebaseDataSource("followrequests");
-        Map<String, Object> data = new HashMap<>();
-        data.put("from", fromUser);
-        data.put("to", toUser);
-        data.put("accepted", false);
 
-        followRequestDataSource.saveData(data, successListener, failureListener);
+    //Get top 10 users ordered by karma
+    public Query getTopUsersQuery() {
+        return firebaseDataSource.getCollectionReference()
+                .orderBy("karma", Query.Direction.DESCENDING)
+                .limit(10);
     }
 
 }

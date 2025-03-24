@@ -145,12 +145,16 @@ public class UserCreateTest {
     @Test
     public void testSuccessfulUserCreation() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
-        // Using unique values should lead to a successful account creation.
-        viewModel.createUser("unique@example.com", "password123", "password123", "uniqueuser");
+        // Generate unique values so that collisions are avoided.
+        String uniqueSuffix = String.valueOf(System.currentTimeMillis());
+        String email = "unique" + uniqueSuffix + "@example.com";
+        String username = "uniqueuser" + uniqueSuffix;
+        viewModel.createUser(email, "password123", "password123", username);
         viewModel.getAccountCreated().observeForever(created -> latch.countDown());
         awaitLatch(latch);
         Boolean created = viewModel.getAccountCreated().getValue();
         String message = viewModel.getMessage().getValue();
+        System.out.println(message);
         assertNotNull(created);
         assertTrue(created);
         assertEquals("Account created successfully. Please login", message);

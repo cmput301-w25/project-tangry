@@ -69,7 +69,7 @@ public class FollowRequestTest {
     @Test
     public void testSendFollowRequest() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        followController.sendFollowRequest(senderUsername, currentUsername,
+        followController.sendFollowRequest("send", "recv",
                 documentReference -> latch.countDown(),
                 e -> latch.countDown());
         assertTrue(latch.await(5, TimeUnit.SECONDS));
@@ -77,13 +77,13 @@ public class FollowRequestTest {
         // Verify that a follow request document is created.
         QuerySnapshot qs = Tasks.await(
                 db.collection("followrequests")
-                        .whereEqualTo("from", senderUsername)
-                        .whereEqualTo("to", currentUsername)
+                        .whereEqualTo("from", "send")
+                        .whereEqualTo("to", "recv")
                         .get(), 5, TimeUnit.SECONDS);
         assertFalse(qs.isEmpty());
         DocumentSnapshot doc = qs.getDocuments().get(0);
-        assertEquals(senderUsername, doc.getString("from"));
-        assertEquals(currentUsername, doc.getString("to"));
+        assertEquals("send", doc.getString("from"));
+        assertEquals("recv", doc.getString("to"));
         assertFalse(doc.getBoolean("accepted"));
     }
 

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tangry.R;
 import com.example.tangry.adapters.LeaderboardAdapter;
-import com.example.tangry.controllers.UsernameController;
+import com.example.tangry.controllers.UserController;
 import com.example.tangry.models.User;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -23,7 +23,7 @@ public class LeaderboardFragment extends Fragment {
     private static final String TAG = "LeaderboardFragment";
     private RecyclerView recyclerView;
     private LeaderboardAdapter adapter;
-    private UsernameController usernameController;
+    private UserController userController;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,10 +42,10 @@ public class LeaderboardFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         // Initialize controller
-        usernameController = new UsernameController();
+        userController = new UserController();
 
         // Live listener for real-time updates
-        Query query = usernameController.getTopUsersQuery();
+        Query query = userController.getTopUsersQuery();
         query.addSnapshotListener((querySnapshot, e) -> {
             if (e != null || querySnapshot == null) {
                 Log.e(TAG, "Error fetching leaderboard", e);
