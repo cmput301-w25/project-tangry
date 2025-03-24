@@ -3,6 +3,7 @@ package com.example.tangry.models;
 import com.google.firebase.Timestamp;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class EmotionPost implements Serializable {
     private String username;
     private Timestamp timestamp;
     private String postId; // Firestore Document ID
+    private List<Comment> comments = new ArrayList<>();
 
     /**
      * Default constructor.
@@ -214,13 +216,26 @@ public class EmotionPost implements Serializable {
     }
 
     /**
-     * Gets the Firestore document ID of the post.
+     * Retrieves all comments associated with this emotion post.
      *
-     * @return the postId.
+     * @return A list of Comment objects.
      */
-    public String getPostId() {
-        return postId;
+    public List<Comment> getComments() {
+        return comments;
     }
+
+    /**
+     * Adds a comment to this emotion post.
+     *
+     * @param comment The Comment object to add.
+     */
+    public void addComment(Comment comment) {
+        if (comment != null) {
+            comments.add(comment);
+        }
+    }
+
+    public String getPostId() { return postId; }
 
     /**
      * Sets the Firestore document ID of the post.

@@ -14,6 +14,7 @@ package com.example.tangry.controllers;
 
 import android.util.Log;
 
+import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -115,5 +116,17 @@ public class EmotionPostController {
         }
 
         repository.updateEmotionPost(postId, updatedPost, onSuccess, onFailure);
+    }
+
+    /**
+     * Adds a comment to an EmotionPost.
+     *
+     * @param postId    the ID of the post to comment on
+     * @param comment   the Comment object to add
+     * @param onSuccess callback on success
+     * @param onFailure callback on failure
+     */
+    public void addCommentToPost(String postId, Comment comment, Runnable onSuccess, OnFailureListener onFailure) {
+        repository.addCommentToPost(postId, comment, onSuccess, onFailure);
     }
 }

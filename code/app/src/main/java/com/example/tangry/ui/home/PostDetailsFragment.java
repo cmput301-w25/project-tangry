@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -28,16 +29,24 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
+import com.example.tangry.adapters.CommentAdapter;
 import com.example.tangry.controllers.EmotionPostController;
+import com.example.tangry.controllers.UsernameController;
+import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
-import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.utils.TimeUtils;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
-import java.util.Objects;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
@@ -45,7 +54,13 @@ public class PostDetailsFragment extends Fragment {
     private Button editButton, deleteButton;
     private EmotionPost post;
     private String postId;
-    private EmotionPostController controller;
+    private EmotionPostController emotionPostController;
+    private UsernameController usernameController;
+    private RecyclerView commentsRecyclerView;
+    private EditText commentInput;
+    private Button commentSubmitButton;
+    private CommentAdapter commentAdapter;
+    private List<Comment> commentList = new ArrayList<>();
 
     /**
      * Default empty constructor required for Fragments.
@@ -77,7 +92,8 @@ public class PostDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        controller = new EmotionPostController();
+        emotionPostController = new EmotionPostController();
+        usernameController = new UsernameController();
 
         // Initialize Views
         userName = view.findViewById(R.id.user_name);
@@ -104,6 +120,56 @@ public class PostDetailsFragment extends Fragment {
 
         editButton.setOnClickListener(v -> editPost());
         deleteButton.setOnClickListener(v -> confirmDeletePost());
+
+        commentsRecyclerView = view.findViewById(R.id.comments_recycler_view);
+        commentInput = view.findViewById(R.id.comment_input);
+        commentSubmitButton = view.findViewById(R.id.comment_submit_button);
+
+        commentAdapter = new CommentAdapter(commentList);
+        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        commentsRecyclerView.setAdapter(commentAdapter);
+
+        commentsRecyclerView.setNestedScrollingEnabled(false);
+
+        if (post != null && post.getComments() != null) {
+            commentList.addAll(post.getComments());
+            commentAdapter.notifyDataSetChanged();
+        }
+
+        commentSubmitButton.setOnClickListener(v -> {
+            String content = commentInput.getText().toString().trim();
+            if (!content.isEmpty() && postId != null) {
+                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                usernameController.getUsername(email,
+                    username -> {
+                        Comment comment = new Comment(username, content);
+                        emotionPostController.addCommentToPost(postId, comment,
+                            () -> {
+                                commentList.add(comment);
+                                commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                commentInput.setText("");
+                            },
+                            e -> Log.e("PostDetails", "Failed to add comment", e)
+                        );
+                    },
+                    e -> {
+                        Log.e("PostDetails", "Failed to fetch username", e);
+                        // Optional fallback
+                        Comment fallbackComment = new Comment("Unknown", content);
+                        emotionPostController.addCommentToPost(postId, fallbackComment,
+                            () -> {
+                                commentList.add(fallbackComment);
+                                commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                commentInput.setText("");
+                            },
+                            error -> Log.e("PostDetails", "Failed to add comment (fallback)", error)
+                        );
+                    }
+                );
+            }
+        });
+
     }
 
     /**
@@ -245,7 +311,7 @@ public class PostDetailsFragment extends Fragment {
      * Deletes the post document from Firestore using the EmotionPostController.
      */
     private void deletePostFromFirestore() {
-        controller.deleteEmotionPost(postId,
+        emotionPostController.deleteEmotionPost(postId,
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
                     Navigation.findNavController(requireView())
