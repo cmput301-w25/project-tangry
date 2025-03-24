@@ -36,7 +36,7 @@ import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.adapters.CommentAdapter;
 import com.example.tangry.controllers.EmotionPostController;
-import com.example.tangry.controllers.UsernameController;
+import com.example.tangry.controllers.UserController;
 import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.utils.TimeUtils;
@@ -55,7 +55,7 @@ public class PostDetailsFragment extends Fragment {
     private EmotionPost post;
     private String postId;
     private EmotionPostController emotionPostController;
-    private UsernameController usernameController;
+    private UserController userController;
     private RecyclerView commentsRecyclerView;
     private EditText commentInput;
     private Button commentSubmitButton;
@@ -93,7 +93,7 @@ public class PostDetailsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         emotionPostController = new EmotionPostController();
-        usernameController = new UsernameController();
+        userController = new UserController();
 
         // Initialize Views
         userName = view.findViewById(R.id.user_name);
@@ -141,7 +141,7 @@ public class PostDetailsFragment extends Fragment {
             if (!content.isEmpty() && postId != null) {
                 String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-                usernameController.getUsername(email,
+                userController.getUsername(email,
                     username -> {
                         Comment comment = new Comment(username, content);
                         emotionPostController.addCommentToPost(postId, comment,
