@@ -149,6 +149,12 @@ public class PostDetailsFragment extends Fragment {
                                 commentList.add(comment);
                                 commentAdapter.notifyItemInserted(commentList.size() - 1);
                                 commentInput.setText("");
+                                int commentKarma = 5;
+                                userController.incrementKarma(email,
+                                        aVoid -> Log.d("PostDetails", "Karma incremented by " + commentKarma + " for commenting."),
+                                        e -> Log.e("PostDetails", "Failed to increment karma after comment", e),
+                                        commentKarma
+                                );
                             },
                             e -> Log.e("PostDetails", "Failed to add comment", e)
                         );
