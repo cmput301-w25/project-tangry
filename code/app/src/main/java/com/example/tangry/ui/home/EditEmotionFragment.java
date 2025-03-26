@@ -39,6 +39,7 @@ import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
+import com.example.tangry.utils.NetworkMonitor;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
@@ -46,6 +47,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -176,25 +178,21 @@ public class EditEmotionFragment extends Fragment {
         String location = locationInput.getText().toString().trim();
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
         String emotion = emotionTextView.getText().toString();
-
         if ("Select social situation".equals(socialSituation)) {
             socialSituation = null;
         }
-
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
             Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT)
                     .show();
             return;
         }
-
         updatedPost.setExplanation(explanation);
         updatedPost.setLocation(location);
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
 
-        // If a new image is selected (and not already a Firebase Storage URL), process
-        // and upload it.
-        if (imageUri != null && !imageUri.startsWith("https://firebasestorage")) {
+        // Check if we have a new image (from user selection) vs. existing image URI
+        if (isNewImageSelected && imageUri != null && !imageUri.isEmpty()) {
             try {
                 Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
                 uploadImage(processedUri);
@@ -203,7 +201,8 @@ public class EditEmotionFragment extends Fragment {
                 Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // No new image, proceed to update the post.
+            // No new image or using existing image URI, proceed to update the post
+            // without trying to reprocess the image
             updatePostInFirestore(null);
         }
     }
@@ -240,17 +239,32 @@ public class EditEmotionFragment extends Fragment {
             updatedPost.setImageUri(imageUrl);
         }
 
+        // Check network connectivity
+        NetworkMonitor networkMonitor = new NetworkMonitor(getContext());
+        boolean isConnected = networkMonitor.isConnected();
+
         // Save the updated post to Firestore with offline support.
         emotionPostController.updateEmotionPostWithOfflineSupport(
                 getContext(),
                 postId,
                 updatedPost,
                 () -> {
-                    Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
+                    // Show appropriate message based on connectivity
+                    if (!isConnected) {
+                        Toast.makeText(getContext(),
+                                "Post updated locally and will sync when online",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), "Post updated successfully!",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Navigate back
                     navController.popBackStack(R.id.navigation_home, true);
                 },
                 e -> {
-                    Toast.makeText(getContext(), "Failed to update. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to update: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Failed to update post", e);
                 });
     }
@@ -315,6 +329,49 @@ public class EditEmotionFragment extends Fragment {
      */
     private void uploadImage(Uri imageUri) {
         Log.d(TAG, "Uploading image: " + imageUri);
+
+        // Check network connectivity first
+        NetworkMonitor networkMonitor = new NetworkMonitor(getContext());
+        if (!networkMonitor.isConnected()) {
+            // We're offline - store the image locally and update post
+            try {
+                // Copy the image to app's local storage for offline use
+                File cacheDir = getContext().getCacheDir();
+                File localImageFile = new File(cacheDir,
+                        "offline_image_" + postId + "_" + System.currentTimeMillis() + ".jpg");
+
+                InputStream inputStream = getContext().getContentResolver().openInputStream(imageUri);
+                FileOutputStream outputStream = new FileOutputStream(localImageFile);
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                inputStream.close();
+                outputStream.close();
+
+                // Create a local URI that can be used later
+                Uri localUri = Uri.fromFile(localImageFile);
+
+                // Store this local image path in the post and update
+                updatedPost.setImageUri(localUri.toString());
+                updatedPost.setOfflineImagePending(true); // Add this flag to EmotionPost class
+
+                // Update post with local image reference
+                updatePostInFirestore(localUri.toString());
+
+                Toast.makeText(getContext(), "Image saved locally and will upload when online", Toast.LENGTH_SHORT)
+                        .show();
+
+            } catch (IOException e) {
+                Log.e(TAG, "Error saving image locally", e);
+                Toast.makeText(getContext(), "Failed to save image locally: " + e.getMessage(), Toast.LENGTH_SHORT)
+                        .show();
+            }
+            return;
+        }
+
+        // We're online - proceed with normal Firebase Storage upload
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
 

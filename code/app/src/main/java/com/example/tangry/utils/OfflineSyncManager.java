@@ -2,6 +2,7 @@ package com.example.tangry.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
 import com.example.tangry.controllers.EmotionPostController;
@@ -10,12 +11,16 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.models.PendingOperation;
 import com.example.tangry.models.SyncStatus;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OfflineSyncManager implements NetworkMonitor.NetworkChangeListener {
@@ -40,7 +45,8 @@ public class OfflineSyncManager implements NetworkMonitor.NetworkChangeListener 
         this.networkMonitor.setNetworkChangeListener(this);
     }
 
-    public OfflineSyncManager(Context context, NetworkMonitor networkMonitor, EmotionPostController emotionPostController) {
+    public OfflineSyncManager(Context context, NetworkMonitor networkMonitor,
+            EmotionPostController emotionPostController) {
         this.context = context.getApplicationContext();
         this.sharedPreferences = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.networkMonitor = networkMonitor;
@@ -189,33 +195,86 @@ public class OfflineSyncManager implements NetworkMonitor.NetworkChangeListener 
                 break;
 
             case UPDATE:
-                emotionPostController.updateEmotionPost(operation.getPostId(), operation.getPost(),
-                        () -> { // Using Runnable instead of OnSuccessListener<Void>
-                            Log.d(TAG, "Successfully synced UPDATE operation");
-                            operations.remove(operation);
-                            savePendingOperations(operations);
-                            checkSyncCompletion(operations, completed.incrementAndGet(), failed.get());
-                        },
-                        e -> {
-                            Log.e(TAG, "Failed to sync UPDATE operation", e);
-                            failed.incrementAndGet();
-                            checkSyncCompletion(operations, completed.get(), failed.get());
-                        });
+                EmotionPost postToUpdate = operation.getPost();
+                // Check if this post has a pending offline image
+                if (postToUpdate.isOfflineImagePending() && postToUpdate.getImageUri() != null) {
+                    // Upload the local image first, then update the post
+                    String localImagePath = postToUpdate.getImageUri();
+                    Uri localUri = Uri.parse(localImagePath);
+
+                    StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                    StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
+
+                    imageRef.putFile(localUri)
+                            .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl()
+                                    .addOnSuccessListener(uri -> {
+                                        // Update the post with the cloud storage URL
+                                        postToUpdate.setImageUri(uri.toString());
+                                        postToUpdate.setOfflineImagePending(false);
+
+                                        // Now update the post with the cloud image URL
+                                        emotionPostController.updateEmotionPost(operation.getPostId(), postToUpdate,
+                                                () -> {
+                                                    Log.d(TAG,
+                                                            "Successfully synced UPDATE operation with offline image");
+                                                    operations.remove(operation);
+                                                    savePendingOperations(operations);
+                                                    checkSyncCompletion(operations, completed.incrementAndGet(),
+                                                            failed.get());
+
+                                                    // Clean up the local file
+                                                    new File(localUri.getPath()).delete();
+                                                },
+                                                e -> {
+                                                    Log.e(TAG, "Failed to sync UPDATE operation with offline image", e);
+                                                    failed.incrementAndGet();
+                                                    checkSyncCompletion(operations, completed.get(), failed.get());
+                                                });
+                                    }))
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to upload offline image during sync", e);
+                                failed.incrementAndGet();
+                                checkSyncCompletion(operations, completed.get(), failed.get());
+                            });
+                } else {
+                    // Normal update without pending image
+                    emotionPostController.updateEmotionPost(operation.getPostId(), operation.getPost(),
+                            () -> {
+                                Log.d(TAG, "Successfully synced UPDATE operation");
+                                operations.remove(operation);
+                                savePendingOperations(operations);
+                                checkSyncCompletion(operations, completed.incrementAndGet(), failed.get());
+                            },
+                            e -> {
+                                Log.e(TAG, "Failed to sync UPDATE operation", e);
+                                failed.incrementAndGet();
+                                checkSyncCompletion(operations, completed.get(), failed.get());
+                            });
+                }
                 break;
 
             case DELETE:
-                emotionPostController.deleteEmotionPost(operation.getPostId(),
-                        () -> { // Using Runnable instead of OnSuccessListener<Void>
-                            Log.d(TAG, "Successfully synced DELETE operation");
-                            operations.remove(operation);
-                            savePendingOperations(operations);
-                            checkSyncCompletion(operations, completed.incrementAndGet(), failed.get());
-                        },
-                        e -> {
-                            Log.e(TAG, "Failed to sync DELETE operation", e);
-                            failed.incrementAndGet();
-                            checkSyncCompletion(operations, completed.get(), failed.get());
-                        });
+                String postIdToDelete = operation.getPostId();
+
+                // Define a callback to execute the delete
+                Runnable performDelete = () -> {
+                    emotionPostController.deleteEmotionPost(postIdToDelete,
+                            () -> {
+                                Log.d(TAG, "Successfully synced DELETE operation");
+                                operations.remove(operation);
+                                savePendingOperations(operations);
+                                checkSyncCompletion(operations, completed.incrementAndGet(), failed.get());
+                            },
+                            e -> {
+                                Log.e(TAG, "Failed to sync DELETE operation", e);
+                                failed.incrementAndGet();
+                                checkSyncCompletion(operations, completed.get(), failed.get());
+                            });
+                };
+
+                // Just perform the delete without trying to handle the image
+                // The emotionPostController will handle image deletion if needed
+                performDelete.run();
                 break;
         }
     }

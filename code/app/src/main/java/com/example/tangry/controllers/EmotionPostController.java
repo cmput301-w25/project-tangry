@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.OnFailureListener;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EmotionPostController {
     private final EmotionPostRepository repository;
@@ -42,7 +43,6 @@ public class EmotionPostController {
     public EmotionPostController() {
         this.repository = EmotionPostRepository.getInstance();
     }
-
 
     /**
      * Creates a new EmotionPost and saves it to Firestore.
@@ -158,31 +158,76 @@ public class EmotionPostController {
     }
 
     public void updateEmotionPostWithOfflineSupport(Context context, String postId, EmotionPost post,
-                                                    Runnable onSuccess, OnFailureListener onFailure) {
-        OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
-        NetworkMonitor networkMonitor = new NetworkMonitor(context);
+            Runnable onSuccess, OnFailureListener onFailure) {
+        try {
+            OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
+            NetworkMonitor networkMonitor = new NetworkMonitor(context);
 
-        if (networkMonitor.isConnected()) {
-            updateEmotionPost(postId, post, onSuccess, onFailure);
-        } else {
-            syncManager.addPendingUpdate(postId, post);
-            if (onSuccess != null) {
-                onSuccess.run();
+            if (networkMonitor.isConnected()) {
+                updateEmotionPost(postId, post, onSuccess, onFailure);
+            } else {
+                // Create defensive copy with null checks
+                String emotion = post.getEmotion() != null ? post.getEmotion() : "";
+                String explanation = post.getExplanation() != null ? post.getExplanation() : "";
+                String imageUri = post.getImageUri() != null ? post.getImageUri() : null;
+                String location = post.getLocation() != null ? post.getLocation() : "";
+                String socialSituation = !Objects.equals(post.getSocialSituation(), "") ? post.getSocialSituation()
+                        : "";
+                String username = post.getUsername() != null ? post.getUsername() : "";
+
+                // Make a defensive copy of the post
+                EmotionPost postCopy = EmotionPost.create(
+                        emotion,
+                        explanation,
+                        imageUri,
+                        location,
+                        socialSituation,
+                        username);
+
+                // Add timestamp and other metadata
+                if (post.getTimestamp() != null) {
+                    postCopy.setTimestamp(post.getTimestamp());
+                }
+
+                syncManager.addPendingUpdate(postId, postCopy);
+                if (onSuccess != null) {
+                    onSuccess.run();
+                }
+            }
+        } catch (Exception e) {
+            Log.e("EmotionPostController", "Error in updateEmotionPostWithOfflineSupport: " + e.getMessage(), e);
+            if (onFailure != null) {
+                onFailure.onFailure(e);
             }
         }
     }
 
-    public void deleteEmotionPostWithOfflineSupport(Context context, String postId,
-                                                    Runnable onSuccess, OnFailureListener onFailure) {
+    public void deleteEmotionPostWithOfflineSupport(Context context, String postId, EmotionPost post,
+            Runnable onSuccess, OnFailureListener onFailure) {
+        final String TAG = "EmotionPostController";
         OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
         NetworkMonitor networkMonitor = new NetworkMonitor(context);
 
         if (networkMonitor.isConnected()) {
+            // We're online - proceed with normal delete
             deleteEmotionPost(postId, onSuccess, onFailure);
         } else {
-            syncManager.addPendingDelete(postId);
-            if (onSuccess != null) {
-                onSuccess.run();
+            // We're offline - queue for later and provide immediate feedback
+            try {
+                // Just store the post ID for deletion without any image handling
+                syncManager.addPendingDelete(postId);
+
+                // Provide immediate success feedback to user
+                if (onSuccess != null) {
+                    onSuccess.run();
+                }
+
+                Log.d(TAG, "Added delete operation to offline queue for postId: " + postId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error adding delete operation to offline queue", e);
+                if (onFailure != null) {
+                    onFailure.onFailure(e);
+                }
             }
         }
     }
