@@ -14,6 +14,7 @@ import java.util.List;
 public class EmotionPost implements Serializable {
     private static final String TAG = "EmotionPost";
 
+    private boolean offlineImagePending = false;
     private String emotion;
     private String explanation;
     private String imageUri;
@@ -37,7 +38,8 @@ public class EmotionPost implements Serializable {
             "Fear", "Happiness", "Sadness", "Shame", "Surprise");
 
     /**
-     * Private constructor to create an EmotionPost instance with specified attributes.
+     * Private constructor to create an EmotionPost instance with specified
+     * attributes.
      *
      * @param emotion         the emotion type.
      * @param explanation     the explanation text.
@@ -47,7 +49,7 @@ public class EmotionPost implements Serializable {
      * @param username        the username who created the post.
      */
     private EmotionPost(String emotion, String explanation, String imageUri, String location, String socialSituation,
-                        String username) {
+            String username) {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
@@ -60,17 +62,21 @@ public class EmotionPost implements Serializable {
     /**
      * Factory method to create an EmotionPost object with validation.
      *
-     * @param emotion         the emotion type; must not be null or empty and must be valid.
-     * @param explanation     the explanation text; if provided, must be at most 20 characters or 3 words.
+     * @param emotion         the emotion type; must not be null or empty and must
+     *                        be valid.
+     * @param explanation     the explanation text; if provided, must be at most 20
+     *                        characters or 3 words.
      * @param imageUri        the URI of the image.
      * @param location        the location information.
-     * @param socialSituation the social situation; if provided, must be one of the valid options.
-     * @param username        the username; if null, defaults are applied in getters.
+     * @param socialSituation the social situation; if provided, must be one of the
+     *                        valid options.
+     * @param username        the username; if null, defaults are applied in
+     *                        getters.
      * @return a new EmotionPost object.
      * @throws IllegalArgumentException if any validation fails.
      */
     public static EmotionPost create(String emotion, String explanation, String imageUri, String location,
-                                     String socialSituation, String username) throws IllegalArgumentException {
+            String socialSituation, String username) throws IllegalArgumentException {
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
@@ -87,6 +93,14 @@ public class EmotionPost implements Serializable {
             throw new IllegalArgumentException("Invalid emotion.");
         }
         return new EmotionPost(emotion, explanation, imageUri, location, socialSituation, username);
+    }
+
+    public boolean isOfflineImagePending() {
+        return offlineImagePending;
+    }
+
+    public void setOfflineImagePending(boolean offlineImagePending) {
+        this.offlineImagePending = offlineImagePending;
     }
 
     /**
@@ -235,7 +249,9 @@ public class EmotionPost implements Serializable {
         }
     }
 
-    public String getPostId() { return postId; }
+    public String getPostId() {
+        return postId;
+    }
 
     /**
      * Sets the Firestore document ID of the post.

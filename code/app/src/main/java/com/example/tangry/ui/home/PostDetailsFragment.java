@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -31,6 +33,7 @@ import androidx.navigation.Navigation;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.NavController;
 
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
@@ -39,6 +42,7 @@ import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.controllers.UserController;
 import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
+import com.example.tangry.utils.NetworkMonitor;
 import com.example.tangry.utils.TimeUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
@@ -84,7 +88,8 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Initializes UI components, retrieves post data from arguments, and sets up event listeners.
+     * Initializes UI components, retrieves post data from arguments, and sets up
+     * event listeners.
      *
      * @param view               The root view returned by onCreateView.
      * @param savedInstanceState Previously saved state, if any.
@@ -142,37 +147,34 @@ public class PostDetailsFragment extends Fragment {
                 String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
                 userController.getUsername(email,
-                    username -> {
-                        Comment comment = new Comment(username, content);
-                        emotionPostController.addCommentToPost(postId, comment,
-                            () -> {
-                                commentList.add(comment);
-                                commentAdapter.notifyItemInserted(commentList.size() - 1);
-                                commentInput.setText("");
-                                int commentKarma = 5;
-                                userController.incrementKarma(email,
-                                        aVoid -> Log.d("PostDetails", "Karma incremented by " + commentKarma + " for commenting."),
-                                        e -> Log.e("PostDetails", "Failed to increment karma after comment", e),
-                                        commentKarma
-                                );
-                            },
-                            e -> Log.e("PostDetails", "Failed to add comment", e)
-                        );
-                    },
-                    e -> {
-                        Log.e("PostDetails", "Failed to fetch username", e);
-                        // Optional fallback
-                        Comment fallbackComment = new Comment("Unknown", content);
-                        emotionPostController.addCommentToPost(postId, fallbackComment,
-                            () -> {
-                                commentList.add(fallbackComment);
-                                commentAdapter.notifyItemInserted(commentList.size() - 1);
-                                commentInput.setText("");
-                            },
-                            error -> Log.e("PostDetails", "Failed to add comment (fallback)", error)
-                        );
-                    }
-                );
+                        username -> {
+                            Comment comment = new Comment(username, content);
+                            emotionPostController.addCommentToPost(postId, comment,
+                                    () -> {
+                                        commentList.add(comment);
+                                        commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                        commentInput.setText("");
+                                        int commentKarma = 5;
+                                        userController.incrementKarma(email,
+                                                aVoid -> Log.d("PostDetails",
+                                                        "Karma incremented by " + commentKarma + " for commenting."),
+                                                e -> Log.e("PostDetails", "Failed to increment karma after comment", e),
+                                                commentKarma);
+                                    },
+                                    e -> Log.e("PostDetails", "Failed to add comment", e));
+                        },
+                        e -> {
+                            Log.e("PostDetails", "Failed to fetch username", e);
+                            // Optional fallback
+                            Comment fallbackComment = new Comment("Unknown", content);
+                            emotionPostController.addCommentToPost(postId, fallbackComment,
+                                    () -> {
+                                        commentList.add(fallbackComment);
+                                        commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                        commentInput.setText("");
+                                    },
+                                    error -> Log.e("PostDetails", "Failed to add comment (fallback)", error));
+                        });
             }
         });
 
@@ -283,7 +285,8 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Deletes the post by first attempting to remove the associated image (if any) from Firebase Storage,
+     * Deletes the post by first attempting to remove the associated image (if any)
+     * from Firebase Storage,
      * then deleting the post document from Firestore.
      */
     private void deletePost() {
@@ -317,12 +320,50 @@ public class PostDetailsFragment extends Fragment {
      * Deletes the post document from Firestore using the EmotionPostController.
      */
     private void deletePostFromFirestore() {
-        emotionPostController.deleteEmotionPost(postId,
+        // Get a reference to navigation before async operation
+        final androidx.navigation.NavController navController = isAdded() && getView() != null
+                ? androidx.navigation.Navigation.findNavController(requireView())
+                : null;
+
+        // Check network connectivity
+        NetworkMonitor networkMonitor = new NetworkMonitor(requireContext());
+        boolean isConnected = networkMonitor.isConnected();
+
+        // Pass all required parameters including the EmotionPost object
+        emotionPostController.deleteEmotionPostWithOfflineSupport(
+                requireContext(),
+                postId,
+                post, // Pass the EmotionPost object
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
-                    Navigation.findNavController(requireView())
-                            .popBackStack(R.id.navigation_home, false);
+
+                    // Show toast message based on connectivity
+                    if (!isConnected) {
+                        Toast.makeText(requireContext(),
+                                "Post deleted locally and will be removed when online",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), "Post deleted successfully",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Check if fragment is still attached and navController is available
+                    if (isAdded() && navController != null && getView() != null) {
+                        navController.popBackStack(R.id.navigation_home, false);
+                    } else {
+                        // Handle the case when fragment is already detached
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                getActivity().onBackPressed();
+                            });
+                        }
+                    }
                 },
-                e -> Log.e("PostDetails", "Error deleting post", e));
+                e -> {
+                    Log.e("PostDetails", "Error deleting post", e);
+                    Toast.makeText(requireContext(),
+                            "Failed to delete post: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 }
