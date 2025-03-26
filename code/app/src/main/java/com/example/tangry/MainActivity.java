@@ -16,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.tangry.databinding.ActivityMainBinding;
+import com.example.tangry.utils.OfflineSyncManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        OfflineSyncManager syncManager = OfflineSyncManager.getInstance(this);
 
         // Set up the primary toolbar.
         MaterialToolbar primaryToolbar = findViewById(R.id.toolbar_primary);
@@ -75,7 +78,8 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Called when the user has successfully logged in.
-     * This method makes the bottom navigation view and floating action button visible
+     * This method makes the bottom navigation view and floating action button
+     * visible
      * and navigates to the home destination.
      */
     public void onLoginSuccess() {

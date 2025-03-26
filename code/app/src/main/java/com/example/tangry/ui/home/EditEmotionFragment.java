@@ -85,8 +85,10 @@ public class EditEmotionFragment extends Fragment {
     }
 
     /**
-     * Called when the view has been created. Initializes UI components, retrieves arguments,
-     * pre-fills data if available, and sets up event listeners for image selection and post update.
+     * Called when the view has been created. Initializes UI components, retrieves
+     * arguments,
+     * pre-fills data if available, and sets up event listeners for image selection
+     * and post update.
      *
      * @param view               The root view of the fragment.
      * @param savedInstanceState Previously saved state.
@@ -165,7 +167,8 @@ public class EditEmotionFragment extends Fragment {
     }
 
     /**
-     * Updates the emotion post. Validates the input and either uploads a new image if selected or
+     * Updates the emotion post. Validates the input and either uploads a new image
+     * if selected or
      * directly updates the post in Firestore.
      */
     private void updatePost() {
@@ -179,7 +182,8 @@ public class EditEmotionFragment extends Fragment {
         }
 
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
-            Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -188,7 +192,8 @@ public class EditEmotionFragment extends Fragment {
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
 
-        // If a new image is selected (and not already a Firebase Storage URL), process and upload it.
+        // If a new image is selected (and not already a Firebase Storage URL), process
+        // and upload it.
         if (imageUri != null && !imageUri.startsWith("https://firebasestorage")) {
             try {
                 Uri processedUri = checkAndCompressImage(Uri.parse(imageUri));
@@ -204,18 +209,21 @@ public class EditEmotionFragment extends Fragment {
     }
 
     /**
-     * Updates the emotion post in Firestore. If a new image URL is provided, it replaces the old one.
+     * Updates the emotion post in Firestore. If a new image URL is provided, it
+     * replaces the old one.
      * Also attempts to delete the previous image from Firebase Storage.
      *
      * @param imageUrl The new image URL, or null if unchanged.
      */
     private void updatePostInFirestore(String imageUrl) {
-        // If a new image is provided and an old image exists in Firebase Storage, attempt deletion.
+        // If a new image is provided and an old image exists in Firebase Storage,
+        // attempt deletion.
         if (imageUrl != null && updatedPost.getImageUri() != null &&
                 !updatedPost.getImageUri().isEmpty() &&
                 updatedPost.getImageUri().startsWith("https://firebasestorage")) {
             try {
-                StorageReference oldImageRef = FirebaseStorage.getInstance().getReferenceFromUrl(updatedPost.getImageUri());
+                StorageReference oldImageRef = FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(updatedPost.getImageUri());
                 oldImageRef.delete().addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Old image deleted successfully");
                 }).addOnFailureListener(e -> {
@@ -232,18 +240,24 @@ public class EditEmotionFragment extends Fragment {
             updatedPost.setImageUri(imageUrl);
         }
 
-        // Save the updated post to Firestore.
-        emotionPostController.updateEmotionPost(postId, updatedPost, () -> {
-            Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
-            navController.popBackStack(R.id.navigation_home, true);
-        }, e -> {
-            Toast.makeText(getContext(), "Failed to update. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Failed to update post", e);
-        });
+        // Save the updated post to Firestore with offline support.
+        emotionPostController.updateEmotionPostWithOfflineSupport(
+                getContext(),
+                postId,
+                updatedPost,
+                () -> {
+                    Toast.makeText(getContext(), "Post updated!", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack(R.id.navigation_home, true);
+                },
+                e -> {
+                    Toast.makeText(getContext(), "Failed to update. " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to update post", e);
+                });
     }
 
     /**
-     * Compresses an image if its size exceeds 64KB by reducing quality and scaling down dimensions.
+     * Compresses an image if its size exceeds 64KB by reducing quality and scaling
+     * down dimensions.
      *
      * @param originalUri The original URI of the selected image.
      * @return The URI of the compressed image.
@@ -294,7 +308,8 @@ public class EditEmotionFragment extends Fragment {
     }
 
     /**
-     * Uploads an image to Firebase Storage and updates the post with the download URL upon success.
+     * Uploads an image to Firebase Storage and updates the post with the download
+     * URL upon success.
      *
      * @param imageUri The URI of the image to upload.
      */
@@ -304,12 +319,10 @@ public class EditEmotionFragment extends Fragment {
         StorageReference imageRef = storageRef.child("images/" + UUID.randomUUID().toString());
 
         imageRef.putFile(imageUri)
-                .addOnSuccessListener(taskSnapshot ->
-                        imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                            String downloadUrl = uri.toString();
-                            updatePostInFirestore(downloadUrl);
-                        })
-                )
+                .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String downloadUrl = uri.toString();
+                    updatePostInFirestore(downloadUrl);
+                }))
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Image upload failed", e);

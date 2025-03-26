@@ -146,8 +146,10 @@ public class CreateEmotionPostFragment extends Fragment {
     }
 
     /**
-     * Validates input fields and initiates the process of saving a new emotion post.
-     * It retrieves the username associated with the current user's email and handles image upload if present.
+     * Validates input fields and initiates the process of saving a new emotion
+     * post.
+     * It retrieves the username associated with the current user's email and
+     * handles image upload if present.
      */
     private void saveMoodEvent() {
         String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
@@ -178,24 +180,27 @@ public class CreateEmotionPostFragment extends Fragment {
     }
 
     /**
-     * Uploads an image using ImageHelper and creates an emotion post upon successful upload.
+     * Uploads an image using ImageHelper and creates an emotion post upon
+     * successful upload.
      *
-     * @param imageUri         the URI of the processed image
-     * @param emotion          the emotion text
-     * @param explanation      the explanation text
-     * @param location         the location string
-     * @param socialSituation  the social situation string (nullable)
-     * @param username         the username associated with the current user
+     * @param imageUri        the URI of the processed image
+     * @param emotion         the emotion text
+     * @param explanation     the explanation text
+     * @param location        the location string
+     * @param socialSituation the social situation string (nullable)
+     * @param username        the username associated with the current user
      */
     private void uploadImage(Uri imageUri, String emotion, String explanation,
-                             String location, String socialSituation, String username) {
+            String location, String socialSituation, String username) {
         ImageHelper.uploadImage(imageUri,
-                downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(), location, socialSituation, username),
+                downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(), location,
+                        socialSituation, username),
                 e -> Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     /**
-     * Creates an EmotionPost object and saves it to Firestore using the EmotionPostController.
+     * Creates an EmotionPost object and saves it to Firestore using the
+     * EmotionPostController.
      *
      * @param emotion         the emotion text
      * @param explanation     the explanation text
@@ -205,23 +210,28 @@ public class CreateEmotionPostFragment extends Fragment {
      * @param username        the username associated with the current user
      */
     private void createEmotionPost(String emotion, String explanation, String imageUrl, String location,
-                                   String socialSituation, String username) {
+            String socialSituation, String username) {
         try {
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl, location, socialSituation, username);
             Log.d(TAG, "Saving mood event: " + post.toString());
-            emotionPostController.createPost(post,
-                    (DocumentReference docRef) -> {
-                        // Post saved successfully – now increment user karma
-                        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-                        //If post with no images posted karma increase by 10. Else by 20
-                        int incrementAmount = calculateKarmaIncrement(post);
-                        usernameController.incrementKarma(email,
-                                aVoid -> Log.d(TAG, "User karma incremented by " + incrementAmount),
-                                e -> Log.e(TAG, "Failed to increment karma", e),
-                                incrementAmount
-                        );
 
-                        Toast.makeText(getContext(), "Mood event saved to Firestore!", Toast.LENGTH_SHORT).show();
+            emotionPostController.createPostWithOfflineSupport(
+                    getContext(),
+                    post,
+                    (DocumentReference docRef) -> {
+                        // Post saved successfully or queued for offline
+                        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                        // Only increment karma if we're online (docRef will be null if offline)
+                        if (docRef != null) {
+                            int incrementAmount = calculateKarmaIncrement(post);
+                            usernameController.incrementKarma(email,
+                                    aVoid -> Log.d(TAG, "User karma incremented by " + incrementAmount),
+                                    e -> Log.e(TAG, "Failed to increment karma", e),
+                                    incrementAmount);
+                        }
+
+                        Toast.makeText(getContext(), "Mood event saved!", Toast.LENGTH_SHORT).show();
                         navController.popBackStack();
                         navController.popBackStack();
                     },
@@ -229,9 +239,9 @@ public class CreateEmotionPostFragment extends Fragment {
                         Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "Failed to save mood event", e);
                     });
-        } catch (IllegalArgumentException e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Error saving mood event", e);
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating emotion post", e);
+            Toast.makeText(getContext(), "Error creating post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

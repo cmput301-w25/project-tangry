@@ -23,35 +23,46 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.Timestamp;
 
+import android.content.Context;
+import com.example.tangry.utils.NetworkMonitor;
+import com.example.tangry.utils.OfflineSyncManager;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
+
 import java.util.List;
 
 public class EmotionPostController {
     private final EmotionPostRepository repository;
 
     /**
-     * Constructs a new EmotionPostController using the singleton instance of EmotionPostRepository.
+     * Constructs a new EmotionPostController using the singleton instance of
+     * EmotionPostRepository.
      */
     public EmotionPostController() {
         this.repository = EmotionPostRepository.getInstance();
     }
 
+
     /**
      * Creates a new EmotionPost and saves it to Firestore.
      *
      * @param post      the EmotionPost object to be saved
-     * @param onSuccess callback for successful Firestore save, receiving the DocumentReference of the saved post
+     * @param onSuccess callback for successful Firestore save, receiving the
+     *                  DocumentReference of the saved post
      * @param onFailure callback for failure scenario
      */
     public void createPost(EmotionPost post,
-                           OnSuccessListener<DocumentReference> onSuccess,
-                           OnFailureListener onFailure) {
+            OnSuccessListener<DocumentReference> onSuccess,
+            OnFailureListener onFailure) {
         repository.saveEmotionPostToFirestore(post, onSuccess, onFailure);
     }
 
     /**
      * Retrieves a Firestore Query for all EmotionPosts.
      *
-     * This query can be used by views (e.g., in a RecyclerView adapter) to display posts.
+     * This query can be used by views (e.g., in a RecyclerView adapter) to display
+     * posts.
      *
      * @return a Query object for retrieving all EmotionPosts
      */
@@ -60,10 +71,13 @@ public class EmotionPostController {
     }
 
     /**
-     * Retrieves a Firestore Query for EmotionPosts filtered by specified emotions and an optional recent time filter.
+     * Retrieves a Firestore Query for EmotionPosts filtered by specified emotions
+     * and an optional recent time filter.
      *
-     * @param emotions   a list of emotion strings to filter posts; if empty, no emotion filter is applied
-     * @param filterRecent if true, the query will be filtered to only include posts from the past week
+     * @param emotions     a list of emotion strings to filter posts; if empty, no
+     *                     emotion filter is applied
+     * @param filterRecent if true, the query will be filtered to only include posts
+     *                     from the past week
      * @return a Query object for retrieving filtered EmotionPosts
      */
     public Query getFilteredPostsQuery(List<String> emotions, boolean filterRecent) {
@@ -89,8 +103,8 @@ public class EmotionPostController {
      * @param onFailure callback for failure scenario
      */
     public void deleteEmotionPost(String postId,
-                                  Runnable onSuccess,
-                                  OnFailureListener onFailure) {
+            Runnable onSuccess,
+            OnFailureListener onFailure) {
         if (postId == null || postId.isEmpty()) {
             Log.e("EmotionPostController", "Invalid post ID");
             return;
@@ -107,9 +121,9 @@ public class EmotionPostController {
      * @param onFailure   callback for failure scenario
      */
     public void updateEmotionPost(String postId,
-                                  EmotionPost updatedPost,
-                                  Runnable onSuccess,
-                                  OnFailureListener onFailure) {
+            EmotionPost updatedPost,
+            Runnable onSuccess,
+            OnFailureListener onFailure) {
         if (postId == null || postId.isEmpty()) {
             Log.e("EmotionPostController", "Invalid post ID");
             return;
@@ -128,5 +142,48 @@ public class EmotionPostController {
      */
     public void addCommentToPost(String postId, Comment comment, Runnable onSuccess, OnFailureListener onFailure) {
         repository.addCommentToPost(postId, comment, onSuccess, onFailure);
+    }
+
+    public void createPostWithOfflineSupport(Context context, EmotionPost post,
+            OnSuccessListener<DocumentReference> onSuccess, OnFailureListener onFailure) {
+        OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
+        NetworkMonitor networkMonitor = new NetworkMonitor(context);
+
+        if (networkMonitor.isConnected()) {
+            createPost(post, onSuccess, onFailure);
+        } else {
+            syncManager.addPendingCreate(post);
+            onSuccess.onSuccess(null); // Return null document reference since we're offline
+        }
+    }
+
+    public void updateEmotionPostWithOfflineSupport(Context context, String postId, EmotionPost post,
+                                                    Runnable onSuccess, OnFailureListener onFailure) {
+        OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
+        NetworkMonitor networkMonitor = new NetworkMonitor(context);
+
+        if (networkMonitor.isConnected()) {
+            updateEmotionPost(postId, post, onSuccess, onFailure);
+        } else {
+            syncManager.addPendingUpdate(postId, post);
+            if (onSuccess != null) {
+                onSuccess.run();
+            }
+        }
+    }
+
+    public void deleteEmotionPostWithOfflineSupport(Context context, String postId,
+                                                    Runnable onSuccess, OnFailureListener onFailure) {
+        OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
+        NetworkMonitor networkMonitor = new NetworkMonitor(context);
+
+        if (networkMonitor.isConnected()) {
+            deleteEmotionPost(postId, onSuccess, onFailure);
+        } else {
+            syncManager.addPendingDelete(postId);
+            if (onSuccess != null) {
+                onSuccess.run();
+            }
+        }
     }
 }
