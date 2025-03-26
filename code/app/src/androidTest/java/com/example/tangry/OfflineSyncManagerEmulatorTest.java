@@ -79,8 +79,10 @@ public class OfflineSyncManagerEmulatorTest {
 
     @After
     public void cleanup() {
-        // Clear pending operations after each test.
-        syncManager.clearPendingOperations();
+        // Clear pending operations after each test, but check for null first
+        if (syncManager != null) {
+            syncManager.clearPendingOperations();
+        }
     }
 
     @Test

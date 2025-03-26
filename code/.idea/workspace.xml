@@ -234,6 +234,7 @@
     "Android Instrumented Tests.UserInterfaceTest.executor": "Run",
     "Android Instrumented Tests.UserLoginTest.executor": "Run",
     "Android Instrumented Tests.testInvalidEmotionValues().executor": "Run",
+    "Android Instrumented Tests.testMultipleOfflineOperationsThenSync().executor": "Run",
     "Android Instrumented Tests.testOfflineCreateThenSync().executor": "Run",
     "Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor": "Run",
     "Android Instrumented Tests.testSuccessfulUserCreation().executor": "Run",
@@ -266,7 +267,7 @@
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
-  <component name="RunManager" selected="Android Instrumented Tests.testMultipleOfflineOperationsThenSync()">
+  <component name="RunManager" selected="Android Instrumented Tests.OfflineSyncManagerEmulatorTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="tangry.app" />
       <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
@@ -574,8 +575,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Android Instrumented Tests.testMultipleOfflineOperationsThenSync()" />
         <item itemvalue="Android Instrumented Tests.OfflineSyncManagerEmulatorTest" />
+        <item itemvalue="Android Instrumented Tests.testMultipleOfflineOperationsThenSync()" />
         <item itemvalue="Android Instrumented Tests.testOfflineCreateThenSync()" />
         <item itemvalue="Gradle.OfflineSyncManagerTest" />
         <item itemvalue="Gradle.OfflineSyncManagerTest.testAddPendingCreate_NotifiesListener" />
