@@ -18,6 +18,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LeaderboardFragment extends Fragment {
     private static final String TAG = "LeaderboardFragment";
@@ -56,11 +57,43 @@ public class LeaderboardFragment extends Fragment {
             for (QueryDocumentSnapshot doc : querySnapshot) {
                 String username = doc.getString("username");
                 Long karma = doc.getLong("karma");
+
+                // Retrieve badge fields from nested 'badges'
+                Map<String, Object> badges = (Map<String, Object>) doc.get("badges");
+                int goldBadgeCount = 0;
+                int silverBadgeCount = 0;
+                int dailyBadgeCount = 0;  // daily = size of dailyBadgeDates array
+
+                if (badges != null) {
+                    // goldBadges
+                    if (badges.get("goldBadges") != null) {
+                        goldBadgeCount = ((Long) badges.get("goldBadges")).intValue();
+                    }
+                    // silverBadges
+                    if (badges.get("silverBadges") != null) {
+                        silverBadgeCount = ((Long) badges.get("silverBadges")).intValue();
+                    }
+                    // dailyBadgeDates
+                    List<String> dailyBadgeDates = (List<String>) badges.get("dailyBadgeDates");
+                    if (dailyBadgeDates != null) {
+                        dailyBadgeCount = dailyBadgeDates.size();
+                    }
+                }
+
                 if (username != null) {
-                    users.add(new User(username, karma != null ? karma.intValue() : 0));
+                    // Construct User object with the badge counts
+                    User user = new User(
+                            username,
+                            karma != null ? karma.intValue() : 0,
+                            goldBadgeCount,
+                            silverBadgeCount,
+                            dailyBadgeCount
+                    );
+                    users.add(user);
                 }
             }
 
+            // Update the adapter with the new user list
             adapter.updateUsers(users);
         });
     }

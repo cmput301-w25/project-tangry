@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Shield Background -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="1"
+        android:fillColor="#C0C0C0"
+        android:pathData="M12,2L3,6v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V6l-9,-4z"/>
+
+    <!-- Wolf head silhouette -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M14,8c0.5,0 1,0.25 1.25,0.75l1.5,3c0.5,1 -0.5,2 -1.5,2h-1v1c0,0.55 -0.45,1 -1,1h-2c-0.55,0 -1,-0.45 -1,-1v-1H10c-1,0 -2,-1 -1.5,-2l1.5,-3C10.9,8.25 11.5,8 12,8h2z"/>
+</vector>
