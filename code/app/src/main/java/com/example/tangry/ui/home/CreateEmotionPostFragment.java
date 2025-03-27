@@ -14,9 +14,13 @@
 package com.example.tangry.ui.home;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,9 +34,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.controllers.UserController;
@@ -40,9 +47,14 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.utils.ImageHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class CreateEmotionPostFragment extends Fragment {
     private static final String TAG = "CreateEmotionPostFragment";
@@ -58,6 +70,10 @@ public class CreateEmotionPostFragment extends Fragment {
 
     private EmotionPostController emotionPostController;
     private UserController usernameController;
+
+    private static final int CAMERA_REQUEST = 2;
+    private static final int CAMERA_PERMISSION_REQUEST = 100;
+    private Uri cameraImageUri; // To store the camera image URI
 
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
             "Select social situation", "Alone", "With one other person", "With two to several people", "With a crowd");
@@ -118,9 +134,129 @@ public class CreateEmotionPostFragment extends Fragment {
      * Launches an intent to select an image from the device's gallery.
      */
     private void selectImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        // Create a bottom sheet dialog or alert dialog with options
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Choose Image Source");
+
+        String[] options = { "Take Photo", "Choose from Gallery", "Cancel" };
+
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                // Camera option selected
+                checkCameraPermissionAndOpenCamera();
+            } else if (which == 1) {
+                // Gallery option selected
+                openGallery();
+            } else {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    /**
+     * Check for camera permission and request if needed
+     */
+    private void checkCameraPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            // Check if we should show an explanation
+            if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+                // Show explanation to the user and then request permission
+                new AlertDialog.Builder(requireContext())
+                        .setTitle("Camera Permission Required")
+                        .setMessage("This app needs camera access to take photos for your emotion posts")
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            // Request the permission again
+                            requestPermissions(new String[] { android.Manifest.permission.CAMERA },
+                                    CAMERA_PERMISSION_REQUEST);
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create()
+                        .show();
+            } else {
+                // No explanation needed; request the permission
+                requestPermissions(new String[] { android.Manifest.permission.CAMERA },
+                        CAMERA_PERMISSION_REQUEST);
+            }
+        } else {
+            // Permission already granted
+            openCamera();
+        }
+    }
+
+    /**
+     * Open the device camera to take a photo
+     */
+    private void openCamera() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // Create file to store the image
+        File photoFile = null;
+        try {
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            photoFile = File.createTempFile(imageFileName, ".jpg", storageDir);
+        } catch (IOException ex) {
+            Log.e(TAG, "Error creating image file", ex);
+            Toast.makeText(getContext(), "Error creating image file", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Continue only if the file was successfully created
+        if (photoFile != null) {
+            // Use FileProvider to get content URI that's accessible to the camera app
+            cameraImageUri = FileProvider.getUriForFile(requireContext(),
+                    "com.example.tangry.fileprovider",
+                    photoFile);
+
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
+    }
+
+    /**
+     * Handle permission request results
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            // Check if the permission was granted
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, open camera
+                openCamera();
+            } else {
+                // Permission denied
+                Toast.makeText(getContext(),
+                        "Camera permission is required to take photos",
+                        Toast.LENGTH_LONG).show();
+
+                // If permanently denied, guide user to app settings
+                if (!shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Permission Denied")
+                            .setMessage(
+                                    "Camera permission has been permanently denied. Please go to Settings to enable it.")
+                            .setPositiveButton("Settings", (dialog, which) -> {
+                                // Open app settings
+                                Intent intent = new Intent(
+                                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .create()
+                            .show();
+                }
+            }
+        }
     }
 
     /**
@@ -133,12 +269,22 @@ public class CreateEmotionPostFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Uri uri = data.getData();
-            if (uri != null) {
-                imageUri = uri.toString();
-                imageAttachment.setImageURI(uri);
-                Log.d(TAG, "Image selected: " + uri.toString());
+
+        if (resultCode == Activity.RESULT_OK) {
+            Uri imageUri = null;
+
+            if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+                // Handle gallery selection
+                imageUri = data.getData();
+            } else if (requestCode == CAMERA_REQUEST) {
+                // Handle camera photo - we already have the URI in cameraImageUri
+                imageUri = cameraImageUri;
+            }
+
+            if (imageUri != null) {
+                this.imageUri = imageUri.toString();
+                imageAttachment.setImageURI(imageUri);
+                Log.d(TAG, "Image selected/captured: " + imageUri.toString());
             } else {
                 Log.e(TAG, "Image URI is null");
             }
@@ -196,6 +342,15 @@ public class CreateEmotionPostFragment extends Fragment {
                 downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(), location,
                         socialSituation, username),
                 e -> Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+    /**
+     * Open the gallery to select an image
+     */
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     /**
