@@ -31,7 +31,7 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     @Override
     public LeaderboardAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_leaderboard, parent, false); // <--- Make sure this matches your layout name
+                .inflate(R.layout.item_leaderboard, parent, false);
         return new ViewHolder(view);
     }
 
@@ -43,11 +43,9 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         holder.usernameText.setText(user.getUsername());
         holder.karmaText.setText("🔥 " + user.getKarma());
 
-        // Show gold badges with "xN"
         int goldCount = user.getGoldBadges();
         holder.goldBadgeCount.setText("x" + goldCount);
 
-        // If you want to dim the icon if count is 0:
         if (goldCount == 0) {
             holder.goldBadgeIcon.setAlpha(0.3f); // dim
         } else {
