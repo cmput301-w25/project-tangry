@@ -86,7 +86,7 @@ public class EmotionPost implements Serializable {
         if ((explanation == null || explanation.isEmpty()) && (imageUri == null || imageUri.isEmpty())) {
             throw new IllegalArgumentException("Emotion post requires text or image.");
         }
-        if (socialSituation != null && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
+        if (socialSituation != null && (!VALID_SOCIAL_SITUATIONS.contains(socialSituation) || socialSituation.isEmpty())) {
             throw new IllegalArgumentException("Invalid social situation.");
         }
         if (!VALID_EMOTIONS.contains(emotion)) {

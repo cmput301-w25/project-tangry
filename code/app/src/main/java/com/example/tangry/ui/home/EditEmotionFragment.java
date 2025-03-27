@@ -39,6 +39,7 @@ import com.bumptech.glide.Glide;
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
+import com.example.tangry.utils.ImageCaptureUtil;
 import com.example.tangry.utils.NetworkMonitor;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -68,6 +69,10 @@ public class EditEmotionFragment extends Fragment {
     private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
     private Button actionButton;
+
+    private static final int CAMERA_REQUEST = 2;
+    private static final int CAMERA_PERMISSION_REQUEST = 100;
+    private Uri cameraImageUri; // To store the camera image URI
 
     private static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
             "Select social situation", "Alone", "With one other person",
@@ -174,18 +179,25 @@ public class EditEmotionFragment extends Fragment {
      * directly updates the post in Firestore.
      */
     private void updatePost() {
+        // Get all the values first
         String explanation = explanationInput.getText().toString().trim();
         String location = locationInput.getText().toString().trim();
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
         String emotion = emotionTextView.getText().toString();
+
+        // Normalize social situation
         if ("Select social situation".equals(socialSituation)) {
             socialSituation = null;
         }
+
+        // Perform validation
         if (explanation.isEmpty() && (imageUri == null || imageUri.isEmpty())) {
-            Toast.makeText(getContext(), "Please provide either an explanation or an image.", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(getContext(), "Please provide either an explanation or an image.",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
+
+        // At this point, validation passed - update the post object
         updatedPost.setExplanation(explanation);
         updatedPost.setLocation(location);
         updatedPost.setSocialSituation(socialSituation);
@@ -215,8 +227,7 @@ public class EditEmotionFragment extends Fragment {
      * @param imageUrl The new image URL, or null if unchanged.
      */
     private void updatePostInFirestore(String imageUrl) {
-        // If a new image is provided and an old image exists in Firebase Storage,
-        // attempt deletion.
+        // Handle previous image deletion if needed
         if (imageUrl != null && updatedPost.getImageUri() != null &&
                 !updatedPost.getImageUri().isEmpty() &&
                 updatedPost.getImageUri().startsWith("https://firebasestorage")) {
@@ -344,9 +355,11 @@ public class EditEmotionFragment extends Fragment {
                 FileOutputStream outputStream = new FileOutputStream(localImageFile);
                 byte[] buffer = new byte[1024];
                 int bytesRead;
+
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
+
                 inputStream.close();
                 outputStream.close();
 
@@ -355,18 +368,15 @@ public class EditEmotionFragment extends Fragment {
 
                 // Store this local image path in the post and update
                 updatedPost.setImageUri(localUri.toString());
-                updatedPost.setOfflineImagePending(true); // Add this flag to EmotionPost class
+                updatedPost.setOfflineImagePending(true);
 
                 // Update post with local image reference
                 updatePostInFirestore(localUri.toString());
 
-                Toast.makeText(getContext(), "Image saved locally and will upload when online", Toast.LENGTH_SHORT)
-                        .show();
-
             } catch (IOException e) {
                 Log.e(TAG, "Error saving image locally", e);
-                Toast.makeText(getContext(), "Failed to save image locally: " + e.getMessage(), Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(getContext(), "Failed to save image locally: " + e.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -381,7 +391,8 @@ public class EditEmotionFragment extends Fragment {
                     updatePostInFirestore(downloadUrl);
                 }))
                 .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "Image upload failed", e);
                 });
     }
@@ -390,9 +401,27 @@ public class EditEmotionFragment extends Fragment {
      * Opens an image picker to allow the user to select an image.
      */
     private void selectImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        ImageCaptureUtil.showImageSourceDialog(this, this::checkCameraPermissionAndOpenCamera);
+    }
+
+    private void checkCameraPermissionAndOpenCamera() {
+        if (!ImageCaptureUtil.checkCameraPermission(this)) {
+            // Check if we should show an explanation
+            if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
+                ImageCaptureUtil.showCameraPermissionRationale(this);
+            } else {
+                // No explanation needed; request the permission
+                requestPermissions(new String[] { android.Manifest.permission.CAMERA },
+                        ImageCaptureUtil.CAMERA_PERMISSION_REQUEST);
+            }
+        } else {
+            // Permission already granted
+            openCamera();
+        }
+    }
+
+    private void openCamera() {
+        cameraImageUri = ImageCaptureUtil.openCamera(this);
     }
 
     /**
@@ -402,15 +431,53 @@ public class EditEmotionFragment extends Fragment {
      * @param resultCode  The result code.
      * @param data        The returned data containing the selected image URI.
      */
+    /**
+     * Handles the result of the image picker or camera intent.
+     *
+     * @param requestCode The request code.
+     * @param resultCode  The result code.
+     * @param data        The returned data containing the selected image URI.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Uri uri = data.getData();
+
+        if (resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+
+            if (requestCode == ImageCaptureUtil.PICK_IMAGE_REQUEST && data != null) {
+                // Handle gallery selection
+                uri = data.getData();
+            } else if (requestCode == ImageCaptureUtil.CAMERA_REQUEST) {
+                // Handle camera photo - we already have the URI in cameraImageUri
+                uri = cameraImageUri;
+
+                // Debug log to verify camera URI is valid
+                Log.d(TAG, "Camera image URI: " + uri);
+            }
+
             if (uri != null) {
                 imageUri = uri.toString();
                 isNewImageSelected = true; // Mark as newly selected
-                imageAttachment.setImageURI(uri);
+
+                try {
+                    // Load the image using content resolver to ensure it's properly loaded
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                    imageAttachment.setImageBitmap(bitmap);
+
+                    // Also try with setImageURI as backup
+                    if (bitmap == null) {
+                        imageAttachment.setImageURI(uri);
+                    }
+
+                    Log.d(TAG, "Image set successfully from: " + uri.toString());
+                } catch (IOException e) {
+                    Log.e(TAG, "Error loading image from URI: " + uri, e);
+                    // Fallback to direct URI setting
+                    imageAttachment.setImageURI(uri);
+                }
+            } else {
+                Log.e(TAG, "Image URI is null after camera/gallery selection");
             }
         }
     }

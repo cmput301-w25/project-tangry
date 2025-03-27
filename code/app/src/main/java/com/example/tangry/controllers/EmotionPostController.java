@@ -171,8 +171,11 @@ public class EmotionPostController {
                 String explanation = post.getExplanation() != null ? post.getExplanation() : "";
                 String imageUri = post.getImageUri() != null ? post.getImageUri() : null;
                 String location = post.getLocation() != null ? post.getLocation() : "";
-                String socialSituation = !Objects.equals(post.getSocialSituation(), "") ? post.getSocialSituation()
-                        : "";
+                String socialSituation = post.getSocialSituation();
+                if (socialSituation == null || socialSituation.isEmpty() ||
+                        "Select social situation".equals(socialSituation)) {
+                    socialSituation = null;
+                }
                 String username = post.getUsername() != null ? post.getUsername() : "";
 
                 // Make a defensive copy of the post
