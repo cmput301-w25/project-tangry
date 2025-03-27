@@ -47,7 +47,8 @@ public class ImageStorageRepository {
     }
 
     /**
-     * Constructor for testing purposes that accepts a custom FirebaseStorage instance.
+     * Constructor for testing purposes that accepts a custom FirebaseStorage
+     * instance.
      *
      * @param storageInstance the FirebaseStorage instance to use
      */
@@ -58,12 +59,15 @@ public class ImageStorageRepository {
     /**
      * Uploads an image to Firebase Storage.
      *
-     * @param imageUri     the local URI of the image to upload
-     * @param storagePath  the path in Firebase Storage where the image should be stored
-     * @param onSuccess    callback that receives the download URL as a String upon success
-     * @param onFailure    callback that receives an Exception upon failure
+     * @param imageUri    the local URI of the image to upload
+     * @param storagePath the path in Firebase Storage where the image should be
+     *                    stored
+     * @param onSuccess   callback that receives the download URL as a String upon
+     *                    success
+     * @param onFailure   callback that receives an Exception upon failure
      */
-    public void uploadImage(Uri imageUri, String storagePath, Consumer<String> onSuccess, Consumer<Exception> onFailure) {
+    public void uploadImage(Uri imageUri, String storagePath, Consumer<String> onSuccess,
+            Consumer<Exception> onFailure) {
         StorageReference imageRef = storage.getReference().child(storagePath);
 
         imageRef.putFile(imageUri)
@@ -89,9 +93,12 @@ public class ImageStorageRepository {
      * Uploads an image to Firebase Storage with progress tracking.
      *
      * @param imageUri         the local URI of the image to upload
-     * @param storagePath      the path in Firebase Storage where the image should be stored
-     * @param progressListener callback that receives the current progress percentage as an Integer
-     * @param onSuccess        callback that receives the download URL as a String upon success
+     * @param storagePath      the path in Firebase Storage where the image should
+     *                         be stored
+     * @param progressListener callback that receives the current progress
+     *                         percentage as an Integer
+     * @param onSuccess        callback that receives the download URL as a String
+     *                         upon success
      * @param onFailure        callback that receives an Exception upon failure
      */
     public void uploadImageWithProgress(
@@ -131,7 +138,8 @@ public class ImageStorageRepository {
      * Retrieves the download URL for an image stored in Firebase Storage.
      *
      * @param storagePath the path in Firebase Storage where the image is stored
-     * @param onSuccess   callback that receives the download URL as a String upon success
+     * @param onSuccess   callback that receives the download URL as a String upon
+     *                    success
      * @param onFailure   callback that receives an Exception upon failure
      */
     public void getImageUrl(String storagePath, Consumer<String> onSuccess, Consumer<Exception> onFailure) {

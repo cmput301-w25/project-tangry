@@ -39,17 +39,22 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.controllers.UserController;
 import com.example.tangry.models.EmotionPost;
+import com.example.tangry.utils.ImageCaptureUtil;
 import com.example.tangry.utils.ImageHelper;
+import com.example.tangry.utils.NetworkMonitor;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -134,52 +139,21 @@ public class CreateEmotionPostFragment extends Fragment {
      * Launches an intent to select an image from the device's gallery.
      */
     private void selectImage() {
-        // Create a bottom sheet dialog or alert dialog with options
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Choose Image Source");
-
-        String[] options = { "Take Photo", "Choose from Gallery", "Cancel" };
-
-        builder.setItems(options, (dialog, which) -> {
-            if (which == 0) {
-                // Camera option selected
-                checkCameraPermissionAndOpenCamera();
-            } else if (which == 1) {
-                // Gallery option selected
-                openGallery();
-            } else {
-                dialog.dismiss();
-            }
-        });
-
-        builder.show();
+        ImageCaptureUtil.showImageSourceDialog(this, this::checkCameraPermissionAndOpenCamera);
     }
 
     /**
      * Check for camera permission and request if needed
      */
     private void checkCameraPermissionAndOpenCamera() {
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-
+        if (!ImageCaptureUtil.checkCameraPermission(this)) {
             // Check if we should show an explanation
             if (shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
-                // Show explanation to the user and then request permission
-                new AlertDialog.Builder(requireContext())
-                        .setTitle("Camera Permission Required")
-                        .setMessage("This app needs camera access to take photos for your emotion posts")
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            // Request the permission again
-                            requestPermissions(new String[] { android.Manifest.permission.CAMERA },
-                                    CAMERA_PERMISSION_REQUEST);
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .create()
-                        .show();
+                ImageCaptureUtil.showCameraPermissionRationale(this);
             } else {
                 // No explanation needed; request the permission
                 requestPermissions(new String[] { android.Manifest.permission.CAMERA },
-                        CAMERA_PERMISSION_REQUEST);
+                        ImageCaptureUtil.CAMERA_PERMISSION_REQUEST);
             }
         } else {
             // Permission already granted
@@ -191,31 +165,7 @@ public class CreateEmotionPostFragment extends Fragment {
      * Open the device camera to take a photo
      */
     private void openCamera() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        // Create file to store the image
-        File photoFile = null;
-        try {
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            File storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            photoFile = File.createTempFile(imageFileName, ".jpg", storageDir);
-        } catch (IOException ex) {
-            Log.e(TAG, "Error creating image file", ex);
-            Toast.makeText(getContext(), "Error creating image file", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Continue only if the file was successfully created
-        if (photoFile != null) {
-            // Use FileProvider to get content URI that's accessible to the camera app
-            cameraImageUri = FileProvider.getUriForFile(requireContext(),
-                    "com.example.tangry.fileprovider",
-                    photoFile);
-
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
-        }
+        cameraImageUri = ImageCaptureUtil.openCamera(this);
     }
 
     /**
@@ -226,7 +176,7 @@ public class CreateEmotionPostFragment extends Fragment {
             @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+        if (requestCode == ImageCaptureUtil.CAMERA_PERMISSION_REQUEST) {
             // Check if the permission was granted
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, open camera
@@ -239,21 +189,7 @@ public class CreateEmotionPostFragment extends Fragment {
 
                 // If permanently denied, guide user to app settings
                 if (!shouldShowRequestPermissionRationale(android.Manifest.permission.CAMERA)) {
-                    new AlertDialog.Builder(requireContext())
-                            .setTitle("Permission Denied")
-                            .setMessage(
-                                    "Camera permission has been permanently denied. Please go to Settings to enable it.")
-                            .setPositiveButton("Settings", (dialog, which) -> {
-                                // Open app settings
-                                Intent intent = new Intent(
-                                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                Uri uri = Uri.fromParts("package", requireActivity().getPackageName(), null);
-                                intent.setData(uri);
-                                startActivity(intent);
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .create()
-                            .show();
+                    ImageCaptureUtil.showPermissionPermanentlyDeniedDialog(this);
                 }
             }
         }
@@ -271,26 +207,44 @@ public class CreateEmotionPostFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == Activity.RESULT_OK) {
-            Uri imageUri = null;
+            Uri uri = null;
 
-            if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+            if (requestCode == ImageCaptureUtil.PICK_IMAGE_REQUEST && data != null) {
                 // Handle gallery selection
-                imageUri = data.getData();
-            } else if (requestCode == CAMERA_REQUEST) {
+                uri = data.getData();
+            } else if (requestCode == ImageCaptureUtil.CAMERA_REQUEST) {
                 // Handle camera photo - we already have the URI in cameraImageUri
-                imageUri = cameraImageUri;
+                uri = cameraImageUri;
             }
 
-            if (imageUri != null) {
-                this.imageUri = imageUri.toString();
-                imageAttachment.setImageURI(imageUri);
-                Log.d(TAG, "Image selected/captured: " + imageUri.toString());
-            } else {
-                Log.e(TAG, "Image URI is null");
+            if (resultCode == Activity.RESULT_OK) {
+                Uri imageUri = null;
+
+                if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+                    // Handle gallery selection
+                    imageUri = data.getData();
+                } else if (requestCode == CAMERA_REQUEST) {
+                    // Handle camera photo - we already have the URI in cameraImageUri
+                    imageUri = cameraImageUri;
+                }
+
+                if (imageUri != null) {
+                    this.imageUri = imageUri.toString();
+                    imageAttachment.setImageURI(imageUri);
+                    Log.d(TAG, "Image selected/captured: " + imageUri.toString());
+                } else {
+                    Log.e(TAG, "Image URI is null");
+                }
             }
         }
     }
 
+    /**
+     * Validates input fields and initiates the process of saving a new emotion
+     * post.
+     * It retrieves the username associated with the current user's email and
+     * handles image upload if present.
+     */
     /**
      * Validates input fields and initiates the process of saving a new emotion
      * post.
@@ -305,6 +259,7 @@ public class CreateEmotionPostFragment extends Fragment {
                     final String explanation = explanationInput.getText().toString().trim();
                     final String location = locationInput.getText().toString().trim();
                     String socialSituation = socialSituationSpinner.getSelectedItem().toString();
+
                     if ("Select social situation".equals(socialSituation)) {
                         socialSituation = null;
                     }
@@ -313,7 +268,18 @@ public class CreateEmotionPostFragment extends Fragment {
                     if (imageUri != null) {
                         try {
                             Uri processedUri = ImageHelper.compressImage(Uri.parse(imageUri), getContext());
-                            uploadImage(processedUri, emotion, explanation, location, finalSocialSituation, username);
+
+                            // Check network connectivity
+                            NetworkMonitor networkMonitor = new NetworkMonitor(getContext());
+                            if (!networkMonitor.isConnected()) {
+                                // We're offline - handle locally
+                                handleOfflineImageUpload(processedUri, emotion, explanation,
+                                        location, finalSocialSituation, username);
+                            } else {
+                                // We're online - proceed with normal upload
+                                uploadImage(processedUri, emotion, explanation, location,
+                                        finalSocialSituation, username);
+                            }
                         } catch (IOException e) {
                             Log.e(TAG, "Error processing image", e);
                             Toast.makeText(getContext(), "Error processing image.", Toast.LENGTH_SHORT).show();
@@ -323,6 +289,64 @@ public class CreateEmotionPostFragment extends Fragment {
                     }
                 },
                 e -> Toast.makeText(getContext(), "Failed to get username.", Toast.LENGTH_SHORT).show());
+    }
+
+    /**
+     * Handles the case when we need to save an image locally for offline use
+     */
+    private void handleOfflineImageUpload(Uri imageUri, String emotion, String explanation,
+            String location, String socialSituation, String username) {
+
+        try {
+            // Copy the image to app's local storage for offline use
+            File cacheDir = getContext().getCacheDir();
+            File localImageFile = new File(cacheDir,
+                    "offline_image_" + System.currentTimeMillis() + ".jpg");
+
+            InputStream inputStream = getContext().getContentResolver().openInputStream(imageUri);
+            FileOutputStream outputStream = new FileOutputStream(localImageFile);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            inputStream.close();
+            outputStream.close();
+
+            // Create a local URI that can be used later
+            Uri localUri = Uri.fromFile(localImageFile);
+
+            // Create emotion post with local URI
+            EmotionPost post = EmotionPost.create(emotion, explanation, localUri.toString(),
+                    location, socialSituation, username);
+            post.setOfflineImagePending(true);
+
+            // Save with offline support
+            emotionPostController.createPostWithOfflineSupport(
+                    getContext(),
+                    post,
+                    (DocumentReference docRef) -> {
+                        Toast.makeText(getContext(),
+                                "Post saved locally and will upload when online",
+                                Toast.LENGTH_SHORT).show();
+
+                        // Navigate back to the home screen
+                        NavController navController = NavHostFragment.findNavController(this);
+                        navController.popBackStack(R.id.navigation_home, false);
+                    },
+                    e -> {
+                        Toast.makeText(getContext(), "Error saving post: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error saving post", e);
+                    });
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error saving image locally", e);
+            Toast.makeText(getContext(), "Failed to save image locally: " + e.getMessage(),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     /**
@@ -336,21 +360,25 @@ public class CreateEmotionPostFragment extends Fragment {
      * @param socialSituation the social situation string (nullable)
      * @param username        the username associated with the current user
      */
+
     private void uploadImage(Uri imageUri, String emotion, String explanation,
             String location, String socialSituation, String username) {
+
         ImageHelper.uploadImage(imageUri,
-                downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(), location,
-                        socialSituation, username),
-                e -> Toast.makeText(getContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                downloadUri -> createEmotionPost(emotion, explanation, downloadUri.toString(),
+                        location, socialSituation, username),
+                e -> {
+                    Toast.makeText(getContext(), "Upload failed: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Image upload failed", e);
+                });
     }
 
     /**
      * Open the gallery to select an image
      */
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+        ImageCaptureUtil.openGallery(this);
     }
 
     /**
@@ -364,10 +392,13 @@ public class CreateEmotionPostFragment extends Fragment {
      * @param socialSituation the social situation string (nullable)
      * @param username        the username associated with the current user
      */
-    private void createEmotionPost(String emotion, String explanation, String imageUrl, String location,
-            String socialSituation, String username) {
+    private void createEmotionPost(String emotion, String explanation, String imageUrl,
+            String location, String socialSituation, String username) {
+
         try {
-            EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl, location, socialSituation, username);
+            EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl,
+                    location, socialSituation, username);
+
             Log.d(TAG, "Saving mood event: " + post.toString());
 
             emotionPostController.createPostWithOfflineSupport(
@@ -382,21 +413,25 @@ public class CreateEmotionPostFragment extends Fragment {
                             int incrementAmount = calculateKarmaIncrement(post);
                             usernameController.incrementKarma(email,
                                     aVoid -> Log.d(TAG, "User karma incremented by " + incrementAmount),
-                                    e -> Log.e(TAG, "Failed to increment karma", e),
+                                    e -> Log.e(TAG, "Error incrementing karma", e),
                                     incrementAmount);
                         }
 
-                        Toast.makeText(getContext(), "Mood event saved!", Toast.LENGTH_SHORT).show();
-                        navController.popBackStack();
-                        navController.popBackStack();
+                        Toast.makeText(getContext(),
+                                docRef != null ? "Post created successfully!" : "Post will be uploaded when online",
+                                Toast.LENGTH_SHORT).show();
+
+                        // Navigate back to the home screen
+                        NavController navController = NavHostFragment.findNavController(this);
+                        navController.popBackStack(R.id.navigation_home, false);
                     },
                     e -> {
-                        Toast.makeText(getContext(), "Failed to save. " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to save mood event", e);
+                        Toast.makeText(getContext(), "Error creating post: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error creating post", e);
                     });
-        } catch (Exception e) {
-            Log.e(TAG, "Error creating emotion post", e);
-            Toast.makeText(getContext(), "Error creating post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
