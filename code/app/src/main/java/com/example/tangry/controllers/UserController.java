@@ -3,7 +3,6 @@ package com.example.tangry.controllers;
 import com.example.tangry.repositories.UserRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.Query;
 
 public class UserController {
@@ -29,15 +28,65 @@ public class UserController {
         repository.getUsernameFromEmail(email, onSuccess, onFailure);
     }
 
-    //Increment karma using email (should be username once constraint done)
+    /**
+     * Increments the user's karma by the specified amount.
+     *
+     * @param email           the user's email address
+     * @param onSuccess       callback invoked upon successful update
+     * @param onFailure       callback invoked if the update fails
+     * @param incrementAmount the amount to increment the user's karma
+     */
     public void incrementKarma(String email,
                                OnSuccessListener<Void> onSuccess,
                                OnFailureListener onFailure, int incrementAmount) {
         repository.incrementKarmaByEmail(email, onSuccess, onFailure, incrementAmount);
     }
 
-    // Expose the top users query for the leaderboard.
+    /**
+     * Retrieves the top users query for the leaderboard.
+     *
+     * @return a Query object to retrieve the top users
+     */
     public Query getTopUsersQuery() {
         return repository.getTopUsersQuery();
+    }
+
+    /**
+     * Increments the user's post count and awards a gold badge for every 3 posts.
+     *
+     * @param email     the user's email address
+     * @param onSuccess callback invoked upon successful update
+     * @param onFailure callback invoked if the update fails
+     */
+    public void incrementPostCount(String email,
+                                   OnSuccessListener<Void> onSuccess,
+                                   OnFailureListener onFailure) {
+        repository.updatePostCount(email, onSuccess, onFailure);
+    }
+
+    /**
+     * Increments the user's comment count and awards a silver badge for every 3 comments.
+     *
+     * @param email     the user's email address
+     * @param onSuccess callback invoked upon successful update
+     * @param onFailure callback invoked if the update fails
+     */
+    public void incrementCommentCount(String email,
+                                      OnSuccessListener<Void> onSuccess,
+                                      OnFailureListener onFailure) {
+        repository.updateCommentCount(email, onSuccess, onFailure);
+    }
+
+    /**
+     * Awards a daily badge if the user hasn't received one for today.
+     *
+     * @param email     the user's email address
+     * @param onSuccess callback invoked upon successful update
+     * @param onFailure callback invoked if the update fails
+     */
+    public void updateDailyBadge(String email,
+                                 OnSuccessListener<Void> onSuccess,
+                                 OnFailureListener onFailure) {
+        repository.updateDailyBadge(email, onSuccess, onFailure);
     }
 }

@@ -10,7 +10,12 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query.Direction;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class UserRepository {
@@ -138,4 +143,148 @@ public class UserRepository {
                 .limit(10);
     }
 
+
+
+
+    /**
+     * Updates the user's post count and awards a gold badge for every 3 posts.
+     *
+     * @param email           the user's email address
+     * @param onSuccess       callback invoked on success
+     * @param onFailure       callback invoked on failure
+     */
+    public void updatePostCount(String email,
+                                OnSuccessListener<Void> onSuccess,
+                                OnFailureListener onFailure) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        String docId = querySnapshot.getDocuments().get(0).getId();
+                        firebaseDataSource.getCollectionReference().document(docId)
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    long postCount = documentSnapshot.contains("postCount")
+                                            ? documentSnapshot.getLong("postCount")
+                                            : 0;
+                                    postCount++;
+
+                                    long goldBadges = 0;
+                                    if (documentSnapshot.contains("badges.goldBadges")) {
+                                        goldBadges = documentSnapshot.getLong("badges.goldBadges");
+                                    }
+                                    if (postCount % 3 == 0) {
+                                        goldBadges++;
+                                    }
+                                    Map<String, Object> updates = new HashMap<>();
+                                    updates.put("postCount", postCount);
+                                    updates.put("badges.goldBadges", goldBadges);
+                                    firebaseDataSource.getCollectionReference().document(docId)
+                                            .update(updates)
+                                            .addOnSuccessListener(onSuccess)
+                                            .addOnFailureListener(onFailure);
+                                })
+                                .addOnFailureListener(onFailure);
+                    } else {
+                        onFailure.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    /**
+     * Updates the user's comment count and awards a silver badge for every 3 comments.
+     *
+     * @param email           the user's email address
+     * @param onSuccess       callback invoked on success
+     * @param onFailure       callback invoked on failure
+     */
+    public void updateCommentCount(String email,
+                                   OnSuccessListener<Void> onSuccess,
+                                   OnFailureListener onFailure) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        String docId = querySnapshot.getDocuments().get(0).getId();
+                        firebaseDataSource.getCollectionReference().document(docId)
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    long commentCount = documentSnapshot.contains("commentCount")
+                                            ? documentSnapshot.getLong("commentCount")
+                                            : 0;
+                                    commentCount++;
+
+                                    long silverBadges = 0;
+                                    if (documentSnapshot.contains("badges.silverBadges")) {
+                                        silverBadges = documentSnapshot.getLong("badges.silverBadges");
+                                    }
+                                    if (commentCount % 3 == 0) {
+                                        silverBadges++;
+                                    }
+                                    Map<String, Object> updates = new HashMap<>();
+                                    updates.put("commentCount", commentCount);
+                                    updates.put("badges.silverBadges", silverBadges);
+                                    firebaseDataSource.getCollectionReference().document(docId)
+                                            .update(updates)
+                                            .addOnSuccessListener(onSuccess)
+                                            .addOnFailureListener(onFailure);
+                                })
+                                .addOnFailureListener(onFailure);
+                    } else {
+                        onFailure.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    /**
+     * Awards a daily badge if the user hasn't received one for today.
+     *
+     * @param email           the user's email address
+     * @param onSuccess       callback invoked on success
+     * @param onFailure       callback invoked on failure
+     */
+    public void updateDailyBadge(String email,
+                                 OnSuccessListener<Void> onSuccess,
+                                 OnFailureListener onFailure) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        String docId = querySnapshot.getDocuments().get(0).getId();
+                        firebaseDataSource.getCollectionReference().document(docId)
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    List<String> dailyBadgeDates = (List<String>) documentSnapshot.get("badges.dailyBadgeDates");
+                                    if (dailyBadgeDates == null) {
+                                        dailyBadgeDates = new ArrayList<>();
+                                    }
+                                    String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+                                    if (!dailyBadgeDates.contains(today)) {
+                                        dailyBadgeDates.add(today);
+                                        Map<String, Object> updates = new HashMap<>();
+                                        updates.put("badges.dailyBadgeDates", dailyBadgeDates);
+                                        firebaseDataSource.getCollectionReference().document(docId)
+                                                .update(updates)
+                                                .addOnSuccessListener(onSuccess)
+                                                .addOnFailureListener(onFailure);
+                                    } else {
+                                        // Daily badge already awarded today.
+                                        onSuccess.onSuccess(null);
+                                    }
+                                })
+                                .addOnFailureListener(onFailure);
+                    } else {
+                        onFailure.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(onFailure);
+    }
 }

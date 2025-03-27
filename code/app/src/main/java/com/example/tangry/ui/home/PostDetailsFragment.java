@@ -156,10 +156,15 @@ public class PostDetailsFragment extends Fragment {
                                         commentInput.setText("");
                                         int commentKarma = 5;
                                         userController.incrementKarma(email,
-                                                aVoid -> Log.d("PostDetails",
-                                                        "Karma incremented by " + commentKarma + " for commenting."),
+                                                aVoid -> Log.d("PostDetails", "Karma incremented by " + commentKarma + " for commenting."),
                                                 e -> Log.e("PostDetails", "Failed to increment karma after comment", e),
                                                 commentKarma);
+
+                                        // --- New Badge Functionality for Comments ---
+                                        // Update the user's comment count and award a silver badge for every 3 comments.
+                                        userController.incrementCommentCount(email,
+                                                aVoid -> Log.d("PostDetails", "User comment count incremented (silver badge updated)"),
+                                                e -> Log.e("PostDetails", "Failed to update comment count for badge", e));
                                     },
                                     e -> Log.e("PostDetails", "Failed to add comment", e));
                         },
@@ -266,7 +271,6 @@ public class PostDetailsFragment extends Fragment {
             bundle.putString("postJson", new Gson().toJson(post));
             bundle.putString("postId", postId);
             bundle.putBoolean("isEditing", true);
-
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
         }
@@ -286,23 +290,18 @@ public class PostDetailsFragment extends Fragment {
 
     /**
      * Deletes the post by first attempting to remove the associated image (if any)
-     * from Firebase Storage,
-     * then deleting the post document from Firestore.
+     * from Firebase Storage, then deleting the post document from Firestore.
      */
     private void deletePost() {
         if (postId != null) {
-            // Check if the post has an associated image
             if (post.getImageUri() != null && !post.getImageUri().isEmpty()) {
                 try {
                     StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(post.getImageUri());
-                    // Delete the image file
                     imageRef.delete().addOnSuccessListener(aVoid -> {
                         Log.d("PostDetails", "Image deleted successfully");
-                        // After image deletion, delete the post
                         deletePostFromFirestore();
                     }).addOnFailureListener(e -> {
                         Log.e("PostDetails", "Error deleting image", e);
-                        // Even if image deletion fails, try deleting the post
                         deletePostFromFirestore();
                     });
                 } catch (IllegalArgumentException e) {
@@ -310,7 +309,6 @@ public class PostDetailsFragment extends Fragment {
                     deletePostFromFirestore();
                 }
             } else {
-                // No image to delete; directly delete the post
                 deletePostFromFirestore();
             }
         }
@@ -320,24 +318,18 @@ public class PostDetailsFragment extends Fragment {
      * Deletes the post document from Firestore using the EmotionPostController.
      */
     private void deletePostFromFirestore() {
-        // Get a reference to navigation before async operation
-        final androidx.navigation.NavController navController = isAdded() && getView() != null
-                ? androidx.navigation.Navigation.findNavController(requireView())
+        final NavController navController = isAdded() && getView() != null
+                ? Navigation.findNavController(requireView())
                 : null;
-
-        // Check network connectivity
         NetworkMonitor networkMonitor = new NetworkMonitor(requireContext());
         boolean isConnected = networkMonitor.isConnected();
 
-        // Pass all required parameters including the EmotionPost object
         emotionPostController.deleteEmotionPostWithOfflineSupport(
                 requireContext(),
                 postId,
-                post, // Pass the EmotionPost object
+                post,
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
-
-                    // Show toast message based on connectivity
                     if (!isConnected) {
                         Toast.makeText(requireContext(),
                                 "Post deleted locally and will be removed when online",
@@ -346,16 +338,11 @@ public class PostDetailsFragment extends Fragment {
                         Toast.makeText(requireContext(), "Post deleted successfully",
                                 Toast.LENGTH_SHORT).show();
                     }
-
-                    // Check if fragment is still attached and navController is available
                     if (isAdded() && navController != null && getView() != null) {
                         navController.popBackStack(R.id.navigation_home, false);
                     } else {
-                        // Handle the case when fragment is already detached
                         if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                getActivity().onBackPressed();
-                            });
+                            getActivity().runOnUiThread(() -> getActivity().onBackPressed());
                         }
                     }
                 },

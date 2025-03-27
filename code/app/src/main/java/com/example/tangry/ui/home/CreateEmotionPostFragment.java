@@ -393,12 +393,11 @@ public class CreateEmotionPostFragment extends Fragment {
      * @param username        the username associated with the current user
      */
     private void createEmotionPost(String emotion, String explanation, String imageUrl,
-            String location, String socialSituation, String username) {
+                                   String location, String socialSituation, String username) {
 
         try {
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl,
                     location, socialSituation, username);
-
             Log.d(TAG, "Saving mood event: " + post.toString());
 
             emotionPostController.createPostWithOfflineSupport(
@@ -415,6 +414,17 @@ public class CreateEmotionPostFragment extends Fragment {
                                     aVoid -> Log.d(TAG, "User karma incremented by " + incrementAmount),
                                     e -> Log.e(TAG, "Error incrementing karma", e),
                                     incrementAmount);
+
+                            // --- New Badge Functionality ---
+                            // Update the user's post count and award a gold badge for every 3 posts
+                            usernameController.incrementPostCount(email,
+                                    aVoid -> {
+                                        // Once the post count is updated, update the daily badge
+                                        usernameController.updateDailyBadge(email,
+                                                aVoid2 -> Log.d(TAG, "Daily badge updated for " + email),
+                                                e -> Log.e(TAG, "Failed to update daily badge", e));
+                                    },
+                                    e -> Log.e(TAG, "Failed to update post count", e));
                         }
 
                         Toast.makeText(getContext(),
