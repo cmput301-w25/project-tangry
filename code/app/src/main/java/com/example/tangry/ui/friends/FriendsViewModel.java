@@ -15,24 +15,48 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.tangry.repositories.UserRepository;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.List;
+
 public class FriendsViewModel extends ViewModel {
+    private final MutableLiveData<List<String>> friendsList = new MutableLiveData<>();
+    private final MutableLiveData<String> message = new MutableLiveData<>();
 
-    private final MutableLiveData<String> mText;
-
-    /**
-     * Constructs a new FriendsViewModel and initializes the text LiveData with a default message.
-     */
     public FriendsViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is Friends fragment");
+        loadFriendsList();
     }
 
-    /**
-     * Returns the LiveData object containing the text message for the FriendsFragment.
-     *
-     * @return a LiveData containing the friends fragment text message
-     */
-    public LiveData<String> getText() {
-        return mText;
+    public LiveData<List<String>> getFriendsList() {
+        return friendsList;
+    }
+
+    public LiveData<String> getMessage() {
+        return message;
+    }
+
+    public void loadFriendsList() {
+        String email = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
+        if (email == null) {
+            message.setValue("User not logged in");
+            return;
+        }
+        UserRepository.getInstance().getFriendsList(email,
+                new OnSuccessListener<List<String>>() {
+                    @Override
+                    public void onSuccess(List<String> friends) {
+                        friendsList.setValue(friends);
+                    }
+                },
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        message.setValue("Failed to load friends: " + e.getMessage());
+                    }
+                });
     }
 }

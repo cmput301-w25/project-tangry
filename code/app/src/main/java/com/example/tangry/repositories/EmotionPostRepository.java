@@ -200,4 +200,44 @@ public class EmotionPostRepository {
                 })
                 .addOnFailureListener(onFailure);
     }
+    /**
+     * Gets posts by a specific user with emotion filtering
+     *
+     * @param username The username to filter by
+     * @param emotions List of emotions to filter by (optional)
+     * @return Query object for the filtered posts
+     */
+    public Query getFilteredUserPosts(String username, List<String> emotions) {
+        Query query = firebaseDataSource.getCollectionReference()
+                .whereEqualTo("username", username);
+
+        if (emotions != null && !emotions.isEmpty()) {
+            query = query.whereIn("emotion", emotions);
+        }
+
+        return query.orderBy("timestamp", Query.Direction.DESCENDING);
+    }
+
+    /**
+     * Gets posts from a list of friends with emotion filtering
+     *
+     * @param friendUsernames List of friend usernames
+     * @param emotions List of emotions to filter by (optional)
+     * @return Query object for the filtered posts
+     */
+    public Query getFilteredFriendsPosts(List<String> friendUsernames, List<String> emotions) {
+        if (friendUsernames == null || friendUsernames.isEmpty()) {
+            // Return empty query if no friends
+            return firebaseDataSource.getCollectionReference().whereEqualTo("username", "NO_MATCHING_USERNAME");
+        }
+
+        Query query = firebaseDataSource.getCollectionReference()
+                .whereIn("username", friendUsernames);
+
+        if (emotions != null && !emotions.isEmpty()) {
+            query = query.whereIn("emotion", emotions);
+        }
+
+        return query.orderBy("timestamp", Query.Direction.DESCENDING);
+    }
 }

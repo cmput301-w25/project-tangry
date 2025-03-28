@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_friends_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
-    android:padding="16dp">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/text_friends"
-        android:layout_width="wrap_content"
+        android:id="@+id/emptyTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/friends"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:text="You have no friends"
+        android:gravity="center"
+        android:visibility="gone"
+        android:textSize="18sp"
+        android:padding="16dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/friendsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

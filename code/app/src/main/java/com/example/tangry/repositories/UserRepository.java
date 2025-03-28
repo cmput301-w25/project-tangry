@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.Query.Direction;
@@ -286,5 +287,46 @@ public class UserRepository {
                     }
                 })
                 .addOnFailureListener(onFailure);
+    }
+    /**
+     * Retrieves the friends list for the user identified by email.
+     * Users are considered friends if they follow each other.
+     * It calculates the intersection of the "followers" and "followings" arrays in the user's Firestore document.
+     *
+     * @param email           the user's email address
+     * @param successListener callback invoked with the list of friend usernames
+     * @param failureListener callback invoked if retrieval fails
+     */
+    public void getFriendsList(String email,
+                               OnSuccessListener<List<String>> successListener,
+                               OnFailureListener failureListener) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                        List<String> followers = (List<String>) doc.get("followers");
+                        List<String> followings = (List<String>) doc.get("followings");
+                        if (followers == null) {
+                            followers = new ArrayList<>();
+                        }
+                        if (followings == null) {
+                            followings = new ArrayList<>();
+                        }
+                        // Calculate the intersection of followers and followings.
+                        List<String> friends = new ArrayList<>();
+                        for (String user : followers) {
+                            if (followings.contains(user)) {
+                                friends.add(user);
+                            }
+                        }
+                        successListener.onSuccess(friends);
+                    } else {
+                        successListener.onSuccess(new ArrayList<>());
+                    }
+                })
+                .addOnFailureListener(failureListener);
     }
 }

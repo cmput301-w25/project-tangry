@@ -7,10 +7,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import com.example.tangry.R;
-import com.example.tangry.repositories.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.auth.User;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -69,11 +67,45 @@ public class PersonalProfileFragment extends Fragment {
         } else {
             personalInfoTextView.setText("User info not available");
         }
-
         Button followRequestsButton = view.findViewById(R.id.button_follow_requests);
         followRequestsButton.setOnClickListener(v ->
-                Navigation.findNavController(v)
-                          .navigate(R.id.action_personalProfileFragment_to_followRequestsFragment)
+                Navigation.findNavController(v).navigate(R.id.action_personalProfileFragment_to_followRequestsFragment)
         );
+
+        // Add Sign Out button functionality
+        Button signOutButton = view.findViewById(R.id.signOutButton);
+        signOutButton.setOnClickListener(v -> {
+            // Clear any saved login credentials to prevent auto-login
+            v.getContext()
+                    .getSharedPreferences("LoginPrefs", v.getContext().MODE_PRIVATE)
+                    .edit().clear().apply();
+
+            // Sign out from Firebase
+            FirebaseAuth.getInstance().signOut();
+
+            // Hide UI elements - access through activity instead of fragment view
+            if (getActivity() != null) {
+                // Hide toolbar
+                View toolbar = getActivity().findViewById(R.id.toolbar_primary);
+                if (toolbar != null) {
+                    toolbar.setVisibility(View.GONE);
+                }
+
+                // Hide FAB
+                View fab = getActivity().findViewById(R.id.fab);
+                if (fab != null) {
+                    fab.setVisibility(View.GONE);
+                }
+
+                // Hide bottom navigation
+                View navView = getActivity().findViewById(R.id.nav_view);
+                if (navView != null) {
+                    navView.setVisibility(View.GONE);
+                }
+            }
+
+            // Navigate back to the login screen
+            Navigation.findNavController(v).navigate(R.id.navigation_login);
+        });
     }
 }

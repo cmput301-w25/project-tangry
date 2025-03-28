@@ -234,4 +234,43 @@ public class EmotionPostController {
             }
         }
     }
+    /**
+     * Retrieves a Firestore Query for the current user's posts with optional emotion filters
+     * and recent time filter.
+     *
+     * @param username     the username of the current user
+     * @param emotions     a list of emotion strings to filter posts; if empty, no emotion filter is applied
+     * @param filterRecent if true, the query will be filtered to only include posts from the past week
+     * @return a Query object for retrieving the user's filtered EmotionPosts
+     */
+    public Query getUserPostsWithFilter(String username, List<String> emotions, boolean filterRecent) {
+        Query query = repository.getFilteredUserPosts(username, emotions);
+
+        if (filterRecent) {
+            Timestamp oneWeekAgo = new Timestamp(Timestamp.now().getSeconds() - (7 * 24 * 60 * 60), 0);
+            query = query.whereGreaterThanOrEqualTo("timestamp", oneWeekAgo);
+        }
+
+        return query;
+    }
+
+    /**
+     * Retrieves a Firestore Query for posts from the user's friends with optional emotion filters
+     * and recent time filter.
+     *
+     * @param friendUsernames list of usernames of the user's friends
+     * @param emotions        a list of emotion strings to filter posts; if empty, no emotion filter is applied
+     * @param filterRecent    if true, the query will be filtered to only include posts from the past week
+     * @return a Query object for retrieving the friends' filtered EmotionPosts
+     */
+    public Query getFriendsPostsWithFilter(List<String> friendUsernames, List<String> emotions, boolean filterRecent) {
+        Query query = repository.getFilteredFriendsPosts(friendUsernames, emotions);
+
+        if (filterRecent) {
+            Timestamp oneWeekAgo = new Timestamp(Timestamp.now().getSeconds() - (7 * 24 * 60 * 60), 0);
+            query = query.whereGreaterThanOrEqualTo("timestamp", oneWeekAgo);
+        }
+
+        return query;
+    }
 }

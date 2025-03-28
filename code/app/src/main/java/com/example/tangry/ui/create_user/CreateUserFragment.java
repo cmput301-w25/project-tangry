@@ -88,10 +88,6 @@ public class CreateUserFragment extends Fragment {
         if (toolbarPrimary != null) {
             toolbarPrimary.setVisibility(View.GONE);
         }
-        View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
-        if (toolbarSecondary != null) {
-            toolbarSecondary.setVisibility(View.GONE);
-        }
     }
 
     /**
@@ -107,10 +103,6 @@ public class CreateUserFragment extends Fragment {
         View toolbarPrimary = getActivity().findViewById(R.id.toolbar_primary);
         if (toolbarPrimary != null) {
             toolbarPrimary.setVisibility(View.VISIBLE);
-        }
-        View toolbarSecondary = getActivity().findViewById(R.id.toolbar_secondary);
-        if (toolbarSecondary != null) {
-            toolbarSecondary.setVisibility(View.VISIBLE);
         }
     }
 
