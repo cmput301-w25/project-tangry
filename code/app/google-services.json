@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1023415985733",
+    "project_id": "tangry-7f852",
+    "storage_bucket": "tangry-7f852.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1023415985733:android:d07e85e18782f3c33fe52c",
+        "android_client_info": {
+          "package_name": "com.example.tangry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZZAiw-3kAvbdhAyzLUsXkDSTuCML4NXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

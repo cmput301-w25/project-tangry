@@ -1,3 +1,14 @@
+/**
+ * FriendMoodsFragment.java
+ *
+ * This fragment displays a UI layout for viewing friend moods. It inflates the corresponding layout
+ * resource (fragment_friend_moods.xml) and serves as a placeholder for further functionality related
+ * to friend mood interactions.
+ *
+ * Outstanding Issues:
+ * - Additional UI components and interaction logic may be added in future iterations.
+ */
+
 package com.example.tangry.ui.home;
 
 import android.os.Bundle;

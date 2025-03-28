@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="?android:attr/colorBackground">
+
+    <!-- Visible Emotion Text -->
+    <TextView
+        android:id="@+id/emotion_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Emotion"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:gravity="center" />
+
+    <!-- Reason Section -->
+    <TextView
+        android:id="@+id/reason_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Reason"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/emotion_text"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+    <!-- hardcode text to black/grey due to white image background -->
+    <EditText
+        android:id="@+id/explanation_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Max 20 characters or 3 words. (Optional)"
+        android:maxLength="20"
+        android:padding="12dp"
+        android:background="@android:drawable/editbox_background"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/reason_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Location Section -->
+    <TextView
+        android:id="@+id/location_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/explanation_input"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- hardcode text to black/grey due to white image background -->
+    <EditText
+        android:id="@+id/location_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter location (Optional)"
+        android:padding="12dp"
+        android:background="@drawable/input_background"
+        android:textColorHint="@android:color/darker_gray"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/location_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Social Situation Section -->
+    <TextView
+        android:id="@+id/social_situation_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Social Situation (Optional)"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/location_input"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <Spinner
+        android:id="@+id/social_situation_spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:background="@drawable/spinner_background"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Photo Section -->
+    <TextView
+        android:id="@+id/photo_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Photo"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/social_situation_spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Photo Attachment Box -->
+    <FrameLayout
+        android:id="@+id/photo_container"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:background="@drawable/input_background"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/photo_label"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp">
+
+        <!-- Image Attachment -->
+        <ImageView
+            android:id="@+id/image_attachment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image_background" />
+
+        <!-- Overlay Text Prompt -->
+        <TextView
+            android:id="@+id/choose_picture_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose Picture"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorPrimary"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
+    <!-- Save Button -->
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:background="@drawable/button_background"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@id/photo_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

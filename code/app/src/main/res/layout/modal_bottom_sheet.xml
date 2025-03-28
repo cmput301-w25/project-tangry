@@ -1,0 +1,101 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <CheckBox
+        android:id="@+id/recent_week_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Most Recent Week"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Moods"
+        android:textSize="18sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:padding="4dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/Angry_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Angry"
+                android:textColor="@color/colorAngry" />
+
+            <CheckBox
+                android:id="@+id/Confused_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confused"
+                android:textColor="@color/colorConfused" />
+
+            <CheckBox
+                android:id="@+id/Disgusted_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Disgust"
+                android:textColor="@color/colorDisgust" />
+
+            <CheckBox
+                android:id="@+id/Fearful_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fear"
+                android:textColor="@color/colorFear" />
+
+            <CheckBox
+                android:id="@+id/Happy_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Happiness"
+                android:textColor="@color/colorHappiness" />
+
+            <CheckBox
+                android:id="@+id/Sad_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sadness"
+                android:textColor="@color/colorSadness" />
+
+            <CheckBox
+                android:id="@+id/Shame_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shame"
+                android:textColor="@color/colorShame" />
+
+            <CheckBox
+                android:id="@+id/Surprised_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Surprise"
+                android:textColor="@color/colorSurprise" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Apply Filter Button -->
+    <Button
+        android:id="@+id/apply_filter_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply Filter"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@android:color/white"/>
+</LinearLayout>

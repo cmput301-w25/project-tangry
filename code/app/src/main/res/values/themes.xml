@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Updated application theme using your greenish-blue palette without an ActionBar -->
+    <style name="Theme.Tangry" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Disable window-supplied action bar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Primary brand color: light greenish-blue -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color: using your accent -->
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorSecondaryVariant">@color/colorAccent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <!-- Additional customizations can go here -->
+    </style>
+
+    <style name="TangryToolbarTitleTextAppearance" parent="@style/TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/montserrat_light</item>
+    </style>
+
+    <style name="TangryToolbarSubtitleTextAppearance" parent="@style/TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:fontFamily">@font/montserrat_light</item>
+    </style>
+</resources>
