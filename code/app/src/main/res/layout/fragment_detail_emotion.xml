@@ -31,7 +31,8 @@
         app:layout_constraintTop_toBottomOf="@id/emotion_text"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
-    <!-- hardcode text to black/grey due to white image background -->
+
+    <!-- Explanation Input -->
     <EditText
         android:id="@+id/explanation_input"
         android:layout_width="0dp"
@@ -58,12 +59,13 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- hardcode text to black/grey due to white image background -->
-    <EditText
+    <!-- Updated Location Input: AutoCompleteTextView for suggestions -->
+    <AutoCompleteTextView
         android:id="@+id/location_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="Enter location (Optional)"
+        android:completionThreshold="1"
         android:padding="12dp"
         android:background="@drawable/input_background"
         android:textColorHint="@android:color/darker_gray"
