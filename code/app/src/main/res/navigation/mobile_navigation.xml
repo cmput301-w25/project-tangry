@@ -64,9 +64,12 @@
         android:name="com.example.tangry.ui.profile.others.UserProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_user_profile" />
-    <action
-        android:id="@+id/action_userProfileFragment_to_postDetailsFragment"
-        app:destination="@id/postDetailsFragment" />
+        <action
+            android:id="@+id/action_userProfileFragment_to_postDetailsFragment"
+            app:destination="@id/postDetailsFragment" />
+        <action
+            android:id="@+id/alobal_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
 
     <fragment
         android:id="@+id/navigation_friends"
@@ -174,5 +177,13 @@
     <action
         android:id="@+id/action_global_personal_profile"
         app:destination="@id/personalProfileFragment" />
+
+    <fragment
+        android:id="@+id/friendsFragment"
+        android:name="com.example.tangry.ui.friends.FriendsFragment"
+        android:label="Friends">
+    </fragment>
+
+
 
 </navigation>

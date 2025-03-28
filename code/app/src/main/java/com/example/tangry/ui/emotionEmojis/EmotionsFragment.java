@@ -115,10 +115,7 @@ public class EmotionsFragment extends Fragment implements EmotionEmojisAdapter.I
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
                 int id = menuItem.getItemId();
-                if (id == R.id.ic_filter) {
-                    showMoodsBottomSheet();
-                    return true;
-                } else if (id == R.id.action_profile) {
+                if (id == R.id.action_profile) {
                     Navigation.findNavController(getView())
                             .navigate(R.id.action_global_personal_profile);
                     return true;

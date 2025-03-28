@@ -1,17 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Menu for toolbar actions. The filter icon has been removed from the toolbar -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <!-- Filter Icon on the Left -->
-    <item
-        android:id="@+id/ic_filter"
-        android:icon="@drawable/ic_filter_icon"
-        android:title="@string/ic_filter"
-        app:showAsAction="ifRoom" /> <!-- This pushes the filter to the left edge -->
-
-    <!-- Profile Icon on the Right -->
+    <!-- Profile button remains in the toolbar and works from anywhere -->
     <item
         android:id="@+id/action_profile"
         android:icon="@drawable/ic_profile"
-        android:title="@string/profile"
-        app:showAsAction="always" /> <!-- This always stays on the right -->
+        android:title="Profile"
+        app:showAsAction="always" />
 </menu>

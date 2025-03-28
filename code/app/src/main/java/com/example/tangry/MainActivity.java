@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         MaterialToolbar primaryToolbar = findViewById(R.id.toolbar_primary);
         setSupportActionBar(primaryToolbar);
         // Inflate the toolbar menu including the profile button.
-        primaryToolbar.inflateMenu(R.menu.menu_profile);
+//        primaryToolbar.inflateMenu(R.menu.menu_profile);
 
         // Configure AppBar with top-level destinations.
         appBarConfiguration = new AppBarConfiguration.Builder(
@@ -58,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
         // Initially hide UI elements until user is logged in.
         binding.navView.setVisibility(View.GONE);
         fab.setVisibility(View.GONE);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        return true;
     }
 
     @Override

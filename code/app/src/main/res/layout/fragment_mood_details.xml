@@ -175,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Write a comment..."
+                android:textColorHint="@color/black"
                 android:inputType="text"
                 android:maxLines="3"
                 android:background="@drawable/edittext_background"
