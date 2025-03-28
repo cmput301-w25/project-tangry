@@ -1,27 +1,17 @@
-/**
- * HomeFragment.java
- *
- * This fragment serves as the home screen of the application. It utilizes a TabLayout and ViewPager2 to display
- * multiple tabs, allowing the user to switch between viewing their own mood and their friends' moods.
- * The HomePagerAdapter manages the fragments for each tab.
- *
- * Outstanding Issues:
- * - Future iterations might include more dynamic tab titles or additional tabs.
- * - We are consider enhancing page transition animations and tab customization.
- */
-
 package com.example.tangry.ui.home;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.tangry.R;
+import com.example.tangry.ui.home.HomePagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -53,8 +43,12 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Called immediately after onCreateView() has returned. Initializes the TabLayout and ViewPager2,
-     * sets up the HomePagerAdapter, and attaches the TabLayout to the ViewPager2.
+     * Called immediately after onCreateView() has returned.
+     * Initializes the TabLayout and ViewPager2, sets up the HomePagerAdapter,
+     * and attaches the TabLayout to the ViewPager2.
+     *
+     * Navigation for individual posts is now handled by the child fragments (via the adapter's click listener)
+     * provided by HomePagerAdapter.
      *
      * @param view               The View returned by onCreateView().
      * @param savedInstanceState A Bundle containing previously saved state, if any.
@@ -65,11 +59,11 @@ public class HomeFragment extends Fragment {
         tabLayout = view.findViewById(R.id.tab_layout_home);
         viewPager = view.findViewById(R.id.view_pager_home);
 
-        // Use the HomePagerAdapter to manage pages
+        // HomePagerAdapter now instantiates fragments that use the updated EmotionPostAdapter with an OnItemClickListener.
         HomePagerAdapter adapter = new HomePagerAdapter(this);
         viewPager.setAdapter(adapter);
 
-        // Attach the TabLayout to the ViewPager2 with appropriate tab titles
+        // Setup the TabLayout with appropriate titles.
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             if (position == 0) {
                 tab.setText("Your Mood");

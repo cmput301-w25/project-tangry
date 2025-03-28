@@ -21,4 +21,9 @@
         android:icon="@drawable/ic_group"
         android:title="@string/title_friends" />
 
+    <item
+        android:id="@+id/navigation_leaderboard"
+        android:icon="@drawable/ic_group"
+        android:title="Leaderboard" />
+
 </menu>

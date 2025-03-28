@@ -123,7 +123,7 @@ public class EmotionPostTest {
         );
 
         assertEquals("Happiness", post.getEmotion());
-        assertNull(post.getSocialSituation());
+        assertEquals("", post.getSocialSituation());
     }
 
     @Test
@@ -139,6 +139,6 @@ public class EmotionPostTest {
         );
 
         assertEquals("Happiness", post.getEmotion());
-        assertNull(post.getLocation());
+        assertEquals("", post.getLocation());
     }
 }

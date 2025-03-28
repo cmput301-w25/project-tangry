@@ -1,111 +1,155 @@
-/**
- * AddUserViewModel.java
- *
- * This ViewModel handles the logic for creating a new user account. It performs basic input validation,
- * checks for duplicate usernames and emails in Firestore, and uses FirebaseAuth to register the user.
- * Upon successful registration, it stores the username in Firestore via the UsernameRepository.
- *
- * Outstanding Issues:
- * - Input validation could be further enhanced (e.g., email format verification).
- * - Additional error handling may be required to handle edge cases during asynchronous operations.
- */
-
 package com.example.tangry.ui.add_user;
 
-import android.text.TextUtils;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.example.tangry.repositories.UsernameRepository;
+
+import com.example.tangry.controllers.FollowController;
+import com.example.tangry.controllers.FollowController.FollowStatus;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * ViewModel for managing user interactions in the Add User screen.
+ * It handles searching users, sending follow requests, and tracking follow statuses.
+ */
 public class AddUserViewModel extends ViewModel {
 
+    private final MutableLiveData<List<String>> searchResults = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<String>> followings = new MutableLiveData<>(new ArrayList<>());
+    private final MutableLiveData<List<String>> sentFollowRequests = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<String> message = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> accountCreated = new MutableLiveData<>();
-    private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FollowController followController = new FollowController();
 
     /**
-     * Returns a LiveData instance that holds messages for user notifications.
+     * Gets the LiveData for the list of usernames found from a search.
      *
-     * @return a LiveData of String messages
+     * @return LiveData list of usernames matching the search criteria.
+     */
+    public LiveData<List<String>> getSearchResults() {
+        return searchResults;
+    }
+
+    /**
+     * Gets the LiveData for the list of usernames that the current user is following.
+     *
+     * @return LiveData list of followed usernames.
+     */
+    public LiveData<List<String>> getFollowings() {
+        return followings;
+    }
+
+    /**
+     * Gets the LiveData for the list of usernames to whom the current user has sent follow requests.
+     *
+     * @return LiveData list of usernames with pending follow requests.
+     */
+    public LiveData<List<String>> getSentFollowRequests() {
+        return sentFollowRequests;
+    }
+
+    /**
+     * Gets the LiveData for messages or notifications.
+     *
+     * @return LiveData containing message strings for UI display.
      */
     public LiveData<String> getMessage() {
         return message;
     }
 
     /**
-     * Returns a LiveData instance that indicates whether an account has been successfully created.
-     *
-     * @return a LiveData of Boolean status for account creation
+     * Loads the current user's follow status.
+     * Delegates to FollowController to fetch both followed users and sent follow requests.
+     * Sets an error message if the user is not logged in or if an error occurs.
      */
-    public LiveData<Boolean> getAccountCreated() {
-        return accountCreated;
+    public void loadFollowStatus() {
+        String currentEmail = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getEmail() : null;
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
+        if (currentEmail == null || currentUsername == null) {
+            message.setValue("User not logged in");
+            return;
+        }
+        followController.loadFollowStatus(currentEmail, currentUsername,
+                status -> {
+                    followings.setValue(status.getFollowings());
+                    sentFollowRequests.setValue(status.getSentFollowRequests());
+                },
+                e -> message.setValue("Error loading follow status: " + e.getMessage())
+        );
     }
 
     /**
-     * Attempts to create a new user account after performing basic input validation.
-     * It checks for empty fields, password requirements, and duplicate usernames or emails in Firestore.
-     * If all checks pass, the method registers the user with FirebaseAuth and saves the username to Firestore.
+     * Searches for a user by their username.
+     * Queries the Firestore "users" collection for a matching username.
+     * On success, updates the searchResults LiveData and sets a message if no user is found.
      *
-     * @param email          the email address for the new account
-     * @param password       the password for the new account
-     * @param confirmPassword the confirmation of the password
-     * @param username       the desired username
+     * @param query the username to search for.
      */
-    public void createUser(String email, String password, String confirmPassword, String username) {
-
-        // Basic validation
-        if (TextUtils.isEmpty(email)) {
-            message.setValue("Email is required");
-            return;
-        }
-        if (TextUtils.isEmpty(username)) {
-            message.setValue("Username is required");
-            return;
-        }
-        if (password.length() < 8) {
-            message.setValue("Password must be at least 8 characters");
-            return;
-        }
-        if (!password.equals(confirmPassword)) {
-            message.setValue("Passwords do not match");
-            return;
-        }
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("usernames")
-                .whereEqualTo("username", username)
+    public void searchUser(String query) {
+        db.collection("users")
+                .whereEqualTo("username", query)
                 .get()
-                .addOnCompleteListener(usernameTask -> {
-                    if (usernameTask.isSuccessful() && !usernameTask.getResult().isEmpty()) {
-                        message.setValue("Username already exists");
-                    } else {
-                        db.collection("usernames")
-                                .whereEqualTo("email", email)
-                                .get()
-                                .addOnCompleteListener(emailTask -> {
-                                    if (emailTask.isSuccessful() && !emailTask.getResult().isEmpty()) {
-                                        message.setValue("Email already in use");
-                                    } else {
-                                        mAuth.createUserWithEmailAndPassword(email, password)
-                                                .addOnCompleteListener(task -> {
-                                                    if (task.isSuccessful()) {
-                                                        UsernameRepository.getInstance().saveUsernameToFirestore(username, email,
-                                                                docRef -> {
-                                                                    message.setValue("Account created successfully. Please login");
-                                                                    accountCreated.setValue(true);
-                                                                },
-                                                                e -> message.setValue("Registration failed: " + e.getMessage())
-                                                        );
-                                                    } else {
-                                                        message.setValue("Registration failed: " + task.getException().getMessage());
-                                                    }
-                                                });
-                                    }
-                                });
+                .addOnSuccessListener(querySnapshot -> {
+                    List<String> results = new ArrayList<>();
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        String username = doc.getString("username");
+                        if (username != null) {
+                            results.add(username);
+                        }
                     }
-                });
+                    searchResults.setValue(results);
+                    if (results.isEmpty()) {
+                        message.setValue("No user found with username: " + query);
+                    }
+                })
+                .addOnFailureListener(e -> message.setValue("Error searching user: " + e.getMessage()));
+    }
+
+    /**
+     * Sends a follow request to the specified target user.
+     * Validates that the current user is logged in and is not trying to follow themselves.
+     * On success, notifies the UI and reloads follow status.
+     *
+     * @param targetUsername the username of the user to send a follow request to.
+     */
+    public void followUser(String targetUsername) {
+        String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
+        if (currentUsername == null) {
+            message.setValue("User not logged in");
+            return;
+        }
+        if (currentUsername.equals(targetUsername)) {
+            message.setValue("You cannot follow yourself");
+            return;
+        }
+        followController.sendFollowRequest(currentUsername, targetUsername,
+                documentReference -> {
+                    message.setValue("Follow request sent");
+                    loadFollowStatus();
+                },
+                e -> message.setValue("Error sending follow request: " + e.getMessage())
+        );
+    }
+
+    /**
+     * Checks if the current user is already following or has already sent a follow request to the target user.
+     *
+     * @param targetUsername the username to check against followings and sent follow requests.
+     * @return true if the target username is already in the followings or sent follow requests; false otherwise.
+     */
+    public boolean isAlreadyFollowingOrRequested(String targetUsername) {
+        List<String> followingList = followings.getValue();
+        List<String> requests = sentFollowRequests.getValue();
+        return (followingList != null && followingList.contains(targetUsername)) ||
+                (requests != null && requests.contains(targetUsername));
     }
 }

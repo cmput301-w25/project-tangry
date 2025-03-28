@@ -20,24 +20,37 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.NavController;
+
 import com.bumptech.glide.Glide;
 import com.example.tangry.R;
+import com.example.tangry.adapters.CommentAdapter;
 import com.example.tangry.controllers.EmotionPostController;
+import com.example.tangry.controllers.UserController;
+import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
-import com.example.tangry.repositories.EmotionPostRepository;
+import com.example.tangry.utils.NetworkMonitor;
 import com.example.tangry.utils.TimeUtils;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
-import java.util.Objects;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostDetailsFragment extends Fragment {
     private TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
@@ -45,7 +58,13 @@ public class PostDetailsFragment extends Fragment {
     private Button editButton, deleteButton;
     private EmotionPost post;
     private String postId;
-    private EmotionPostController controller;
+    private EmotionPostController emotionPostController;
+    private UserController userController;
+    private RecyclerView commentsRecyclerView;
+    private EditText commentInput;
+    private Button commentSubmitButton;
+    private CommentAdapter commentAdapter;
+    private List<Comment> commentList = new ArrayList<>();
 
     /**
      * Default empty constructor required for Fragments.
@@ -69,7 +88,8 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Initializes UI components, retrieves post data from arguments, and sets up event listeners.
+     * Initializes UI components, retrieves post data from arguments, and sets up
+     * event listeners.
      *
      * @param view               The root view returned by onCreateView.
      * @param savedInstanceState Previously saved state, if any.
@@ -77,7 +97,8 @@ public class PostDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        controller = new EmotionPostController();
+        emotionPostController = new EmotionPostController();
+        userController = new UserController();
 
         // Initialize Views
         userName = view.findViewById(R.id.user_name);
@@ -104,6 +125,64 @@ public class PostDetailsFragment extends Fragment {
 
         editButton.setOnClickListener(v -> editPost());
         deleteButton.setOnClickListener(v -> confirmDeletePost());
+
+        commentsRecyclerView = view.findViewById(R.id.comments_recycler_view);
+        commentInput = view.findViewById(R.id.comment_input);
+        commentSubmitButton = view.findViewById(R.id.comment_submit_button);
+
+        commentAdapter = new CommentAdapter(commentList);
+        commentsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        commentsRecyclerView.setAdapter(commentAdapter);
+
+        commentsRecyclerView.setNestedScrollingEnabled(false);
+
+        if (post != null && post.getComments() != null) {
+            commentList.addAll(post.getComments());
+            commentAdapter.notifyDataSetChanged();
+        }
+
+        commentSubmitButton.setOnClickListener(v -> {
+            String content = commentInput.getText().toString().trim();
+            if (!content.isEmpty() && postId != null) {
+                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                userController.getUsername(email,
+                        username -> {
+                            Comment comment = new Comment(username, content);
+                            emotionPostController.addCommentToPost(postId, comment,
+                                    () -> {
+                                        commentList.add(comment);
+                                        commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                        commentInput.setText("");
+                                        int commentKarma = 5;
+                                        userController.incrementKarma(email,
+                                                aVoid -> Log.d("PostDetails", "Karma incremented by " + commentKarma + " for commenting."),
+                                                e -> Log.e("PostDetails", "Failed to increment karma after comment", e),
+                                                commentKarma);
+
+                                        // --- New Badge Functionality for Comments ---
+                                        // Update the user's comment count and award a silver badge for every 3 comments.
+                                        userController.incrementCommentCount(email,
+                                                aVoid -> Log.d("PostDetails", "User comment count incremented (silver badge updated)"),
+                                                e -> Log.e("PostDetails", "Failed to update comment count for badge", e));
+                                    },
+                                    e -> Log.e("PostDetails", "Failed to add comment", e));
+                        },
+                        e -> {
+                            Log.e("PostDetails", "Failed to fetch username", e);
+                            // Optional fallback
+                            Comment fallbackComment = new Comment("Unknown", content);
+                            emotionPostController.addCommentToPost(postId, fallbackComment,
+                                    () -> {
+                                        commentList.add(fallbackComment);
+                                        commentAdapter.notifyItemInserted(commentList.size() - 1);
+                                        commentInput.setText("");
+                                    },
+                                    error -> Log.e("PostDetails", "Failed to add comment (fallback)", error));
+                        });
+            }
+        });
+
     }
 
     /**
@@ -192,7 +271,6 @@ public class PostDetailsFragment extends Fragment {
             bundle.putString("postJson", new Gson().toJson(post));
             bundle.putString("postId", postId);
             bundle.putBoolean("isEditing", true);
-
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_postDetailsFragment_to_emotionsFragment, bundle);
         }
@@ -211,23 +289,19 @@ public class PostDetailsFragment extends Fragment {
     }
 
     /**
-     * Deletes the post by first attempting to remove the associated image (if any) from Firebase Storage,
-     * then deleting the post document from Firestore.
+     * Deletes the post by first attempting to remove the associated image (if any)
+     * from Firebase Storage, then deleting the post document from Firestore.
      */
     private void deletePost() {
         if (postId != null) {
-            // Check if the post has an associated image
             if (post.getImageUri() != null && !post.getImageUri().isEmpty()) {
                 try {
                     StorageReference imageRef = FirebaseStorage.getInstance().getReferenceFromUrl(post.getImageUri());
-                    // Delete the image file
                     imageRef.delete().addOnSuccessListener(aVoid -> {
                         Log.d("PostDetails", "Image deleted successfully");
-                        // After image deletion, delete the post
                         deletePostFromFirestore();
                     }).addOnFailureListener(e -> {
                         Log.e("PostDetails", "Error deleting image", e);
-                        // Even if image deletion fails, try deleting the post
                         deletePostFromFirestore();
                     });
                 } catch (IllegalArgumentException e) {
@@ -235,7 +309,6 @@ public class PostDetailsFragment extends Fragment {
                     deletePostFromFirestore();
                 }
             } else {
-                // No image to delete; directly delete the post
                 deletePostFromFirestore();
             }
         }
@@ -245,12 +318,39 @@ public class PostDetailsFragment extends Fragment {
      * Deletes the post document from Firestore using the EmotionPostController.
      */
     private void deletePostFromFirestore() {
-        controller.deleteEmotionPost(postId,
+        final NavController navController = isAdded() && getView() != null
+                ? Navigation.findNavController(requireView())
+                : null;
+        NetworkMonitor networkMonitor = new NetworkMonitor(requireContext());
+        boolean isConnected = networkMonitor.isConnected();
+
+        emotionPostController.deleteEmotionPostWithOfflineSupport(
+                requireContext(),
+                postId,
+                post,
                 () -> {
                     Log.d("PostDetails", "Post deleted successfully");
-                    Navigation.findNavController(requireView())
-                            .popBackStack(R.id.navigation_home, false);
+                    if (!isConnected) {
+                        Toast.makeText(requireContext(),
+                                "Post deleted locally and will be removed when online",
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(requireContext(), "Post deleted successfully",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    if (isAdded() && navController != null && getView() != null) {
+                        navController.popBackStack(R.id.navigation_home, false);
+                    } else {
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> getActivity().onBackPressed());
+                        }
+                    }
                 },
-                e -> Log.e("PostDetails", "Error deleting post", e));
+                e -> {
+                    Log.e("PostDetails", "Error deleting post", e);
+                    Toast.makeText(requireContext(),
+                            "Failed to delete post: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
     }
 }

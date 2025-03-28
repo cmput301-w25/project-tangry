@@ -136,7 +136,7 @@ public class LoginFragment extends Fragment {
         // "Create account" click listener.
         createButton.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
-            navController.navigate(R.id.action_navigation_login_to_navigation_add_user);
+            navController.navigate(R.id.action_navigation_login_to_navigation_create_user);
         });
 
         // Auto–login: if "Remember Me" was checked and saved credentials are available.

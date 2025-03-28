@@ -15,6 +15,7 @@ package com.example.tangry.repositories;
 
 import android.util.Log;
 import com.example.tangry.datasource.FirebaseDataSource;
+import com.example.tangry.models.Comment;
 import com.example.tangry.models.EmotionPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -168,5 +169,35 @@ public class EmotionPostRepository {
                 },
                 onFailure
         );
+    }
+
+    public Query getPostsByUser(String username) {
+        return firebaseDataSource.getCollectionReference()
+                .whereEqualTo("username", username)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+    }
+
+    /**
+     * Adds a comment to an existing EmotionPost in Firestore.
+     *
+     * @param postId         the document ID of the EmotionPost
+     * @param comment        the Comment object to add
+     * @param onSuccess      callback on successful update
+     * @param onFailure      callback on failure
+     */
+    public void addCommentToPost(String postId, Comment comment, Runnable onSuccess, OnFailureListener onFailure) {
+        Map<String, Object> commentMap = new HashMap<>();
+        commentMap.put("username", comment.getUsername());
+        commentMap.put("text", comment.getText());
+        commentMap.put("timestamp", comment.getTimestamp());
+
+        firebaseDataSource.getCollectionReference()
+                .document(postId)
+                .update("comments", FieldValue.arrayUnion(commentMap))
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Comment added successfully");
+                    onSuccess.run();
+                })
+                .addOnFailureListener(onFailure);
     }
 }

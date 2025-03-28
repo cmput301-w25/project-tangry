@@ -10,15 +10,14 @@
         android:name="com.example.tangry.ui.login.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
-
         <action
             android:id="@+id/action_loginFragment_to_home"
             app:destination="@id/navigation_home"
             app:popUpTo="@id/navigation_login"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_navigation_login_to_navigation_add_user"
-            app:destination="@id/navigation_add_user" />
+            android:id="@+id/action_navigation_login_to_navigation_create_user"
+            app:destination="@id/navigation_create_user" />
     </fragment>
 
     <fragment
@@ -26,10 +25,20 @@
         android:name="com.example.tangry.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home">
-
         <!-- Navigate from Home to PostDetails -->
         <action
             android:id="@+id/action_homeFragment_to_postDetailsFragment"
+            app:destination="@id/postDetailsFragment" />
+    </fragment>
+
+    <!-- YourMoodFragment entry -->
+    <fragment
+        android:id="@+id/yourMoodFragment"
+        android:name="com.example.tangry.ui.home.YourMoodFragment"
+        android:label="Your Mood"
+        tools:layout="@layout/fragment_your_mood">
+        <action
+            android:id="@+id/action_yourMoodFragment_to_postDetailsFragment"
             app:destination="@id/postDetailsFragment" />
     </fragment>
 
@@ -43,7 +52,21 @@
         android:id="@+id/navigation_add_user"
         android:name="com.example.tangry.ui.add_user.AddUserFragment"
         android:label="@string/title_add_user"
-        tools:layout="@layout/fragment_add_user" />
+        tools:layout="@layout/fragment_add_user">
+        <!-- Navigate from AddUser to UserProfileFragment -->
+        <action
+            android:id="@+id/action_navigation_add_user_to_userProfileFragment"
+            app:destination="@id/userProfileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userProfileFragment"
+        android:name="com.example.tangry.ui.profile.others.UserProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_user_profile" />
+    <action
+        android:id="@+id/action_userProfileFragment_to_postDetailsFragment"
+        app:destination="@id/postDetailsFragment" />
 
     <fragment
         android:id="@+id/navigation_friends"
@@ -51,36 +74,39 @@
         android:label="@string/title_friends"
         tools:layout="@layout/fragment_friends" />
 
+    <fragment
+        android:id="@+id/navigation_leaderboard"
+        android:name="com.example.tangry.ui.leaderboard.LeaderboardFragment"
+        android:label="Leaderboard"
+        tools:layout="@layout/fragment_leaderboard" />
+
 <!-- Redirect to Emotions List after +Mood Button clicked-->
     <fragment
         android:id="@+id/emotionsFragment"
         android:name="com.example.tangry.ui.emotionEmojis.EmotionsFragment"
         android:label="Add Mood"
         tools:layout="@layout/fragment_emotions">
-
         <argument
             android:name="isEditing"
             app:argType="boolean"
-            android:defaultValue="false"/>
+            android:defaultValue="false" />
         <argument
             android:name="postJson"
             app:argType="string" />
         <argument
             android:name="postId"
             app:argType="string" />
-
         <!-- Navigation for adding a new post -->
         <action
             android:id="@+id/action_emotionsFragment_to_detailFragment"
             app:destination="@id/detailFragment" />
-
         <!-- Navigation for editing mode -->
         <action
             android:id="@+id/action_emotionsFragment_to_editEmotionFragment"
             app:destination="@id/editEmotionFragment" />
     </fragment>
 
-    <!-- Redirect to post of Emotion-->
+    <!-- Detail Fragment for adding Mood post -->
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.tangry.ui.home.CreateEmotionPostFragment"
@@ -96,16 +122,12 @@
         android:name="com.example.tangry.ui.home.PostDetailsFragment"
         android:label="Post Details"
         tools:layout="@layout/item_mood">
-
-        <!-- Allow passing post data as an argument -->
         <argument
             android:name="post"
             app:argType="string" />
-
         <argument
             android:name="postId"
             app:argType="string" />
-
         <action
             android:id="@+id/action_postDetailsFragment_to_emotionsFragment"
             app:destination="@id/emotionsFragment" />
@@ -117,8 +139,6 @@
         android:name="com.example.tangry.ui.home.EditEmotionFragment"
         android:label="Edit Mood"
         tools:layout="@layout/fragment_edit_emotion">
-
-        <!-- Arguments to pass post data -->
         <argument
             android:name="postId"
             app:argType="string" />
@@ -126,5 +146,33 @@
             android:name="postJson"
             app:argType="string" />
     </fragment>
+
+    <!-- New entry for CreateUserFragment -->
+    <fragment
+        android:id="@+id/navigation_create_user"
+        android:name="com.example.tangry.ui.create_user.CreateUserFragment"
+        android:label="Create User"
+        tools:layout="@layout/fragment_create_user" />
+
+    <!-- New entry for PersonalProfileFragment -->
+    <fragment
+        android:id="@+id/personalProfileFragment"
+        android:name="com.example.tangry.ui.profile.personal.PersonalProfileFragment"
+        android:label="Personal Profile"
+        tools:layout="@layout/fragment_personal_profile" />
+    <action
+        android:id="@+id/action_personalProfileFragment_to_followRequestsFragment"
+        app:destination="@id/followRequestsFragment" />
+    <!-- FollowRequestsFragment-->
+    <fragment
+    android:id="@+id/followRequestsFragment"
+    android:name="com.example.tangry.ui.profile.personal.FollowRequestsFragment"
+    android:label="Follow Requests"
+    tools:layout="@layout/fragment_follow_requests" />
+
+    <!-- Global action to navigate to Personal Profile -->
+    <action
+        android:id="@+id/action_global_personal_profile"
+        app:destination="@id/personalProfileFragment" />
 
 </navigation>

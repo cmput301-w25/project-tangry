@@ -8,7 +8,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.Observer;
 
 import com.example.tangry.test.EmulatorTestHelper;
-import com.example.tangry.ui.add_user.AddUserViewModel;
+import com.example.tangry.ui.create_user.CreateUserViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Tests for user creation using AddUserViewModel.
+ * Tests for user creation using CreateUserViewModel.
  * Ensures that:
  * - Emails and usernames are not empty.
  * - Passwords are at least 8 characters.
@@ -38,12 +38,12 @@ public class UserCreateTest {
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
-    private AddUserViewModel viewModel;
+    private CreateUserViewModel viewModel;
 
     @Before
     public void setUp() {
         EmulatorTestHelper.useFirebaseEmulators();
-        viewModel = new AddUserViewModel();
+        viewModel = new CreateUserViewModel();
     }
 
     /**
@@ -106,7 +106,7 @@ public class UserCreateTest {
         duplicateRecord.put("email", "duplicate@example.com");
         // Use Tasks.await to synchronously insert the duplicate document.
         DocumentReference ref = Tasks.await(
-                db.collection("usernames").add(duplicateRecord),
+                db.collection("users").add(duplicateRecord),
                 5,
                 TimeUnit.SECONDS
         );
@@ -128,7 +128,7 @@ public class UserCreateTest {
         duplicateRecord.put("email", "duplicate@example.com");
         // Use Tasks.await to synchronously insert the duplicate document.
         DocumentReference ref = Tasks.await(
-                db.collection("usernames").add(duplicateRecord),
+                db.collection("users").add(duplicateRecord),
                 5,
                 TimeUnit.SECONDS
         );
@@ -145,12 +145,16 @@ public class UserCreateTest {
     @Test
     public void testSuccessfulUserCreation() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
-        // Using unique values should lead to a successful account creation.
-        viewModel.createUser("unique@example.com", "password123", "password123", "uniqueuser");
+        // Generate unique values so that collisions are avoided.
+        String uniqueSuffix = String.valueOf(System.currentTimeMillis());
+        String email = "unique" + uniqueSuffix + "@example.com";
+        String username = "uniqueuser" + uniqueSuffix;
+        viewModel.createUser(email, "password123", "password123", username);
         viewModel.getAccountCreated().observeForever(created -> latch.countDown());
         awaitLatch(latch);
         Boolean created = viewModel.getAccountCreated().getValue();
         String message = viewModel.getMessage().getValue();
+        System.out.println(message);
         assertNotNull(created);
         assertTrue(created);
         assertEquals("Account created successfully. Please login", message);
