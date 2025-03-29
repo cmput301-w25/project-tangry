@@ -29,7 +29,7 @@ import com.example.tangry.models.Emotion;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.models.EmotionProvider;
 import com.example.tangry.repositories.EmotionPostRepository;
-import com.example.tangry.utils.GeocoderUtil;
+import com.example.tangry.utils.GeocoderUtility;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
@@ -204,7 +204,7 @@ public class MapFragment extends Fragment {
                         continue;
                     }
                     // Geocode the post location.
-                    GeoPoint eventPoint = GeocoderUtil.getGeoPointFromAddress(getContext(), post.getLocation());
+                    GeoPoint eventPoint = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
                     if (eventPoint == null) {
                         Log.d(TAG, "Geocoder returned null for location: " + post.getLocation() +
                                 " for post by " + username + ". Skipping marker.");
@@ -237,7 +237,7 @@ public class MapFragment extends Fragment {
             } else {
                 // Create markers for each qualifying post.
                 for (EmotionPost post : latestEventPerUser.values()) {
-                    GeoPoint point = GeocoderUtil.getGeoPointFromAddress(getContext(), post.getLocation());
+                    GeoPoint point = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
                     if (point == null) {
                         Log.d(TAG, "Geocoder returned null for post from " + post.getUsername() + ". Skipping marker.");
                         continue;
