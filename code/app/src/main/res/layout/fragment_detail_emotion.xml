@@ -75,6 +75,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
+    <!-- New "Use Current Location" Button -->
+    <Button
+        android:id="@+id/btn_use_current_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use Current Location"
+        app:layout_constraintTop_toBottomOf="@id/location_input"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
+
     <!-- Social Situation Section -->
     <TextView
         android:id="@+id/social_situation_label"
@@ -82,7 +93,7 @@
         android:layout_height="wrap_content"
         android:text="Social Situation (Optional)"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/location_input"
+        app:layout_constraintTop_toBottomOf="@id/btn_use_current_location"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="16dp"/>
 

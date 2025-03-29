@@ -10,6 +10,11 @@
           <theme>@style/Theme.Tangry</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/custom_marker_layout.xml">
+        <config>
+          <theme>@style/Theme.Tangry</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_post_details.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
@@ -120,6 +125,16 @@
           <theme>@style/Theme.Tangry</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/item_user_result.xml">
+        <config>
+          <theme>@style/Theme.Tangry</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/marker_custom.xml">
+        <config>
+          <theme>@style/Theme.Tangry</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/modal_bottom_sheet.xml">
         <config>
           <theme>@style/Theme.Tangry</theme>
@@ -147,7 +162,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_pin_shape.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/custom_marker_layout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/marker_custom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/CreateEmotionPostFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/home/CreateEmotionPostFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,9 +231,9 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
+        <option value="Class" />
         <option value="resourceFile" />
         <option value="layoutResourceFile" />
-        <option value="Class" />
       </list>
     </option>
   </component>
@@ -671,12 +694,12 @@
       <map>
         <entry key="com.example.tangry">
           <value>
-            <CheckInfo lastCheckTimestamp="1743181967030" />
+            <CheckInfo lastCheckTimestamp="1743272659539" />
           </value>
         </entry>
         <entry key="com.example.tangry.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1743181967031" />
+            <CheckInfo lastCheckTimestamp="1743272659538" />
           </value>
         </entry>
       </map>

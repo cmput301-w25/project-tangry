@@ -1,5 +1,6 @@
 package com.example.tangry.ui.map;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import android.Manifest;
@@ -9,8 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -47,8 +46,6 @@ import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
-import org.osmdroid.views.overlay.compass.CompassOverlay;
-import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -91,13 +88,6 @@ public class MapFragment extends Fragment {
         mapView.setTileSource(tileSource);
         mapView.getController().setZoom(DEFAULT_ZOOM);
 
-        // Add overlays: scale bar and compass
-        mapView.getOverlays().add(new ScaleBarOverlay(mapView));
-        CompassOverlay compassOverlay = new CompassOverlay(getContext(),
-                new InternalCompassOrientationProvider(getContext()), mapView);
-        compassOverlay.enableCompass();
-        mapView.getOverlays().add(compassOverlay);
-
         // Setup custom zoom buttons
         ImageButton btnZoomIn = view.findViewById(R.id.btn_zoom_in);
         ImageButton btnZoomOut = view.findViewById(R.id.btn_zoom_out);
@@ -105,6 +95,7 @@ public class MapFragment extends Fragment {
             btnZoomIn.setOnClickListener(v -> mapView.getController().zoomIn());
             btnZoomOut.setOnClickListener(v -> mapView.getController().zoomOut());
         }
+
 
         // Optional: set a MapListener (if needed)
         mapView.setMapListener(new MapListener() {
@@ -175,7 +166,7 @@ public class MapFragment extends Fragment {
 
     /**
      * Loads posts from the current user and followed users,
-     * geocodes their location strings, and adds emoji markers to the map.
+     * geocodes their location strings, and adds custom emoji markers to the map.
      */
     private void loadFollowedMoodEventPins() {
         // Replace these stub methods with your actual implementations.
@@ -247,9 +238,10 @@ public class MapFragment extends Fragment {
                     Marker marker = new Marker(mapView);
                     marker.setPosition(point);
                     int emojiResId = getIconForEmotion(post.getEmotion());
-                    Drawable pinDrawable = createPinDrawable(emojiResId);
-                    marker.setIcon(pinDrawable);
-                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    int emotionColor = getColorForEmotion(post.getEmotion());
+                    // Use the custom marker method that inflates a custom layout
+                    Drawable customMarker = createCustomMarker(post, emojiResId, emotionColor);
+                    marker.setIcon(customMarker);
                     marker.setTitle(post.getUsername());
                     marker.setOnMarkerClickListener((m, mapView) -> {
                         showPostDetails(post);
@@ -275,28 +267,27 @@ public class MapFragment extends Fragment {
         return followed;
     }
 
-    // Stub: Replace with your actual implementation to return the current user's username.
+    // Implementation: Returns the current user's username from Firebase.
     private String getCurrentUsername() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            // Try to use the Firebase user's display name if available.
             String displayName = user.getDisplayName();
             if (displayName != null && !displayName.trim().isEmpty()) {
                 return displayName;
             }
-            // Otherwise, extract a username from the email address.
             String email = user.getEmail();
             if (email != null && email.contains("@")) {
                 return email.substring(0, email.indexOf('@'));
             }
         }
-        return "Unknown"; // Fallback if no user is logged in or no data is available.
+        return "unknown";
     }
 
     private double distanceInKm(GeoPoint point1, GeoPoint point2) {
         return point1.distanceToAsDouble(point2) / 1000.0;
     }
 
+    // Returns the icon resource ID for a given emotion name.
     private int getIconForEmotion(String emotionName) {
         List<Emotion> emotions = EmotionProvider.getSampleEmotions();
         for (Emotion e : emotions) {
@@ -307,74 +298,97 @@ public class MapFragment extends Fragment {
         return R.drawable.ic_angry_selector; // fallback icon.
     }
 
+    // Returns the color for a given emotion using its textColorResId.
+    private int getColorForEmotion(String emotionName) {
+        List<Emotion> emotions = EmotionProvider.getSampleEmotions();
+        for (Emotion e : emotions) {
+            if (e.getName().equalsIgnoreCase(emotionName)) {
+                return ContextCompat.getColor(getContext(), e.getTextColorResId());
+            }
+        }
+        // Fallback color if not found
+        return ContextCompat.getColor(getContext(), android.R.color.holo_red_dark);
+    }
+
     /**
-     * Creates a composite drawable that overlays a scaled-down emoji on a pin background.
+     * Creates a custom marker Drawable by inflating a custom layout.
+     * The layout includes a pin-shaped background (using your custom drawable),
+     * an emoji overlaid in the center, and the username displayed below the pin.
+     *
+     * Make sure your layout file "marker_custom.xml" (shown above) exists in res/layout.
+     *
+     * @param post         the EmotionPost object (for username)
+     * @param emojiResId   the drawable resource ID for the emoji
+     * @param emotionColor the color to tint the pin shape
+     * @return a Drawable representing the custom marker
      */
-    private Drawable createPinDrawable(int emojiDrawableResId) {
-        Drawable pinBackground = ContextCompat.getDrawable(getContext(), R.drawable.map_pin_background);
-        if (pinBackground == null) {
-            GradientDrawable fallbackBackground = new GradientDrawable();
-            fallbackBackground.setShape(GradientDrawable.OVAL);
-            fallbackBackground.setColor(Color.LTGRAY);
-            int size = dpToPx(40);
-            fallbackBackground.setSize(size, size);
-            pinBackground = fallbackBackground;
-        }
-        // Ensure valid bounds on the background drawable.
-        if (pinBackground.getIntrinsicWidth() <= 0 || pinBackground.getIntrinsicHeight() <= 0) {
-            int defaultSize = dpToPx(40);
-            pinBackground.setBounds(0, 0, defaultSize, defaultSize);
+    private Drawable createCustomMarker(EmotionPost post, int emojiResId, int emotionColor) {
+        // Inflate the custom marker layout.
+        View markerView = LayoutInflater.from(getContext()).inflate(R.layout.marker_custom, null);
+
+        // Set the username text below the pin.
+        android.widget.TextView usernameText = markerView.findViewById(R.id.marker_username);
+        if (usernameText != null) {
+            usernameText.setText(post.getUsername());
+        } else {
+            Log.e(TAG, "Marker layout is missing a TextView with ID marker_username!");
         }
 
-        Drawable emojiDrawable = ContextCompat.getDrawable(getContext(), emojiDrawableResId);
-        Bitmap emojiBitmap = drawableToBitmap(emojiDrawable);
-        int emojiSizePx = dpToPx(20);
-        Bitmap scaledEmojiBitmap = Bitmap.createScaledBitmap(emojiBitmap, emojiSizePx, emojiSizePx, true);
-        Drawable scaledEmojiDrawable = new BitmapDrawable(getResources(), scaledEmojiBitmap);
-
-        Drawable[] layers = new Drawable[2];
-        layers[0] = pinBackground;
-        layers[1] = scaledEmojiDrawable;
-        LayerDrawable layeredDrawable = new LayerDrawable(layers);
-        int width = (pinBackground.getIntrinsicWidth() > 0) ? pinBackground.getIntrinsicWidth() : dpToPx(40);
-        int height = (pinBackground.getIntrinsicHeight() > 0) ? pinBackground.getIntrinsicHeight() : dpToPx(40);
-        layeredDrawable.setBounds(0, 0, width, height);
-
-        int insetX = (width - emojiSizePx) / 2;
-        int insetY = (height - emojiSizePx) / 2;
-        layeredDrawable.setLayerInset(1, insetX, insetY, insetX, insetY);
-        return layeredDrawable;
-    }
-
-    private Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
+        // Set the emoji in the center of the pin.
+        android.widget.ImageView emojiImage = markerView.findViewById(R.id.marker_emoji);
+        if (emojiImage != null) {
+            emojiImage.setImageResource(emojiResId);
+        } else {
+            Log.e(TAG, "Marker layout is missing an ImageView with ID marker_emoji!");
         }
-        int width = drawable.getIntrinsicWidth();
-        int height = drawable.getIntrinsicHeight();
-        if (width <= 0) width = dpToPx(40);
-        if (height <= 0) height = dpToPx(40);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        // Optionally tint the pin shape.
+        android.widget.ImageView pinImage = markerView.findViewById(R.id.marker_pin);
+        if (pinImage != null) {
+            pinImage.setColorFilter(emotionColor);
+        } else {
+            Log.e(TAG, "Marker layout is missing an ImageView with ID marker_pin!");
+        }
+
+        // Measure and layout the marker view.
+        markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        markerView.layout(0, 0, markerView.getMeasuredWidth(), markerView.getMeasuredHeight());
+
+        // Create a bitmap from the marker view.
+        Bitmap bitmap = Bitmap.createBitmap(markerView.getMeasuredWidth(), markerView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
-    private int dpToPx(int dp) {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        return Math.round(dp * metrics.density);
+        markerView.draw(canvas);
+        return new BitmapDrawable(getResources(), bitmap);
     }
 
     private void showPostDetails(EmotionPost post) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(post.getEmotion());
+        // Inflate the custom dialog layout
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_post_details, null);
+        android.widget.TextView tvDetails = dialogView.findViewById(R.id.tvDetails);
+        android.widget.ImageView ivPostImage = dialogView.findViewById(R.id.ivPostImage);
         StringBuilder details = new StringBuilder();
         details.append("Posted by: ").append(post.getUsername()).append("\n");
         details.append("Explanation: ").append(post.getExplanation());
-        builder.setMessage(details.toString());
+        tvDetails.setText(details.toString());
+        // If an image URI is available, load it into the ImageView using Glide.
+        if (post.getImageUri() != null && !post.getImageUri().trim().isEmpty()) {
+            ivPostImage.setVisibility(View.VISIBLE);
+            Glide.with(getContext())
+                    .load(post.getImageUri())
+                    .into(ivPostImage);
+        } else {
+            ivPostImage.setVisibility(View.GONE);
+        }
+        builder.setView(dialogView);
         builder.setPositiveButton("Close", null);
         builder.show();
+    }
+
+    private int dpToPx(int dp) {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        return Math.round(dp * metrics.density);
     }
 
     @Override

@@ -49,6 +49,7 @@ android {
 dependencies {
     implementation ("org.osmdroid:osmdroid-android:6.1.14")
     implementation ("com.github.bumptech.glide:glide:4.15.1")
+    implementation(libs.play.services.location)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
     implementation(libs.androidx.recyclerview)
