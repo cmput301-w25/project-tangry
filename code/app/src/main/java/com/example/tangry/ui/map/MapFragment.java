@@ -1,5 +1,7 @@
 package com.example.tangry.ui.map;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -275,8 +277,20 @@ public class MapFragment extends Fragment {
 
     // Stub: Replace with your actual implementation to return the current user's username.
     private String getCurrentUsername() {
-        // Example: return "Liam" (the current user's username)
-        return "Liam";
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Try to use the Firebase user's display name if available.
+            String displayName = user.getDisplayName();
+            if (displayName != null && !displayName.trim().isEmpty()) {
+                return displayName;
+            }
+            // Otherwise, extract a username from the email address.
+            String email = user.getEmail();
+            if (email != null && email.contains("@")) {
+                return email.substring(0, email.indexOf('@'));
+            }
+        }
+        return "Unknown"; // Fallback if no user is logged in or no data is available.
     }
 
     private double distanceInKm(GeoPoint point1, GeoPoint point2) {
