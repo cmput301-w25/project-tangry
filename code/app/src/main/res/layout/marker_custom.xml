@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/marker_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
+
+    <!-- A FrameLayout to overlay the emoji on the pin shape -->
+    <FrameLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+
+        <!-- Pin shape image (use your custom vector or drawable for a pin) -->
+        <ImageView
+            android:id="@+id/marker_pin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_pin_shape" />
+
+        <!-- Emoji ImageView that appears in the center of the pin -->
+        <ImageView
+            android:id="@+id/marker_emoji"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:scaleType="centerInside" />
+    </FrameLayout>
+
+    <!-- Username text appears below the pin -->
+    <TextView
+        android:id="@+id/marker_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username"
+        android:textSize="10sp"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="4dp" />
+</LinearLayout>

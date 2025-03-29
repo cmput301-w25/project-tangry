@@ -1,26 +1,14 @@
-/**
- * CreateEmotionPostFragment.java
- *
- * This fragment allows the user to create a new emotion post by entering details such as an explanation,
- * location, and social situation, as well as attaching an optional image. It retrieves the current user's
- * email via FirebaseAuth and uses a UserController and EmotionPostController to handle post creation.
- * The fragment also provides image selection and compression functionality via the ImageHelper utility.
- *
- * Outstanding Issues:
- * - Additional input validation and error handling can be implemented.
- * - The user experience could be enhanced with progress indicators during image upload.
- */
-
 package com.example.tangry.ui.home;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,6 +26,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -52,6 +41,8 @@ import com.example.tangry.models.EmotionPost;
 import com.example.tangry.utils.ImageCaptureUtil;
 import com.example.tangry.utils.ImageHelper;
 import com.example.tangry.utils.NetworkMonitor;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 
@@ -74,7 +65,7 @@ public class CreateEmotionPostFragment extends Fragment {
 
     private TextView emotionTextView;
     private EditText explanationInput;
-    // Changed locationInput type to AutoCompleteTextView so we can show suggestions
+    // Using AutoCompleteTextView for location suggestions
     private AutoCompleteTextView locationInput;
     private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
@@ -84,6 +75,11 @@ public class CreateEmotionPostFragment extends Fragment {
 
     private EmotionPostController emotionPostController;
     private UserController usernameController;
+
+    // New: Button for "Use Current Location"
+    private Button btnUseCurrentLocation;
+    // New: FusedLocationProviderClient for getting the current location
+    private FusedLocationProviderClient fusedLocationClient;
 
     private Uri cameraImageUri; // To store the camera image URI
 
@@ -102,15 +98,19 @@ public class CreateEmotionPostFragment extends Fragment {
 
         emotionTextView = view.findViewById(R.id.emotion_text);
         explanationInput = view.findViewById(R.id.explanation_input);
-        // Ensure your layout uses an AutoCompleteTextView with id "location_input"
         locationInput = view.findViewById(R.id.location_input);
         socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
         imageAttachment = view.findViewById(R.id.image_attachment);
         saveButton = view.findViewById(R.id.save_button);
+        // New: initialize the current location button
+        btnUseCurrentLocation = view.findViewById(R.id.btn_use_current_location);
 
         // Initialize controllers
         emotionPostController = new EmotionPostController();
         usernameController = new UserController();
+
+        // Initialize FusedLocationProviderClient for current location
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         // Retrieve passed arguments (using Safe Args if applicable)
         if (getArguments() != null) {
@@ -132,7 +132,6 @@ public class CreateEmotionPostFragment extends Fragment {
         saveButton.setOnClickListener(v -> saveMoodEvent());
 
         // Setup location auto-complete suggestions
-        // When the user types three or more characters, fetch address suggestions.
         locationInput.setThreshold(1);
         locationInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -150,6 +149,9 @@ public class CreateEmotionPostFragment extends Fragment {
                 // no-op
             }
         });
+
+        // New: Set up the "Use Current Location" button listener
+        btnUseCurrentLocation.setOnClickListener(v -> useCurrentLocation());
     }
 
     /**
@@ -160,11 +162,11 @@ public class CreateEmotionPostFragment extends Fragment {
         new Thread(() -> {
             try {
                 // Use Android's built-in Geocoder
-                android.location.Geocoder geoCoder = new android.location.Geocoder(getContext(), Locale.getDefault());
-                List<android.location.Address> addresses = geoCoder.getFromLocationName(query, 5);
+                Geocoder geoCoder = new Geocoder(getContext(), Locale.getDefault());
+                List<Address> addresses = geoCoder.getFromLocationName(query, 5);
                 final List<String> suggestions = new ArrayList<>();
                 if (addresses != null && !addresses.isEmpty()) {
-                    for (android.location.Address addr : addresses) {
+                    for (Address addr : addresses) {
                         String addressLine = addr.getAddressLine(0);
                         if (addressLine != null && !addressLine.isEmpty()) {
                             suggestions.add(addressLine);
@@ -184,6 +186,44 @@ public class CreateEmotionPostFragment extends Fragment {
                 Log.e(TAG, "Error fetching address suggestions", e);
             }
         }).start();
+    }
+
+    /**
+     * Uses the FusedLocationProviderClient to get the current device location,
+     * reverse-geocodes it into an address, and populates the location input field.
+     */
+    private void useCurrentLocation() {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling ActivityCompat#requestPermissions here to request the missing permissions,
+            // and then overriding onRequestPermissionsResult to handle the case where the user grants the permission.
+            return;
+        }
+        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+            if (location != null) {
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(
+                            location.getLatitude(), location.getLongitude(), 1);
+                    if (addresses != null && !addresses.isEmpty()) {
+                        String addressLine = addresses.get(0).getAddressLine(0);
+                        if (addressLine != null && !addressLine.isEmpty()) {
+                            locationInput.setText(addressLine);
+                            Toast.makeText(getContext(), "Location updated", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "No address found", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "No address found", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e(TAG, "Error reverse geocoding current location", e);
+                    Toast.makeText(getContext(), "Error retrieving location", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Current location not available", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**

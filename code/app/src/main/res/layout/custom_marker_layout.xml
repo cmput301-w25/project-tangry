@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- The pin shape (PNG or SVG) -->
+    <ImageView
+        android:id="@+id/pinShape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_pin_shape" />
+
+    <!-- The emoji that sits near the top of the pin -->
+    <ImageView
+        android:id="@+id/pinEmoji"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignTop="@+id/pinShape"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="4dp" />
+
+    <!-- Username displayed near bottom of pin -->
+    <TextView
+        android:id="@+id/pinUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/pinShape"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="6dp"
+        android:textColor="@android:color/black"
+        android:textSize="12sp"
+        android:textStyle="bold"/>
+</RelativeLayout>
