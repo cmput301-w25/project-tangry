@@ -162,7 +162,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
+      <change beforePath="$PROJECT_DIR$/.idea/androidTestResultsUserPreferences.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/androidTestResultsUserPreferences.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,6 +268,7 @@
     "Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor": "Run",
     "Android Instrumented Tests.FollowRequestTest.executor": "Run",
     "Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor": "Run",
+    "Android Instrumented Tests.LeaderboardBadgeEmulatorTest.executor": "Run",
     "Android Instrumented Tests.OfflineSyncManagerEmulatorTest.executor": "Run",
     "Android Instrumented Tests.Tests in 'com.example.tangry'.executor": "Run",
     "Android Instrumented Tests.UserCreateTest.executor": "Run",
@@ -312,7 +315,7 @@
       <recent name="com.example.tangry" />
     </key>
   </component>
-  <component name="RunManager" selected="Android App.app">
+  <component name="RunManager" selected="Android Instrumented Tests.LeaderboardBadgeEmulatorTest">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="tangry.app" />
       <option name="DEPLOY" value="true" />
@@ -442,11 +445,11 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="OfflineSyncManagerEmulatorTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
-      <module name="tangry.app" />
+    <configuration name="LeaderboardBadgeEmulatorTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+      <module name="tangry.app.androidTest" />
       <option name="TESTING_TYPE" value="2" />
       <option name="METHOD_NAME" value="" />
-      <option name="CLASS_NAME" value="com.example.tangry.OfflineSyncManagerEmulatorTest" />
+      <option name="CLASS_NAME" value="com.example.tangry.LeaderboardBadgeEmulatorTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
       <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
@@ -503,10 +506,10 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="testMultipleOfflineOperationsThenSync()" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
+    <configuration name="OfflineSyncManagerEmulatorTest" type="AndroidTestRunConfigurationType" factoryName="Android Instrumented Tests" temporary="true" nameIsGenerated="true">
       <module name="tangry.app" />
-      <option name="TESTING_TYPE" value="3" />
-      <option name="METHOD_NAME" value="testMultipleOfflineOperationsThenSync" />
+      <option name="TESTING_TYPE" value="2" />
+      <option name="METHOD_NAME" value="" />
       <option name="CLASS_NAME" value="com.example.tangry.OfflineSyncManagerEmulatorTest" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_NAME_REGEX" value="" />
@@ -614,11 +617,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Android Instrumented Tests.LeaderboardBadgeEmulatorTest" />
         <item itemvalue="Android Instrumented Tests.OfflineSyncManagerEmulatorTest" />
         <item itemvalue="Android Instrumented Tests.EmotionPostRepositoryEmulatorTest" />
         <item itemvalue="Gradle.OfflineSyncManagerTest" />
         <item itemvalue="Gradle.OfflineSyncManagerTest.testNetworkAvailable_TriggersSync" />
-        <item itemvalue="Android Instrumented Tests.testMultipleOfflineOperationsThenSync()" />
       </list>
     </recent_temporary>
   </component>
@@ -671,6 +674,26 @@
           <url>file://$PROJECT_DIR$/app/src/test/java/com/example/tangry/OfflineSyncManagerTest.java</url>
           <line>38</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java</url>
+          <line>363</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java</url>
+          <line>390</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java</url>
+          <line>405</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/app/src/androidTest/java/com/example/tangry/LeaderboardBadgeEmulatorTest.java</url>
+          <line>419</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
