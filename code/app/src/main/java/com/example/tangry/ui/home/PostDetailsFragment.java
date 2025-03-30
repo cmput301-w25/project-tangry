@@ -120,6 +120,15 @@ public class PostDetailsFragment extends Fragment {
             if (postJson != null) {
                 post = new Gson().fromJson(postJson, EmotionPost.class);
                 bindPostDetails(post);
+
+                // Check if current user is the post owner
+                String currentUsername = FirebaseAuth.getInstance().getCurrentUser() != null ?
+                        FirebaseAuth.getInstance().getCurrentUser().getDisplayName() : null;
+
+                // Show edit and delete buttons only if the current user is the post owner
+                boolean isPostOwner = (currentUsername != null && currentUsername.equals(post.getUsername()));
+                editButton.setVisibility(isPostOwner ? View.VISIBLE : View.GONE);
+                deleteButton.setVisibility(isPostOwner ? View.VISIBLE : View.GONE);
             }
         }
 

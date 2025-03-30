@@ -1,7 +1,6 @@
 package com.example.tangry.adapters;
 
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,14 +9,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.R;
 import com.example.tangry.utils.TimeUtils;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +107,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
      * ViewHolder class for holding and binding the UI elements of an EmotionPost item.
      */
     static class PostViewHolder extends RecyclerView.ViewHolder {
-        private final TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText;
+        private final TextView userName, moodText, userHandle, locationText, withText, reasonText, timeText, privacyText;
         private final ImageView moodImage, emojiImage;
 
         /**
@@ -129,6 +126,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
             timeText = itemView.findViewById(R.id.time_text);
             moodImage = itemView.findViewById(R.id.mood_image);
             emojiImage = itemView.findViewById(R.id.emoji_image);
+            privacyText = itemView.findViewById(R.id.privacy_text);
         }
 
         /**
@@ -148,19 +146,19 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                     ? post.getLocation() : "Not Provided";
             locationText.setText(location);
             locationText.setTextColor(ContextCompat.getColor(itemView.getContext(),
-                    (post.getLocation() != null && !post.getLocation().isEmpty()) ? R.color.black : R.color.gray));
+                    (post.getLocation() != null && !post.getLocation().isEmpty()) ? android.R.color.black : R.color.gray));
 
             String social = (post.getSocialSituation() != null && !post.getSocialSituation().isEmpty())
                     ? post.getSocialSituation() : "Not Provided";
             withText.setText(social);
             withText.setTextColor(ContextCompat.getColor(itemView.getContext(),
-                    (post.getSocialSituation() != null && !post.getSocialSituation().isEmpty()) ? R.color.black : R.color.gray));
+                    (post.getSocialSituation() != null && !post.getSocialSituation().isEmpty()) ? android.R.color.black : R.color.gray));
 
             String explanation = (post.getExplanation() != null && !post.getExplanation().isEmpty())
                     ? post.getExplanation() : "Not Provided";
             reasonText.setText(explanation);
             reasonText.setTextColor(ContextCompat.getColor(itemView.getContext(),
-                    (post.getExplanation() != null && !post.getExplanation().isEmpty()) ? R.color.black : R.color.gray));
+                    (post.getExplanation() != null && !post.getExplanation().isEmpty()) ? android.R.color.black : R.color.gray));
 
             if (post.getTimestamp() != null) {
                 timeText.setText(TimeUtils.getTimeAgo(post.getTimestamp().toDate()));
@@ -175,6 +173,15 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
                         .into(moodImage);
             } else {
                 moodImage.setVisibility(View.GONE);
+            }
+
+            // Set privacy text indicator
+            if (post.isPublic()) {
+                privacyText.setText("Public");
+                privacyText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorPrimary));
+            } else {
+                privacyText.setText("Private");
+                privacyText.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.colorFear));
             }
 
             // Set emoji and text color based on the emotion.

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class EmotionPostController {
+    private static final String TAG = "EmotionPostController";
     private final EmotionPostRepository repository;
 
     /**
@@ -53,8 +54,8 @@ public class EmotionPostController {
      * @param onFailure callback for failure scenario
      */
     public void createPost(EmotionPost post,
-            OnSuccessListener<DocumentReference> onSuccess,
-            OnFailureListener onFailure) {
+                           OnSuccessListener<DocumentReference> onSuccess,
+                           OnFailureListener onFailure) {
         repository.saveEmotionPostToFirestore(post, onSuccess, onFailure);
     }
 
@@ -103,10 +104,10 @@ public class EmotionPostController {
      * @param onFailure callback for failure scenario
      */
     public void deleteEmotionPost(String postId,
-            Runnable onSuccess,
-            OnFailureListener onFailure) {
+                                  Runnable onSuccess,
+                                  OnFailureListener onFailure) {
         if (postId == null || postId.isEmpty()) {
-            Log.e("EmotionPostController", "Invalid post ID");
+            Log.e(TAG, "Invalid post ID");
             return;
         }
         repository.deleteEmotionPost(postId, onSuccess, onFailure);
@@ -121,11 +122,11 @@ public class EmotionPostController {
      * @param onFailure   callback for failure scenario
      */
     public void updateEmotionPost(String postId,
-            EmotionPost updatedPost,
-            Runnable onSuccess,
-            OnFailureListener onFailure) {
+                                  EmotionPost updatedPost,
+                                  Runnable onSuccess,
+                                  OnFailureListener onFailure) {
         if (postId == null || postId.isEmpty()) {
-            Log.e("EmotionPostController", "Invalid post ID");
+            Log.e(TAG, "Invalid post ID");
             return;
         }
 
@@ -145,7 +146,7 @@ public class EmotionPostController {
     }
 
     public void createPostWithOfflineSupport(Context context, EmotionPost post,
-            OnSuccessListener<DocumentReference> onSuccess, OnFailureListener onFailure) {
+                                             OnSuccessListener<DocumentReference> onSuccess, OnFailureListener onFailure) {
         OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
         NetworkMonitor networkMonitor = new NetworkMonitor(context);
 
@@ -158,7 +159,7 @@ public class EmotionPostController {
     }
 
     public void updateEmotionPostWithOfflineSupport(Context context, String postId, EmotionPost post,
-            Runnable onSuccess, OnFailureListener onFailure) {
+                                                    Runnable onSuccess, OnFailureListener onFailure) {
         try {
             OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
             NetworkMonitor networkMonitor = new NetworkMonitor(context);
@@ -172,6 +173,8 @@ public class EmotionPostController {
                 String imageUri = post.getImageUri() != null ? post.getImageUri() : null;
                 String location = post.getLocation() != null ? post.getLocation() : "";
                 String socialSituation = post.getSocialSituation();
+                boolean isPublic = post.isPublic();
+
                 if (socialSituation == null || socialSituation.isEmpty() ||
                         "Select social situation".equals(socialSituation)) {
                     socialSituation = null;
@@ -185,7 +188,8 @@ public class EmotionPostController {
                         imageUri,
                         location,
                         socialSituation,
-                        username);
+                        username,
+                        isPublic);
 
                 // Add timestamp and other metadata
                 if (post.getTimestamp() != null) {
@@ -198,7 +202,7 @@ public class EmotionPostController {
                 }
             }
         } catch (Exception e) {
-            Log.e("EmotionPostController", "Error in updateEmotionPostWithOfflineSupport: " + e.getMessage(), e);
+            Log.e(TAG, "Error in updateEmotionPostWithOfflineSupport: " + e.getMessage(), e);
             if (onFailure != null) {
                 onFailure.onFailure(e);
             }
@@ -206,8 +210,7 @@ public class EmotionPostController {
     }
 
     public void deleteEmotionPostWithOfflineSupport(Context context, String postId, EmotionPost post,
-            Runnable onSuccess, OnFailureListener onFailure) {
-        final String TAG = "EmotionPostController";
+                                                    Runnable onSuccess, OnFailureListener onFailure) {
         OfflineSyncManager syncManager = OfflineSyncManager.getInstance(context);
         NetworkMonitor networkMonitor = new NetworkMonitor(context);
 
@@ -234,6 +237,7 @@ public class EmotionPostController {
             }
         }
     }
+
     /**
      * Retrieves a Firestore Query for the current user's posts with optional emotion filters
      * and recent time filter.
@@ -255,15 +259,16 @@ public class EmotionPostController {
     }
 
     /**
-     * Retrieves a Firestore Query for posts from the user's friends with optional emotion filters
+     * Retrieves a Firestore Query for public posts from the user's friends with optional emotion filters
      * and recent time filter.
      *
      * @param friendUsernames list of usernames of the user's friends
      * @param emotions        a list of emotion strings to filter posts; if empty, no emotion filter is applied
      * @param filterRecent    if true, the query will be filtered to only include posts from the past week
-     * @return a Query object for retrieving the friends' filtered EmotionPosts
+     * @return a Query object for retrieving the friends' filtered public EmotionPosts
      */
     public Query getFriendsPostsWithFilter(List<String> friendUsernames, List<String> emotions, boolean filterRecent) {
+        // Use the updated repository method to get only public posts from friends
         Query query = repository.getFilteredFriendsPosts(friendUsernames, emotions);
 
         if (filterRecent) {

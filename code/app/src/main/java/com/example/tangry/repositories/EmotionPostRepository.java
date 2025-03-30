@@ -67,6 +67,7 @@ public class EmotionPostRepository {
         data.put("location", post.getLocation());
         data.put("socialSituation", post.getSocialSituation());
         data.put("username", post.getUsername());
+        data.put("isPublic", post.isPublic()); // Add the isPublic field
         data.put("timestamp", FieldValue.serverTimestamp());
         firebaseDataSource.saveData(data, successListener, failureListener);
     }
@@ -202,22 +203,29 @@ public class EmotionPostRepository {
     }
 
     /**
-     * Gets posts from a list of friends with optional emotion filtering.
+     * Gets public posts from a list of friends with optional emotion filtering.
+     * Only returns posts that are marked as public.
      *
      * @param friendUsernames list of friend usernames
      * @param emotions list of emotions to filter by (optional)
-     * @return a Query object for the filtered posts
+     * @return a Query object for the filtered public posts
      */
     public Query getFilteredFriendsPosts(List<String> friendUsernames, List<String> emotions) {
         if (friendUsernames == null || friendUsernames.isEmpty()) {
             // Return empty query if no friends exist.
             return firebaseDataSource.getCollectionReference().whereEqualTo("username", "NO_MATCHING_USERNAME");
         }
+
+        // Create base query filtering for friends and public posts
         Query query = firebaseDataSource.getCollectionReference()
-                .whereIn("username", friendUsernames);
+                .whereIn("username", friendUsernames)
+                .whereEqualTo("public", true);
+
+        // Add emotion filtering if specified
         if (emotions != null && !emotions.isEmpty()) {
             query = query.whereIn("emotion", emotions);
         }
+
         return query.orderBy("timestamp", Query.Direction.DESCENDING);
     }
 }

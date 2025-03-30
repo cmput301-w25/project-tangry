@@ -158,5 +158,16 @@
             android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_gallery" />
+
+        <!-- Added privacy indicator text below the image -->
+        <TextView
+            android:id="@+id/privacy_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="end"
+            android:text="Public"
+            android:textSize="12sp"
+            android:textStyle="italic" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
