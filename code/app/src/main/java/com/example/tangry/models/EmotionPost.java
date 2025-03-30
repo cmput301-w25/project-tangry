@@ -80,7 +80,7 @@ public class EmotionPost implements Serializable {
         if (emotion == null || emotion.trim().isEmpty()) {
             throw new IllegalArgumentException("Emotion is required.");
         }
-        if (explanation != null && (explanation.length() > 20 || explanation.split("\\s+").length > 3)) {
+        if (explanation != null && (explanation.length() > 200)) {
             throw new IllegalArgumentException("Explanation must be max 20 characters or 3 words.");
         }
         if ((explanation == null || explanation.isEmpty()) && (imageUri == null || imageUri.isEmpty())) {
