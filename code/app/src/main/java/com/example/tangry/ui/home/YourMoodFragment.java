@@ -1,12 +1,16 @@
 package com.example.tangry.ui.home;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -80,10 +84,30 @@ public class YourMoodFragment extends Fragment {
         ImageButton filterBtn = root.findViewById(R.id.btn_filter);
         filterBtn.setOnClickListener(v -> showFilterDialog());
 
+        // Setup search functionality
+        EditText searchInput = root.findViewById(R.id.search_input);
+        searchInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                performSearch(searchInput.getText().toString());
+                // Hide keyboard
+                InputMethodManager imm = (InputMethodManager) requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
+                return true;
+            }
+            return false;
+        });
+
         // Initial data load
         loadPosts();
 
         return root;
+    }
+
+    private void performSearch(String query) {
+        // Assuming your adapter has a filter method
+        if (adapter != null) {
+            adapter.getFilter().filter(query);
+        }
     }
 
     private void showFilterDialog() {
