@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -70,6 +71,7 @@ public class CreateEmotionPostFragment extends Fragment {
     private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
     private Button saveButton;
+    private CheckBox publicCheckbox;
     private String imageUri;
     private NavController navController;
 
@@ -104,6 +106,8 @@ public class CreateEmotionPostFragment extends Fragment {
         saveButton = view.findViewById(R.id.save_button);
         // New: initialize the current location button
         btnUseCurrentLocation = view.findViewById(R.id.btn_use_current_location);
+        // New: initialize the public checkbox
+        publicCheckbox = view.findViewById(R.id.public_checkbox);
 
         // Initialize controllers
         emotionPostController = new EmotionPostController();
@@ -352,9 +356,14 @@ public class CreateEmotionPostFragment extends Fragment {
             inputStream.close();
             outputStream.close();
             Uri localUri = Uri.fromFile(localImageFile);
+
+            // Get the public status from checkbox
+            boolean isPublic = publicCheckbox.isChecked();
+
             EmotionPost post = EmotionPost.create(emotion, explanation, localUri.toString(),
-                    location, socialSituation, username);
+                    location, socialSituation, username, isPublic);
             post.setOfflineImagePending(true);
+
             emotionPostController.createPostWithOfflineSupport(
                     getContext(),
                     post,
@@ -398,9 +407,14 @@ public class CreateEmotionPostFragment extends Fragment {
     private void createEmotionPost(String emotion, String explanation, String imageUrl,
                                    String location, String socialSituation, String username) {
         try {
+            // Get the public status from checkbox
+            boolean isPublic = publicCheckbox.isChecked();
+
             EmotionPost post = EmotionPost.create(emotion, explanation, imageUrl,
-                    location, socialSituation, username);
-            Log.d(TAG, "Saving mood event: " + post.toString());
+                    location, socialSituation, username, isPublic);
+
+            Log.d(TAG, "Saving mood event: " + post.toString() + ", public: " + isPublic);
+
             emotionPostController.createPostWithOfflineSupport(
                     getContext(),
                     post,

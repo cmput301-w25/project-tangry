@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -69,6 +70,7 @@ public class EditEmotionFragment extends Fragment {
     private Spinner socialSituationSpinner;
     private ImageView imageAttachment;
     private Button actionButton;
+    private CheckBox publicCheckbox;
 
     private static final int CAMERA_REQUEST = 2;
     private static final int CAMERA_PERMISSION_REQUEST = 100;
@@ -113,6 +115,7 @@ public class EditEmotionFragment extends Fragment {
         socialSituationSpinner = view.findViewById(R.id.social_situation_spinner);
         imageAttachment = view.findViewById(R.id.image_attachment);
         actionButton = view.findViewById(R.id.save_button);
+        publicCheckbox = view.findViewById(R.id.public_checkbox);
 
         // Populate Spinner with valid social situations
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
@@ -149,6 +152,7 @@ public class EditEmotionFragment extends Fragment {
         explanationInput.setText(updatedPost.getExplanation());
         locationInput.setText(updatedPost.getLocation());
         socialSituationSpinner.setSelection(getSpinnerIndex(socialSituationSpinner, updatedPost.getSocialSituation()));
+        publicCheckbox.setChecked(updatedPost.isPublic());
 
         if (updatedPost.getImageUri() != null) {
             imageUri = updatedPost.getImageUri();
@@ -184,6 +188,7 @@ public class EditEmotionFragment extends Fragment {
         String location = locationInput.getText().toString().trim();
         String socialSituation = socialSituationSpinner.getSelectedItem().toString();
         String emotion = emotionTextView.getText().toString();
+        boolean isPublic = publicCheckbox.isChecked();
 
         // Normalize social situation
         if ("Select social situation".equals(socialSituation)) {
@@ -202,6 +207,7 @@ public class EditEmotionFragment extends Fragment {
         updatedPost.setLocation(location);
         updatedPost.setSocialSituation(socialSituation);
         updatedPost.setEmotion(emotion);
+        updatedPost.setPublic(isPublic);
 
         // Check if we have a new image (from user selection) vs. existing image URI
         if (isNewImageSelected && imageUri != null && !imageUri.isEmpty()) {
@@ -424,13 +430,6 @@ public class EditEmotionFragment extends Fragment {
         cameraImageUri = ImageCaptureUtil.openCamera(this);
     }
 
-    /**
-     * Handles the result of the image picker intent.
-     *
-     * @param requestCode The request code.
-     * @param resultCode  The result code.
-     * @param data        The returned data containing the selected image URI.
-     */
     /**
      * Handles the result of the image picker or camera intent.
      *

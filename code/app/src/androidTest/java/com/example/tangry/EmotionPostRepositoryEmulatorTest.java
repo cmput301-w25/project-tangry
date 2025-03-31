@@ -70,7 +70,8 @@ public class EmotionPostRepositoryEmulatorTest {
                 null,
                 "Test location",
                 "Alone",
-                "testUser");
+                "testUser",
+                true);
 
         // Create latch for async operations
         final CountDownLatch latch = new CountDownLatch(1);
@@ -158,7 +159,9 @@ public class EmotionPostRepositoryEmulatorTest {
                 null,
                 "Office",
                 "With a crowd",
-                "testUser");
+                "testUser",
+                true
+        );
 
         // Save directly to Firestore
         DocumentReference docRef = Tasks.await(
@@ -230,7 +233,8 @@ public class EmotionPostRepositoryEmulatorTest {
                 null,
                 "Home",
                 "Alone",
-                "testUser");
+                "testUser",
+                true);
 
         // Save directly to Firestore
         DocumentReference docRef = Tasks.await(
@@ -368,7 +372,8 @@ public class EmotionPostRepositoryEmulatorTest {
                 null,
                 "Test",
                 "Alone",
-                "testUser");
+                "testUser",
+                true);
 
         // Create a map with the post data and explicit timestamp
         java.util.Map<String, Object> data = new java.util.HashMap<>();
@@ -397,7 +402,8 @@ public class EmotionPostRepositoryEmulatorTest {
                 "image_uri", // Has image
                 "", // Empty location (optional)
                 "Select social situation", // Default social situation
-                "testUser" // Required field
+                "testUser", // Required field
+                true
         );
 
         // Create latch for async operations
@@ -508,7 +514,8 @@ public class EmotionPostRepositoryEmulatorTest {
                     null,
                     "Location",
                     situation,
-                    "testUser");
+                    "testUser",
+                    true);
 
             final CountDownLatch latch = new CountDownLatch(1);
             final AtomicReference<DocumentReference> resultRef = new AtomicReference<>();
@@ -628,7 +635,8 @@ public class EmotionPostRepositoryEmulatorTest {
                     null,
                     "Location " + i,
                     "Alone",
-                    "testUser");
+                    "testUser",
+                    true);
 
             DocumentReference docRef = Tasks.await(
                     db.collection("emotions").add(post),
@@ -737,7 +745,8 @@ public class EmotionPostRepositoryEmulatorTest {
                 null,
                 "Home",
                 "Alone",
-                "testUser");
+                "testUser",
+                true);
 
         DocumentReference docRef = Tasks.await(
                 db.collection("emotions").add(post),
