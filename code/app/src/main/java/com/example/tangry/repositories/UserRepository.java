@@ -32,6 +32,11 @@ public class UserRepository {
         firebaseDataSource = new FirebaseDataSource(COLLECTION_NAME);
     }
 
+    public UserRepository(FirebaseFirestore db, String collectionName) {
+        this.firebaseDataSource = new FirebaseDataSource(db, collectionName);
+    }
+
+
     /**
      * Returns the singleton instance of UserRepository.
      *
