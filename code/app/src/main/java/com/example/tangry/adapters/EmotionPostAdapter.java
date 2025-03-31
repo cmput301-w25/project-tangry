@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -21,8 +23,9 @@ import java.util.List;
 
 /**
  * Adapter class for displaying EmotionPost objects in a RecyclerView.
+ * Implements Filterable to support searching.
  */
-public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.PostViewHolder> {
+public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.PostViewHolder> implements Filterable {
 
     /**
      * Callback interface for handling click events on EmotionPost items.
@@ -38,6 +41,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     }
 
     private List<EmotionPost> posts;
+    private List<EmotionPost> allPosts; // Store the original list for filtering
     private OnItemClickListener listener;
 
     /**
@@ -48,6 +52,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
      */
     public EmotionPostAdapter(List<EmotionPost> posts, OnItemClickListener listener) {
         this.posts = (posts != null) ? posts : new ArrayList<>();
+        this.allPosts = new ArrayList<>(this.posts); // Initialize allPosts
         this.listener = listener;
     }
 
@@ -58,6 +63,7 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
      */
     public void setPosts(List<EmotionPost> posts) {
         this.posts = (posts != null) ? posts : new ArrayList<>();
+        this.allPosts = new ArrayList<>(this.posts); // Keep a copy of all posts for filtering
         notifyDataSetChanged();
     }
 
@@ -101,6 +107,49 @@ public class EmotionPostAdapter extends RecyclerView.Adapter<EmotionPostAdapter.
     @Override
     public int getItemCount() {
         return (posts != null) ? posts.size() : 0;
+    }
+
+    /**
+     * Returns a filter that can be used to constrain data with a filtering pattern.
+     *
+     * @return a filter for this adapter
+     */
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<EmotionPost> filteredList = new ArrayList<>();
+
+                if (constraint == null || constraint.length() == 0) {
+                    filteredList.addAll(allPosts);
+                } else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+
+                    for (EmotionPost post : allPosts) {
+                        // Filter criteria - check emotion type, explanation, location, social situation
+                        if ((post.getEmotion() != null && post.getEmotion().toLowerCase().contains(filterPattern)) ||
+                                (post.getExplanation() != null && post.getExplanation().toLowerCase().contains(filterPattern)) ||
+                                (post.getLocation() != null && post.getLocation().toLowerCase().contains(filterPattern)) ||
+                                (post.getSocialSituation() != null && post.getSocialSituation().toLowerCase().contains(filterPattern)) ||
+                                (post.getUsername() != null && post.getUsername().toLowerCase().contains(filterPattern))) {
+                            filteredList.add(post);
+                        }
+                    }
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = filteredList;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                posts.clear();
+                posts.addAll((List<EmotionPost>) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
     /**
