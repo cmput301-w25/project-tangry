@@ -2,7 +2,7 @@
     <string name="app_name">tangry</string>
     <string name="title_home">Home</string>
     <string name="title_map">Map</string>
-    <string name="title_add_user">Add User</string>
+    <string name="title_add_user">Search User</string>
     <string name="title_friends">Friends</string>
     <string name="emotion_icon">Emotion icon</string>
     <string name="add_mood">Add Mood</string>
