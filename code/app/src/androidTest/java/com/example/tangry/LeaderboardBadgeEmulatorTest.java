@@ -81,18 +81,16 @@ public class LeaderboardBadgeEmulatorTest {
 
     /**
      * Helper method to create a test user using the UserRepository.
-     * It generates a random email suffix for uniqueness and appends it to the username.
+     * It generates a random email suffix for uniqueness and appends it to the base username.
      *
      * @param baseUsername the base username desired
-     * @return a TestUser object containing the DocumentReference and the unique username
+     * @return a TestUser object containing the DocumentReference and the unique username.
      */
     private TestUser createTestUser(String baseUsername) throws InterruptedException, ExecutionException, TimeoutException {
         String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
         String email = baseUsername + randomSuffix + "@example.com";
         String uniqueUsername = baseUsername.concat(randomSuffix);
 
-        // Optionally, you can prepare a userData map if your repository needs it.
-        // Here we assume saveUsernameToFirestore writes the proper document.
         CountDownLatch latch = new CountDownLatch(1);
         AtomicReference<DocumentReference> docRef = new AtomicReference<>();
         userRepository.saveUsernameToFirestore(uniqueUsername, email,
@@ -113,16 +111,13 @@ public class LeaderboardBadgeEmulatorTest {
         return testUser;
     }
 
-    /**
-     * Test: Create a user via the repository, then simulate 3 emotion post submissions
-     * to update postCount and award a gold badge.
-     */
     @Test
     public void testGoldBadgeAwardViaPostSubmissions() throws InterruptedException, ExecutionException, TimeoutException {
         TestUser testUser = createTestUser("badgeTestUser");
         DocumentReference userDoc = testUser.docRef;
         String uniqueUsername = testUser.uniqueUsername;
 
+        // Create 3 posts using the unique username.
         for (int i = 1; i <= 3; i++) {
             EmotionPost post = EmotionPost.create(
                     "Happiness",
@@ -174,10 +169,6 @@ public class LeaderboardBadgeEmulatorTest {
         assertEquals("Gold badge count should be 1", 1L, snapshot.getLong("badges.goldBadges").longValue());
     }
 
-    /**
-     * Test: Create a user via the repository and simulate 3 post operations,
-     * ensuring the gold badge is awarded once.
-     */
     @Test
     public void testGoldBadgeAwardAfterThreePosts() throws InterruptedException, ExecutionException, TimeoutException {
         TestUser testUser = createTestUser("testUser1");
@@ -212,10 +203,6 @@ public class LeaderboardBadgeEmulatorTest {
         assertEquals("Gold badge count should be 1 after 3 posts", 1L, snapshot.getLong("badges.goldBadges").longValue());
     }
 
-    /**
-     * Test: Create a user via the repository and simulate 6 post operations,
-     * ensuring the gold badge is awarded twice.
-     */
     @Test
     public void testGoldBadgeAwardAfterSixPosts() throws InterruptedException, ExecutionException, TimeoutException {
         TestUser testUser = createTestUser("testUser2");
@@ -250,18 +237,16 @@ public class LeaderboardBadgeEmulatorTest {
         assertEquals("Gold badge count should be 2 after 6 posts", 2L, snapshot.getLong("badges.goldBadges").longValue());
     }
 
-    /**
-     * Test: Simulate adding daily badge dates.
-     * Uses the nested field "badges.dailyBadgeDates" and verifies unique addition.
-     */
     @Test
     public void testDailyBadgeCount() throws InterruptedException, ExecutionException, TimeoutException {
         TestUser testUser = createTestUser("testUser3");
         DocumentReference userDoc = testUser.docRef;
 
+        // Use a single Date instance so that arrayUnion adds only one unique value.
+        Date now = new Date();
         for (int i = 0; i < 3; i++) {
             CountDownLatch updateLatch = new CountDownLatch(1);
-            userDoc.update("badges.dailyBadgeDates", FieldValue.arrayUnion(new Date()))
+            userDoc.update("badges.dailyBadgeDates", FieldValue.arrayUnion(now))
                     .addOnCompleteListener(task -> updateLatch.countDown());
             updateLatch.await();
         }
@@ -281,33 +266,26 @@ public class LeaderboardBadgeEmulatorTest {
         assertNotNull("Snapshot should not be null", snapshot);
         List<?> dailyBadgeDates = (List<?>) snapshot.get("badges.dailyBadgeDates");
         assertNotNull("badges.dailyBadgeDates field should not be null", dailyBadgeDates);
-        // With arrayUnion, if Date objects are equal then only one unique entry is stored.
         assertEquals("Daily badge count should equal the number of unique dates", 1, dailyBadgeDates.size());
     }
 
-    /**
-     * Test: Verify that the leaderboard query orders users correctly based on karma.
-     * Here, we create test users via the repository and then update their Firestore documents
-     * with the desired values.
-     */
     @Test
     public void testLeaderboardOrdering() throws InterruptedException, ExecutionException, TimeoutException {
-        // Create three test users.
-        TestUser user1 = createTestUser("user1");
-        TestUser user2 = createTestUser("user2");
-        TestUser user3 = createTestUser("user3");
+        // Create three test users with fixed usernames for predictable ordering.
+        DocumentReference userDoc1 = createTestUserForOrdering("user1");
+        DocumentReference userDoc2 = createTestUserForOrdering("user2");
+        DocumentReference userDoc3 = createTestUserForOrdering("user3");
 
         // Update each user with desired karma and badge values.
         CountDownLatch updateLatch = new CountDownLatch(3);
-        user1.docRef.update("karma", 50, "badges.goldBadges", 2, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
+        userDoc1.update("karma", 50, "badges.goldBadges", 2, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
-        user2.docRef.update("karma", 60, "badges.goldBadges", 1, "badges.silverBadges", 2, "badges.dailyBadgeDates", new ArrayList<Date>())
+        userDoc2.update("karma", 60, "badges.goldBadges", 1, "badges.silverBadges", 2, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
-        user3.docRef.update("karma", 55, "badges.goldBadges", 1, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
+        userDoc3.update("karma", 55, "badges.goldBadges", 1, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
         updateLatch.await();
 
-        // Query users ordered by karma descending.
         CountDownLatch queryLatch = new CountDownLatch(1);
         AtomicReference<QuerySnapshot> querySnapshotRef = new AtomicReference<>();
         db.collection("users").orderBy("karma", Query.Direction.DESCENDING).limit(10)
@@ -330,5 +308,27 @@ public class LeaderboardBadgeEmulatorTest {
         assertEquals("user2", docs.get(0).getString("username"));
         assertEquals("user3", docs.get(1).getString("username"));
         assertEquals("user1", docs.get(2).getString("username"));
+    }
+
+    /**
+     * Helper method to create a test user with fixed username (for leaderboard ordering).
+     *
+     * @param username the username to set exactly
+     * @return the DocumentReference for the created user.
+     */
+    private DocumentReference createTestUserForOrdering(String username) throws InterruptedException, ExecutionException, TimeoutException {
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("username", username);
+        userData.put("email", username + "@example.com");
+        userData.put("karma", 0);
+        userData.put("badges.goldBadges", 0);
+        userData.put("badges.silverBadges", 0);
+        userData.put("badges.dailyBadgeDates", new ArrayList<Date>());
+        userData.put("postCount", 0);
+        userData.put("commentCount", 0);
+        DocumentReference ref = Tasks.await(db.collection("users").add(userData), 5, TimeUnit.SECONDS);
+        assertNotNull(ref);
+        testUserDocIds.add(ref.getId());
+        return ref;
     }
 }
