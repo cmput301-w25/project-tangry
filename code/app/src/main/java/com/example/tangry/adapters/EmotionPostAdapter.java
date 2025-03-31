@@ -1,3 +1,18 @@
+/**
+ * EmotionPostAdapter.java
+ * 
+ * This file contains the adapter implementation for displaying emotion posts in the Tangry application.
+ * It converts EmotionPost objects into view items for display in a RecyclerView, handling the 
+ * visual representation of different emotion types with appropriate colors and icons.
+ * 
+ * Key features:
+ * - Implements Filterable to support searching/filtering posts by content
+ * - Dynamic visual styling based on emotion type (colors, icons)
+ * - Handles image loading via Glide for post attachments
+ * - Displays formatted timestamps, location data, and social context
+ * - Indicates privacy status of posts
+ * - Supports click interactions through callback interface
+ */
 package com.example.tangry.adapters;
 
 import android.net.Uri;

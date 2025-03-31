@@ -1,5 +1,13 @@
 package com.example.tangry.ui.home;
 
+/**
+ * HomeFragment.java
+ * 
+ * Main home screen fragment that hosts a TabLayout with ViewPager2.
+ * Contains tabs for "Your Mood" and "Friend Moods" to navigate between
+ * the user's own posts and their friends' posts.
+ */
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

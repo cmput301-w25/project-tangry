@@ -1,5 +1,12 @@
 package com.example.tangry.ui.home;
 
+/**
+ * Fragment for creating a new emotion post.
+ * Allows users to enter explanation text, location (with geocoding suggestions),
+ * select a social situation, attach images from camera or gallery, and set privacy.
+ * Supports offline creation with synchronization when network is available.
+ */
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;

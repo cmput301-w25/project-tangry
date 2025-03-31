@@ -1,3 +1,21 @@
+/**
+ * EmotionPost.java
+ * 
+ * This file contains the model class for representing user emotion posts in the Tangry application.
+ * The EmotionPost model is the core data structure for storing and managing users' emotional expressions,
+ * including their associated metadata and validation rules.
+ * 
+ * Key features:
+ * - Stores user emotion data with explanations, images, and contextual information
+ * - Implements validation logic for emotion types and post requirements
+ * - Supports location tagging and social situation classification
+ * - Handles both online and offline image storage scenarios
+ * - Maintains privacy settings (public/private) for each post
+ * - Includes comment functionality for social interaction
+ * - Implements Serializable for data transfer between components
+ * - Compatible with Firestore serialization/deserialization
+ * - Provides a factory method pattern for valid object creation
+ */
 package com.example.tangry.models;
 
 import android.util.Log;

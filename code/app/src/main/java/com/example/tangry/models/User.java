@@ -1,3 +1,18 @@
+/**
+ * User.java
+ * 
+ * This file contains the model class for representing user profiles in the Tangry application.
+ * The User model stores identification information and tracks gamification elements such as
+ * karma points and achievement badges.
+ * 
+ * Key features:
+ * - Stores basic user identification (username)
+ * - Tracks karma points for user reputation and engagement
+ * - Maintains counts of different badge types (gold, silver, daily)
+ * - Supports the leaderboard and achievement system
+ * - Provides a simple data structure for user representation
+ * - Used in user profile displays and comparative rankings
+ */
 package com.example.tangry.models;
 
 public class User {

@@ -1,4 +1,11 @@
 package com.example.tangry.ui.profile.personal;
+/**
+ * PersonalProfileFragment.java
+ * 
+ * Fragment for displaying the current user's profile information.
+ * Shows user details, stats (karma, badges), and provides options to view follow requests
+ * and sign out. Fetches user data from Firebase and displays it in the UI.
+ */
 
 import android.os.Bundle;
 import android.util.Log;

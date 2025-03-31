@@ -1,3 +1,18 @@
+/**
+ * UserController.java
+ * 
+ * This file contains the controller implementation for managing user-related operations in the Tangry
+ * application. It handles user data, statistics, and achievement tracking.
+ * 
+ * Key features:
+ * - Manages user identification and lookup (username, email relations)
+ * - Tracks and updates user karma points
+ * - Provides access to leaderboard data for ranking users
+ * - Handles badge awards based on user activities (posts, comments, daily login)
+ * - Maintains user statistics through the repository layer
+ * - Supports retrieving user information by both email and username
+ * - Implements achievement logic for gamification features
+ */
 package com.example.tangry.controllers;
 
 import com.example.tangry.models.UserStats;

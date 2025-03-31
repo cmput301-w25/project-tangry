@@ -1,3 +1,21 @@
+/**
+ * EmotionPostRepository.java
+ * 
+ * This file contains the repository implementation for managing emotion posts in the Tangry application.
+ * It provides a comprehensive data access layer for creating, retrieving, updating, and deleting
+ * EmotionPost objects in the Firebase Firestore database.
+ * 
+ * Key features:
+ * - Implements singleton pattern for application-wide access to post data
+ * - Provides CRUD operations for EmotionPost objects with callback support
+ * - Supports filtering posts by emotion types, usernames, and privacy settings
+ * - Enables comment functionality on emotion posts
+ * - Implements friend-specific post retrieval with privacy controls
+ * - Supports limiting the number of posts per friend in feeds (3 most recent)
+ * - Handles post synchronization between local models and remote database
+ * - Encapsulates all Firestore-specific operations behind a clean API
+ * - Enables testability through dependency injection
+ */
 package com.example.tangry.repositories;
 
 import android.util.Log;

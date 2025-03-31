@@ -1,5 +1,14 @@
 package com.example.tangry.ui.add_user;
 
+/**
+ * AddUserFragment.java
+ * 
+ * Fragment for searching and adding other users.
+ * Provides a search interface that finds users by username,
+ * displays results in a RecyclerView, and allows sending follow
+ * requests or viewing user profiles.
+ */
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
