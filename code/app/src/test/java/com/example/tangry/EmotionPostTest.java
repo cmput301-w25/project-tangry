@@ -31,7 +31,6 @@ public class EmotionPostTest {
 
     @Test
     public void testCreateWithImageNoText() {
-        // Valid case: no explanation but has image
         EmotionPost post = EmotionPost.create(
                 "Happiness", // emotion
                 "", // explanation - empty but valid because we have image

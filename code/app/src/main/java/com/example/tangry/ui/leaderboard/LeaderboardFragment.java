@@ -92,8 +92,6 @@ public class LeaderboardFragment extends Fragment {
                     users.add(user);
                 }
             }
-
-            // Update the adapter with the new user list
             adapter.updateUsers(users);
         });
     }

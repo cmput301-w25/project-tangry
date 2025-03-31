@@ -166,10 +166,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_detail_emotion.xml" afterDir="false" />
-    </list>
+    <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -178,7 +175,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\leneu\.android\avd\Medium_Phone.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\Carlos\.android\avd\Pixel_9_Pro_XL_API_35.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -266,53 +263,53 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Android App.app.executor": "Run",
-    "Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor": "Run",
-    "Android Instrumented Tests.FollowRequestTest.executor": "Run",
-    "Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor": "Run",
-    "Android Instrumented Tests.OfflineSyncManagerEmulatorTest.executor": "Run",
-    "Android Instrumented Tests.Tests in 'com.example.tangry'.executor": "Run",
-    "Android Instrumented Tests.UserCreateTest.executor": "Run",
-    "Android Instrumented Tests.UserInterfaceTest.executor": "Run",
-    "Android Instrumented Tests.UserLoginTest.executor": "Run",
-    "Android Instrumented Tests.testInvalidEmotionValues().executor": "Run",
-    "Android Instrumented Tests.testMultipleOfflineOperationsThenSync().executor": "Run",
-    "Android Instrumented Tests.testOfflineCreateThenSync().executor": "Run",
-    "Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor": "Run",
-    "Android Instrumented Tests.testSuccessfulUserCreation().executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.testGetEmotionPostWhenNotExists.executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.testSaveEmotionPostToFirestore.executor": "Run",
-    "Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor": "Debug",
-    "Gradle.OfflineSyncManagerEmulatorTest.executor": "Run",
-    "Gradle.OfflineSyncManagerIntegrationTest.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testAddPendingCreate_NotifiesListener.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testAddPendingDelete_NotifiesListener.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testAddPendingUpdate_NotifiesListener.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testHasPendingOperations_ReturnsFalseWhenNoOperations.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testHasPendingOperations_ReturnsTrueWhenOperationsExist.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testMultipleOperations_ProcessedInOrder.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testNetworkAvailable_TriggersSync.executor": "Run",
-    "Gradle.OfflineSyncManagerTest.testSyncPendingOperations_WithNetwork_SyncsOperations.executor": "Run",
-    "ResourceManagerPrefKey.ModuleName": "tangry.app.main",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "com.google.services.firebase.aqiPopupShown": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "liambranch1",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Carlos/AndroidStudioProjects/tangry-official/project-tangry/code",
-    "settings.editor.selected.configurable": "editor.preferences.tabs",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Android App.app.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.EmotionPostRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.FollowRequestTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.ImageStorageRepositoryEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.OfflineSyncManagerEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.Tests in 'com.example.tangry'.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.UserCreateTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.UserInterfaceTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.UserLoginTest.executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testInvalidEmotionValues().executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testMultipleOfflineOperationsThenSync().executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testOfflineCreateThenSync().executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testSavePostWithAllSocialSituationValues().executor&quot;: &quot;Run&quot;,
+    &quot;Android Instrumented Tests.testSuccessfulUserCreation().executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.testGetEmotionPostWhenNotExists.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.testSaveEmotionPostToFirestore.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EmotionPostRepositoryTest.testUpdateEmotionPostFailure.executor&quot;: &quot;Debug&quot;,
+    &quot;Gradle.OfflineSyncManagerEmulatorTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerIntegrationTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testAddPendingCreate_NotifiesListener.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testAddPendingDelete_NotifiesListener.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testAddPendingUpdate_NotifiesListener.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testHasPendingOperations_ReturnsFalseWhenNoOperations.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testHasPendingOperations_ReturnsTrueWhenOperationsExist.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testMultipleOperations_ProcessedInOrder.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testNetworkAvailable_TriggersSync.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.OfflineSyncManagerTest.testSyncPendingOperations_WithNetwork_SyncsOperations.executor&quot;: &quot;Run&quot;,
+    &quot;ResourceManagerPrefKey.ModuleName&quot;: &quot;tangry.app.main&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Carlos/AndroidStudioProjects/tangry-official/project-tangry/code&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.example.tangry.utils" />
@@ -337,6 +334,7 @@
       <option name="MODE" value="default_activity" />
       <option name="RESTORE_ENABLED" value="false" />
       <option name="RESTORE_FILE" value="" />
+      <option name="RESTORE_FRESH_INSTALL_ONLY" value="false" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
       <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
