@@ -7,9 +7,9 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
+
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -18,22 +18,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
-
 import com.example.tangry.R;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.Emotion;
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.models.EmotionProvider;
 import com.example.tangry.repositories.EmotionPostRepository;
+import com.example.tangry.repositories.UserRepository;
 import com.example.tangry.utils.GeocoderUtility;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-
 import org.osmdroid.config.Configuration;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -45,10 +43,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.CustomZoomButtonsController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.ScaleBarOverlay;
+
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +81,7 @@ public class MapFragment extends Fragment {
 
         // Set the tile source
         OnlineTileSourceBase tileSource = new XYTileSource("CartoDB Voyager",
-                0, 20, 256, ".png", new String[]{"https://basemaps.cartocdn.com/rastertiles/voyager/"});
+                0, 20, 256, ".png", new String[] {"https://basemaps.cartocdn.com/rastertiles/voyager/"});
         mapView.setTileSource(tileSource);
         mapView.getController().setZoom(DEFAULT_ZOOM);
 
@@ -95,6 +92,7 @@ public class MapFragment extends Fragment {
             btnZoomIn.setOnClickListener(v -> mapView.getController().zoomIn());
             btnZoomOut.setOnClickListener(v -> mapView.getController().zoomOut());
         }
+
 
 
         // Optional: set a MapListener (if needed)
@@ -165,109 +163,183 @@ public class MapFragment extends Fragment {
     }
 
     /**
-     * Loads posts from the current user and followed users,
+     * Loads posts from the current user and friends (public posts only),
      * geocodes their location strings, and adds custom emoji markers to the map.
      */
     private void loadFollowedMoodEventPins() {
-        // Replace these stub methods with your actual implementations.
-        List<String> followedUsers = getFollowedUsernames();
-        String currentUsername = getCurrentUsername();
-
-        // Query posts (no emotion filter used here)
-        Query query = repository.getFilteredPostsQuery(new ArrayList<>());
-        query.get().addOnSuccessListener(querySnapshot -> {
-            Map<String, EmotionPost> latestEventPerUser = new HashMap<>();
-            GeoPoint currentLocation = myLocationOverlay.getMyLocation();
-            if (currentLocation == null ||
-                    currentLocation.getLatitude() < 53.4 ||
-                    currentLocation.getLatitude() > 53.7) {
-                currentLocation = FALLBACK_LOCATION;
-            }
-            Log.d(TAG, "Filtering posts using location: " +
-                    currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
-
-            // Loop through posts and filter by user and distance
-            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                EmotionPost post = document.toObject(EmotionPost.class);
-                if (post != null && post.getLocation() != null && !post.getLocation().trim().isEmpty()) {
-                    String username = post.getUsername();
-                    // Only include posts from the current user or followed users.
-                    if (!username.equals(currentUsername) && !followedUsers.contains(username)) {
-                        Log.d(TAG, "Skipping post from " + username + " (not current user or followed).");
-                        continue;
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null || currentUser.getEmail() == null) {
+            Log.d(TAG, "No current user available.");
+            return;
+        }
+        String currentUserEmail = currentUser.getEmail();
+        // Retrieve friends list asynchronously from UserRepository.
+        UserRepository.getInstance().getFriendsList(currentUserEmail,
+                friendsList -> {
+                    // Combine friends with the current user's username.
+                    List<String> validUsers = new ArrayList<>(friendsList);
+                    String currentUsername = getCurrentUsername();
+                    if (currentUsername != null && !currentUsername.equalsIgnoreCase("unknown")) {
+                        validUsers.add(currentUsername);
                     }
-                    // Geocode the post location.
-                    GeoPoint eventPoint = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
-                    if (eventPoint == null) {
-                        Log.d(TAG, "Geocoder returned null for location: " + post.getLocation() +
-                                " for post by " + username + ". Skipping marker.");
-                        continue;
-                    }
-                    // For followed users, check distance.
-                    if (!username.equals(currentUsername)) {
-                        double distance = distanceInKm(currentLocation, eventPoint);
-                        Log.d(TAG, "Post from " + username + " is " + distance + " km away.");
-                        if (distance > 5.0) {
-                            Log.d(TAG, "Skipping post from " + username + " (distance " + distance + " km > 5 km)");
-                            continue;
+                    // Query posts (no emotion filter used here)
+                    Query query = repository.getFilteredPostsQuery(new ArrayList<>());
+                    query.get().addOnSuccessListener(querySnapshot -> {
+                        Map<String, EmotionPost> latestEventPerUser = new HashMap<>();
+                        GeoPoint currentLocation = myLocationOverlay.getMyLocation();
+                        if (currentLocation == null ||
+                                currentLocation.getLatitude() < 53.4 ||
+                                currentLocation.getLatitude() > 53.7) {
+                            currentLocation = FALLBACK_LOCATION;
                         }
-                    }
-                    // Add the first (latest) post per user.
-                    if (!latestEventPerUser.containsKey(username)) {
-                        latestEventPerUser.put(username, post);
-                        Log.d(TAG, "Added post from " + username);
-                    }
-                }
-            }
+                        Log.d(TAG, "Filtering posts using location: " +
+                                currentLocation.getLatitude() + ", " + currentLocation.getLongitude());
 
-            // If no qualifying posts, add a dummy marker.
-            if (latestEventPerUser.isEmpty()) {
-                Log.d(TAG, "No qualifying posts found; adding dummy marker at fallback.");
-                Marker dummyMarker = new Marker(mapView);
-                dummyMarker.setPosition(FALLBACK_LOCATION);
-                dummyMarker.setTitle("No Posts Found");
-                mapView.getOverlays().add(dummyMarker);
-            } else {
-                // Create markers for each qualifying post.
-                for (EmotionPost post : latestEventPerUser.values()) {
-                    GeoPoint point = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
-                    if (point == null) {
-                        Log.d(TAG, "Geocoder returned null for post from " + post.getUsername() + ". Skipping marker.");
-                        continue;
-                    }
-                    Marker marker = new Marker(mapView);
-                    marker.setPosition(point);
-                    int emojiResId = getIconForEmotion(post.getEmotion());
-                    int emotionColor = getColorForEmotion(post.getEmotion());
-                    // Use the custom marker method that inflates a custom layout
-                    Drawable customMarker = createCustomMarker(post, emojiResId, emotionColor);
-                    marker.setIcon(customMarker);
-                    marker.setTitle(post.getUsername());
-                    marker.setOnMarkerClickListener((m, mapView) -> {
-                        showPostDetails(post);
-                        return true;
-                    });
-                    Log.d(TAG, "Adding marker for " + post.getUsername() + " at " +
-                            point.getLatitude() + ", " + point.getLongitude());
-                    mapView.getOverlays().add(marker);
+                        // Loop through posts and filter by valid user and distance.
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            EmotionPost post = document.toObject(EmotionPost.class);
+                            if (post != null && post.getLocation() != null && !post.getLocation().trim().isEmpty()) {
+                                String username = post.getUsername();
+                                if (username == null) {
+                                    Log.d(TAG, "Skipping post with null username.");
+                                    continue;
+                                }
+                                if (!validUsers.contains(username)) {
+                                    Log.d(TAG, "Skipping post from " + username + " (not current user or friend).");
+                                    continue;
+                                }
+                                // Geocode the post location.
+                                GeoPoint eventPoint = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
+                                if (eventPoint == null) {
+                                    Log.d(TAG, "Geocoder returned null for location: " + post.getLocation() +
+                                            " for post by " + username + ". Skipping marker.");
+                                    continue;
+                                }
+                                // For friend posts (not current user), check distance.
+                                if (!username.equals(currentUsername)) {
+                                    double distance = distanceInKm(currentLocation, eventPoint);
+                                    Log.d(TAG, "Post from " + username + " is " + distance + " km away.");
+                                    if (distance > 5.0) {
+                                        Log.d(TAG, "Skipping post from " + username + " (distance " + distance + " km > 5 km)");
+                                        continue;
+                                    }
+                                }
+                                // Only add the first (latest) post per user.
+                                if (!latestEventPerUser.containsKey(username)) {
+                                    latestEventPerUser.put(username, post);
+                                    Log.d(TAG, "Added post from " + username);
+                                }
+                            }
+                        }
+
+                        // If no qualifying posts, add a dummy marker.
+                        if (latestEventPerUser.isEmpty()) {
+                            Log.d(TAG, "No qualifying posts found; adding dummy marker at fallback.");
+                            Marker dummyMarker = new Marker(mapView);
+                            dummyMarker.setPosition(FALLBACK_LOCATION);
+                            dummyMarker.setTitle("No Posts Found");
+                            mapView.getOverlays().add(dummyMarker);
+                        } else {
+                            // Create markers for each qualifying post using our custom marker view.
+                            for (EmotionPost post : latestEventPerUser.values()) {
+                                GeoPoint point = GeocoderUtility.getGeoPointFromAddress(getContext(), post.getLocation());
+                                if (point == null) {
+                                    Log.d(TAG, "Geocoder returned null for post from " + post.getUsername() + ". Skipping marker.");
+                                    continue;
+                                }
+                                Marker marker = createCustomMarker(post, point);
+                                mapView.getOverlays().add(marker);
+                            }
+                        }
+                        mapView.invalidate();
+                    }).addOnFailureListener(e ->
+                            Toast.makeText(getContext(), "Failed to load posts: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                    );
+                },
+                e -> {
+                    Log.e(TAG, "Error loading friends list", e);
+                    Toast.makeText(getContext(), "Error loading friends list.", Toast.LENGTH_SHORT).show();
                 }
-            }
-            mapView.invalidate();
-        }).addOnFailureListener(e ->
-                Toast.makeText(getContext(), "Failed to load posts: " + e.getMessage(), Toast.LENGTH_SHORT).show()
         );
     }
 
-    // Stub: Replace with your actual implementation to return followed usernames.
-    private List<String> getFollowedUsernames() {
-        List<String> followed = new ArrayList<>();
-        // Example: add followed usernames (update as needed)
-        followed.add("user1");
-        followed.add("user2");
-        return followed;
+    /**
+     * Creates a custom marker for a given post and location.
+     * This method inflates the custom layout (marker_custom.xml) which contains:
+     * - An ImageView for the pin (with a tintable background)
+     * - An ImageView for the emoji
+     * - A TextView for the username (displayed below)
+     *
+     * @param post  the EmotionPost object (for username and emotion)
+     * @param point the GeoPoint where the marker should be placed
+     * @return a Marker with the custom icon
+     */
+    private Marker createCustomMarker(EmotionPost post, GeoPoint point) {
+        Marker marker = new Marker(mapView);
+        marker.setPosition(point);
+
+        // Inflate the custom marker layout.
+        View markerView = LayoutInflater.from(getContext()).inflate(R.layout.marker_custom, null);
+
+        // Set the username text.
+        android.widget.TextView usernameText = markerView.findViewById(R.id.marker_username);
+        if (usernameText != null) {
+            usernameText.setText(post.getUsername());
+        } else {
+            Log.e(TAG, "Marker layout missing TextView with ID marker_username!");
+        }
+
+        // Set the emoji image.
+        android.widget.ImageView emojiImage = markerView.findViewById(R.id.marker_emoji);
+        if (emojiImage != null) {
+            int emojiResId = getIconForEmotion(post.getEmotion());
+            emojiImage.setImageResource(emojiResId);
+        } else {
+            Log.e(TAG, "Marker layout missing ImageView with ID marker_emoji!");
+        }
+
+        // Set the pin background image and tint.
+        android.widget.ImageView pinImage = markerView.findViewById(R.id.marker_pin);
+        if (pinImage != null) {
+            int emotionColor = getColorForEmotion(post.getEmotion());
+            // Assume marker_pin drawable is the base shape – tint it.
+            pinImage.setColorFilter(emotionColor);
+        } else {
+            Log.e(TAG, "Marker layout missing ImageView with ID marker_pin!");
+        }
+
+        // Convert the custom view to a bitmap.
+        Bitmap markerBitmap = createBitmapFromView(markerView);
+        marker.setIcon(new BitmapDrawable(getResources(), markerBitmap));
+        // Anchor the marker so that the bottom center of the bitmap is the location point.
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        // Set a click listener to show post details.
+        marker.setOnMarkerClickListener((m, mapView) -> {
+            showPostDetails(post);
+            return true;
+        });
+        Log.d(TAG, "Adding marker for " + post.getUsername() + " at " +
+                point.getLatitude() + ", " + point.getLongitude());
+        return marker;
     }
 
-    // Implementation: Returns the current user's username from Firebase.
+    /**
+     * Converts a View to a Bitmap.
+     */
+    private Bitmap createBitmapFromView(View view) {
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * Retrieves the current user's username using FirebaseAuth.
+     */
     private String getCurrentUsername() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -287,7 +359,9 @@ public class MapFragment extends Fragment {
         return point1.distanceToAsDouble(point2) / 1000.0;
     }
 
-    // Returns the icon resource ID for a given emotion name.
+    /**
+     * Returns the icon resource ID for a given emotion name.
+     */
     private int getIconForEmotion(String emotionName) {
         List<Emotion> emotions = EmotionProvider.getSampleEmotions();
         for (Emotion e : emotions) {
@@ -298,7 +372,9 @@ public class MapFragment extends Fragment {
         return R.drawable.ic_angry_selector; // fallback icon.
     }
 
-    // Returns the color for a given emotion using its textColorResId.
+    /**
+     * Returns the color for a given emotion using its textColorResId.
+     */
     private int getColorForEmotion(String emotionName) {
         List<Emotion> emotions = EmotionProvider.getSampleEmotions();
         for (Emotion e : emotions) {
@@ -311,60 +387,11 @@ public class MapFragment extends Fragment {
     }
 
     /**
-     * Creates a custom marker Drawable by inflating a custom layout.
-     * The layout includes a pin-shaped background (using your custom drawable),
-     * an emoji overlaid in the center, and the username displayed below the pin.
-     *
-     * Make sure your layout file "marker_custom.xml" (shown above) exists in res/layout.
-     *
-     * @param post         the EmotionPost object (for username)
-     * @param emojiResId   the drawable resource ID for the emoji
-     * @param emotionColor the color to tint the pin shape
-     * @return a Drawable representing the custom marker
+     * Displays a dialog with details for a post.
      */
-    private Drawable createCustomMarker(EmotionPost post, int emojiResId, int emotionColor) {
-        // Inflate the custom marker layout.
-        View markerView = LayoutInflater.from(getContext()).inflate(R.layout.marker_custom, null);
-
-        // Set the username text below the pin.
-        android.widget.TextView usernameText = markerView.findViewById(R.id.marker_username);
-        if (usernameText != null) {
-            usernameText.setText(post.getUsername());
-        } else {
-            Log.e(TAG, "Marker layout is missing a TextView with ID marker_username!");
-        }
-
-        // Set the emoji in the center of the pin.
-        android.widget.ImageView emojiImage = markerView.findViewById(R.id.marker_emoji);
-        if (emojiImage != null) {
-            emojiImage.setImageResource(emojiResId);
-        } else {
-            Log.e(TAG, "Marker layout is missing an ImageView with ID marker_emoji!");
-        }
-
-        // Optionally tint the pin shape.
-        android.widget.ImageView pinImage = markerView.findViewById(R.id.marker_pin);
-        if (pinImage != null) {
-            pinImage.setColorFilter(emotionColor);
-        } else {
-            Log.e(TAG, "Marker layout is missing an ImageView with ID marker_pin!");
-        }
-
-        // Measure and layout the marker view.
-        markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        markerView.layout(0, 0, markerView.getMeasuredWidth(), markerView.getMeasuredHeight());
-
-        // Create a bitmap from the marker view.
-        Bitmap bitmap = Bitmap.createBitmap(markerView.getMeasuredWidth(), markerView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        markerView.draw(canvas);
-        return new BitmapDrawable(getResources(), bitmap);
-    }
-
     private void showPostDetails(EmotionPost post) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle(post.getEmotion());
-        // Inflate the custom dialog layout
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_post_details, null);
         android.widget.TextView tvDetails = dialogView.findViewById(R.id.tvDetails);
         android.widget.ImageView ivPostImage = dialogView.findViewById(R.id.ivPostImage);
@@ -372,7 +399,6 @@ public class MapFragment extends Fragment {
         details.append("Posted by: ").append(post.getUsername()).append("\n");
         details.append("Explanation: ").append(post.getExplanation());
         tvDetails.setText(details.toString());
-        // If an image URI is available, load it into the ImageView using Glide.
         if (post.getImageUri() != null && !post.getImageUri().trim().isEmpty()) {
             ivPostImage.setVisibility(View.VISIBLE);
             Glide.with(getContext())

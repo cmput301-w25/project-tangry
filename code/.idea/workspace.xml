@@ -162,14 +162,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b46932c8-73fa-40b6-b164-3a1d9d0006c0" name="Changes" comment="merge">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/models/UserStats.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/controllers/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/controllers/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/repositories/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/repositories/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/others/UserProfileFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/profile/personal/PersonalProfileFragment.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_personal_profile.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_personal_profile.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_user_profile.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_user_profile.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/tangry/ui/map/MapFragment.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -179,7 +173,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\Carlos\.android\avd\Pixel_9_Pro_XL_API_35.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\leneu\.android\avd\Medium_Phone.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -307,7 +301,7 @@
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "update-wow-factor",
+    "git-widget-placeholder": "liambranch1",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Carlos/AndroidStudioProjects/tangry-official/project-tangry/code",
     "settings.editor.selected.configurable": "editor.preferences.tabs",
@@ -338,7 +332,6 @@
       <option name="MODE" value="default_activity" />
       <option name="RESTORE_ENABLED" value="false" />
       <option name="RESTORE_FILE" value="" />
-      <option name="RESTORE_FRESH_INSTALL_ONLY" value="false" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
       <option name="TARGET_SELECTION_MODE" value="DEVICE_AND_SNAPSHOT_COMBO_BOX" />
