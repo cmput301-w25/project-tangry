@@ -1,5 +1,6 @@
 package com.example.tangry.controllers;
 
+import com.example.tangry.models.UserStats;
 import com.example.tangry.repositories.UserRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +51,26 @@ public class UserController {
     public Query getTopUsersQuery() {
         return repository.getTopUsersQuery();
     }
+
+    /**
+     * Retrieves the user's stats (karma and badges) for the specified email.
+     *
+     * @param email     the user's email address
+     * @param onSuccess callback invoked with a UserStats object on success
+     * @param onFailure callback invoked on failure
+     */
+    public void getUserStats(String email,
+                             OnSuccessListener<UserStats> onSuccess,
+                             OnFailureListener onFailure) {
+        repository.getUserStats(email, onSuccess, onFailure);
+    }
+
+    public void getUserStatsByUsername(String username,
+                                       OnSuccessListener<UserStats> onSuccess,
+                                       OnFailureListener onFailure) {
+        repository.getUserStatsByUsername(username, onSuccess, onFailure);
+    }
+
 
     /**
      * Increments the user's post count and awards a gold badge for every 3 posts.

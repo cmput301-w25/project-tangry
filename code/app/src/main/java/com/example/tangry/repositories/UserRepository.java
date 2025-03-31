@@ -1,6 +1,7 @@
 package com.example.tangry.repositories;
 
 import com.example.tangry.datasource.FirebaseDataSource;
+import com.example.tangry.models.UserStats;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -148,6 +149,69 @@ public class UserRepository {
         return firebaseDataSource.getCollectionReference()
                 .orderBy("karma", Query.Direction.DESCENDING)
                 .limit(10);
+    }
+
+    // Retrieves the user's stats (karma, badges.goldBadges, badges.silverBadges, daily badge count)
+    public void getUserStats(String email,
+                             OnSuccessListener<UserStats> onSuccess,
+                             OnFailureListener onFailure) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("email", email)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                        // Get karma or default to 0
+                        long karma = doc.contains("karma") ? doc.getLong("karma") : 0L;
+
+                        // Get gold badges count or default to 0
+                        long goldBadges = doc.contains("badges.goldBadges") ? doc.getLong("badges.goldBadges") : 0L;
+
+                        // Get silver badges count or default to 0
+                        long silverBadges = doc.contains("badges.silverBadges") ? doc.getLong("badges.silverBadges") : 0L;
+
+                        // Get daily badge dates and calculate count
+                        int dailyBadgeCount = 0;
+                        if (doc.contains("badges.dailyBadgeDates")) {
+                            // Assuming dailyBadgeDates is stored as a List<String>
+                            List<String> dailyBadgeDates = (List<String>) doc.get("badges.dailyBadgeDates");
+                            dailyBadgeCount = (dailyBadgeDates != null) ? dailyBadgeDates.size() : 0;
+                        }
+
+                        UserStats stats = new UserStats(karma, goldBadges, silverBadges, dailyBadgeCount);
+                        onSuccess.onSuccess(stats);
+                    } else {
+                        onFailure.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    public void getUserStatsByUsername(String username,
+                                       OnSuccessListener<UserStats> onSuccess,
+                                       OnFailureListener onFailure) {
+        firebaseDataSource.getCollectionReference()
+                .whereEqualTo("username", username)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
+                        long karma = doc.contains("karma") ? doc.getLong("karma") : 0L;
+                        long goldBadges = doc.contains("badges.goldBadges") ? doc.getLong("badges.goldBadges") : 0L;
+                        long silverBadges = doc.contains("badges.silverBadges") ? doc.getLong("badges.silverBadges") : 0L;
+                        int dailyBadgeCount = 0;
+                        if (doc.contains("badges.dailyBadgeDates")) {
+                            List<String> dailyBadgeDates = (List<String>) doc.get("badges.dailyBadgeDates");
+                            dailyBadgeCount = (dailyBadgeDates != null) ? dailyBadgeDates.size() : 0;
+                        }
+                        onSuccess.onSuccess(new UserStats(karma, goldBadges, silverBadges, dailyBadgeCount));
+                    } else {
+                        onFailure.onFailure(new Exception("User not found."));
+                    }
+                })
+                .addOnFailureListener(onFailure);
     }
 
 
