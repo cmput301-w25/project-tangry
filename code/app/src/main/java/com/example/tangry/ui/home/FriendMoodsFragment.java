@@ -32,6 +32,7 @@ import com.example.tangry.R;
 import com.example.tangry.adapters.EmotionPostAdapter;
 import com.example.tangry.controllers.EmotionPostController;
 import com.example.tangry.models.EmotionPost;
+import com.example.tangry.repositories.EmotionPostRepository;
 import com.example.tangry.repositories.UserRepository;
 import com.example.tangry.utils.FilterBottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
@@ -180,49 +181,38 @@ public class FriendMoodsFragment extends Fragment {
     }
 
     private void loadPosts() {
-        if (friendUsernames.isEmpty()) {
+        if (friendUsernames == null || friendUsernames.isEmpty()) {
             showEmptyState();
             return;
         }
 
-        Query query = emotionPostController.getFriendsPostsWithFilter(
+        // Show loading indicator (optional)
+        // loadingIndicator.setVisibility(View.VISIBLE);
+
+        // Use the new method to get 3 most recent posts per friend
+        EmotionPostRepository.getInstance().getThreeMostRecentPostsPerFriend(
                 friendUsernames,
                 selectedEmotions,
-                filterRecent
-        );
+                posts -> {
+                    // Hide loading indicator if you added one
+                    // loadingIndicator.setVisibility(View.GONE);
 
-        query.addSnapshotListener((value, error) -> {
-            if (error != null) {
-                Log.e(TAG, "Error loading friend posts", error);
-                return;
-            }
+                    if (posts.isEmpty()) {
+                        emptyStateText.setText("No posts to display");
+                        showEmptyState();
+                    } else {
+                        emptyStateText.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
 
-            List<EmotionPost> posts = new ArrayList<>();
-            if (value != null) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    EmotionPost post = doc.toObject(EmotionPost.class);
-                    if (post != null) {
-                        post.setPostId(doc.getId());
-                        posts.add(post);
+                    adapter.setPosts(posts);
+
+                    // Re-apply search if there's text in the search field
+                    if (searchInput.getText().length() > 0) {
+                        performSearch(searchInput.getText().toString());
                     }
                 }
-            }
-
-            if (posts.isEmpty()) {
-                emptyStateText.setText("No posts to display");
-                showEmptyState();
-            } else {
-                emptyStateText.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-            }
-
-            adapter.setPosts(posts);
-
-            // Re-apply search if there's text in the search field
-            if (searchInput.getText().length() > 0) {
-                performSearch(searchInput.getText().toString());
-            }
-        });
+        );
     }
 
     private void showEmptyState() {

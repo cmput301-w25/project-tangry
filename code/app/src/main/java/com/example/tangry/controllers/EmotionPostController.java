@@ -278,4 +278,18 @@ public class EmotionPostController {
 
         return query;
     }
+
+    /**
+     * Gets 3 most recent public posts from each friend with optional emotion filtering.
+     *
+     * @param friendUsernames list of friend usernames
+     * @param emotions list of emotions to filter by (optional)
+     * @param callback callback to receive the combined list of posts
+     */
+    public void getThreeMostRecentPostsPerFriend(List<String> friendUsernames,
+                                                 List<String> emotions,
+                                                 EmotionPostRepository.OnPostsLoadedCallback callback) {
+        EmotionPostRepository.getInstance().getThreeMostRecentPostsPerFriend(
+                friendUsernames, emotions, callback);
+    }
 }
