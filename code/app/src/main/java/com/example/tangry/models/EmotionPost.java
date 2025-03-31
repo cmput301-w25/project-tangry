@@ -29,11 +29,11 @@ public class EmotionPost implements Serializable {
 
     // List of valid emotions
     public static final List<String> VALID_EMOTIONS = Arrays.asList(
-            "Anger", "Disgust", "Fear", "Joy", "Sadness", "Surprise");
+            "Happiness", "Sadness", "Angry", "Disgust", "Fear", "Surprise", "Confused", "Shame");
 
     // List of valid social situations
     public static final List<String> VALID_SOCIAL_SITUATIONS = Arrays.asList(
-            "Alone", "With one other person", "With two to several people", "With a crowd");
+            "Select social situation", "Alone", "With one other person", "With two to several people", "With a crowd");
 
     // Default constructor needed for Firestore
     public EmotionPost() {

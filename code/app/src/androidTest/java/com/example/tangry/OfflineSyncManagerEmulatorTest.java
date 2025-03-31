@@ -113,13 +113,13 @@ public class OfflineSyncManagerEmulatorTest {
     @Test
     public void testOfflineUpdateThenSync() throws Exception {
         // 1. Create a document online.
-        EmotionPost original = EmotionPost.create("Sadness", "Original content", null, "Office", "Alone", "testUser");
+        EmotionPost original = EmotionPost.create("Sadness", "Original content", null, "Office", "Alone", "testUser", true);
         DocumentReference docRef = Tasks.await(db.collection("emotions").add(original), 5, TimeUnit.SECONDS);
         String docId = docRef.getId();
 
         // 2. Go offline and queue an UPDATE operation.
         fakeNetworkMonitor.setConnected(false);
-        EmotionPost updated = EmotionPost.create("Angry", "Updated offline", null, "Home", "Alone", "testUser");
+        EmotionPost updated = EmotionPost.create("Angry", "Updated offline", null, "Home", "Alone", "testUser", true);
         syncManager.addPendingUpdate(docId, updated);
         assertTrue("Should have pending operations", syncManager.hasPendingOperations());
 
@@ -177,10 +177,10 @@ public class OfflineSyncManagerEmulatorTest {
         fakeNetworkMonitor.setConnected(false);
 
         // Add multiple create operations.
-        EmotionPost post1 = EmotionPost.create("Happiness", "First offline post", null, "Home", "Alone", "testUser");
+        EmotionPost post1 = EmotionPost.create("Happiness", "First offline post", null, "Home", "Alone", "testUser", true);
         syncManager.addPendingCreate(post1);
 
-        EmotionPost post2 = EmotionPost.create("Sadness", "Second offline post", null, "Work", "Alone", "testUser");
+        EmotionPost post2 = EmotionPost.create("Sadness", "Second offline post", null, "Work", "Alone", "testUser", true);
         syncManager.addPendingCreate(post2);
 
         assertTrue("Should have pending operations", syncManager.hasPendingOperations());
