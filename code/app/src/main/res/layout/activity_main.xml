@@ -60,7 +60,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Optional Floating Action Button -->
+    <!-- Modified Floating Action Button for right alignment -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -69,8 +69,8 @@
         android:backgroundTint="?attr/colorPrimary"
         android:contentDescription="@string/add_mood"
         app:layout_constraintBottom_toTopOf="@id/nav_view"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"/>
 
     <com.example.tangry.ui.components.SyncStatusView

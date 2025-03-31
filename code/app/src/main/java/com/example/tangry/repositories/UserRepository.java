@@ -377,22 +377,22 @@ public class UserRepository {
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
                         DocumentSnapshot doc = querySnapshot.getDocuments().get(0);
-                        List<String> followers = (List<String>) doc.get("followers");
+//                        List<String> followers = (List<String>) doc.get("followers");
                         List<String> followings = (List<String>) doc.get("followings");
-                        if (followers == null) {
-                            followers = new ArrayList<>();
-                        }
-                        if (followings == null) {
-                            followings = new ArrayList<>();
-                        }
-                        // Calculate the intersection of followers and followings.
-                        List<String> friends = new ArrayList<>();
-                        for (String user : followers) {
-                            if (followings.contains(user)) {
-                                friends.add(user);
-                            }
-                        }
-                        successListener.onSuccess(friends);
+//                        if (followers == null) {
+//                            followers = new ArrayList<>();
+//                        }
+//                        if (followings == null) {
+//                            followings = new ArrayList<>();
+//                        }
+//                        // Calculate the intersection of followers and followings.
+//                        List<String> friends = new ArrayList<>();
+//                        for (String user : followers) {
+//                            if (followings.contains(user)) {
+//                                friends.add(user);
+//                            }
+//                        }
+                        successListener.onSuccess(followings);
                     } else {
                         successListener.onSuccess(new ArrayList<>());
                     }
