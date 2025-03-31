@@ -7,9 +7,11 @@ import com.example.tangry.models.EmotionPost;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.FieldValue;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -228,5 +230,83 @@ public class EmotionPostRepository {
         }
 
         return query.orderBy("timestamp", Query.Direction.DESCENDING);
+    }
+
+    /**
+     * Interface for the post loading callback
+     */
+    public interface OnPostsLoadedCallback {
+        void onPostsLoaded(List<EmotionPost> posts);
+    }
+
+    /**
+     * Gets 3 most recent public posts from each friend with optional emotion filtering.
+     * Makes separate queries for each friend and combines results.
+     *
+     * @param friendUsernames list of friend usernames
+     * @param emotions list of emotions to filter by (optional)
+     * @param callback callback to receive the combined list of posts
+     */
+    public void getThreeMostRecentPostsPerFriend(List<String> friendUsernames,
+                                                 List<String> emotions,
+                                                 OnPostsLoadedCallback callback) {
+        if (friendUsernames == null || friendUsernames.isEmpty()) {
+            // Return empty list if no friends exist
+            callback.onPostsLoaded(new ArrayList<>());
+            return;
+        }
+
+        List<EmotionPost> combinedPosts = new ArrayList<>();
+        final int[] completedQueries = {0};
+        final int totalQueries = friendUsernames.size();
+
+        for (String username : friendUsernames) {
+            // Create a query for this specific friend
+            Query query = firebaseDataSource.getCollectionReference()
+                    .whereEqualTo("username", username)
+                    .whereEqualTo("public", true);
+
+            // Add emotion filtering if specified
+            if (emotions != null && !emotions.isEmpty()) {
+                query = query.whereIn("emotion", emotions);
+            }
+
+            // Order by timestamp and limit to 3 most recent posts
+            query.orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(3)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                            EmotionPost post = doc.toObject(EmotionPost.class);
+                            if (post != null) {
+                                post.setPostId(doc.getId());
+                                combinedPosts.add(post);
+                            }
+                        }
+
+                        completedQueries[0]++;
+
+                        // If all queries are complete, sort and return the combined results
+                        if (completedQueries[0] >= totalQueries) {
+                            // Sort all posts by timestamp (most recent first)
+                            combinedPosts.sort((p1, p2) -> {
+                                if (p1.getTimestamp() == null || p2.getTimestamp() == null) {
+                                    return 0;
+                                }
+                                return p2.getTimestamp().compareTo(p1.getTimestamp());
+                            });
+
+                            callback.onPostsLoaded(combinedPosts);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error querying posts for user: " + username, e);
+                        completedQueries[0]++;
+                        // Continue with other queries even if one fails
+                        if (completedQueries[0] >= totalQueries) {
+                            callback.onPostsLoaded(combinedPosts);
+                        }
+                    });
+        }
     }
 }
