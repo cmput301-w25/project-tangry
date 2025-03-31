@@ -3,12 +3,13 @@ package com.example.tangry;
 import static org.junit.Assert.*;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.Observer;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.example.tangry.models.EmotionPost;
 import com.example.tangry.repositories.EmotionPostRepository;
+import com.example.tangry.repositories.UserRepository;
 import com.example.tangry.test.EmulatorTestHelper;
-import com.example.tangry.ui.create_user.CreateUserViewModel;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.*;
 
 import org.junit.After;
@@ -16,19 +17,24 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+@RunWith(AndroidJUnit4.class)
 public class LeaderboardBadgeEmulatorTest {
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private FirebaseFirestore db;
+    private UserRepository userRepository;
     private EmotionPostRepository repository;
-    private CreateUserViewModel createUserViewModel;
     private List<String> testUserDocIds = new ArrayList<>();
     private List<String> testEmotionPostIds = new ArrayList<>();
 
@@ -41,8 +47,8 @@ public class LeaderboardBadgeEmulatorTest {
     @Before
     public void setup() {
         db = FirebaseFirestore.getInstance();
+        userRepository = new UserRepository(db, "users");
         repository = new EmotionPostRepository(db, "emotions");
-        createUserViewModel = new CreateUserViewModel();
     }
 
     @After
@@ -66,50 +72,56 @@ public class LeaderboardBadgeEmulatorTest {
     }
 
     /**
-     * Helper method to create a user via CreateUserViewModel.
-     * Uses the pattern:
-     *   createUserViewModel.createUser(email, "password123", "password123", username);
-     *   createUserViewModel.getMessage().observeForever(s -> latch.countDown());
-     *
-     * Then queries Firestore for the created user (by username).
-     *
-     * @return the DocumentReference for the created user.
+     * Simple helper inner class to hold a test user's DocumentReference and unique username.
      */
-    private DocumentReference createUserViaViewModel(String email, String username) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        createUserViewModel.createUser(email, "password123", "password123", username);
-        createUserViewModel.getMessage().observeForever(new Observer<String>() {
-            @Override
-            public void onChanged(String s) {
-                latch.countDown();
-            }
-        });
-        latch.await();
-
-        // Query Firestore for the user document by username.
-        CountDownLatch queryLatch = new CountDownLatch(1);
-        AtomicReference<DocumentReference> userDocRef = new AtomicReference<>();
-        db.collection("users").whereEqualTo("username", username).get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.getDocuments().isEmpty()) {
-                        userDocRef.set(querySnapshot.getDocuments().get(0).getReference());
-                    }
-                    queryLatch.countDown();
-                })
-                .addOnFailureListener(e -> queryLatch.countDown());
-        queryLatch.await();
-        assertNotNull("User document should be created via ViewModel", userDocRef.get());
-        testUserDocIds.add(userDocRef.get().getId());
-        return userDocRef.get();
+    private static class TestUser {
+        DocumentReference docRef;
+        String uniqueUsername;
     }
 
     /**
-     * Test: Create a user via the view model, then simulate 3 emotion post submissions
+     * Helper method to create a test user using the UserRepository.
+     * It generates a random email suffix for uniqueness and appends it to the username.
+     *
+     * @param baseUsername the base username desired
+     * @return a TestUser object containing the DocumentReference and the unique username
+     */
+    private TestUser createTestUser(String baseUsername) throws InterruptedException, ExecutionException, TimeoutException {
+        String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+        String email = baseUsername + randomSuffix + "@example.com";
+        String uniqueUsername = baseUsername.concat(randomSuffix);
+
+        // Optionally, you can prepare a userData map if your repository needs it.
+        // Here we assume saveUsernameToFirestore writes the proper document.
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<DocumentReference> docRef = new AtomicReference<>();
+        userRepository.saveUsernameToFirestore(uniqueUsername, email,
+                documentReference -> {
+                    docRef.set(documentReference);
+                    latch.countDown();
+                },
+                error -> {
+                    fail("Failed to create test user: " + error);
+                    latch.countDown();
+                });
+        latch.await();
+        assertNotNull("Test user should be created", docRef.get());
+        testUserDocIds.add(docRef.get().getId());
+        TestUser testUser = new TestUser();
+        testUser.docRef = docRef.get();
+        testUser.uniqueUsername = uniqueUsername;
+        return testUser;
+    }
+
+    /**
+     * Test: Create a user via the repository, then simulate 3 emotion post submissions
      * to update postCount and award a gold badge.
      */
     @Test
-    public void testGoldBadgeAwardViaPostSubmissions() throws InterruptedException {
-        DocumentReference userDoc = createUserViaViewModel("badgeTestUser@example.com", "badgeTestUser");
+    public void testGoldBadgeAwardViaPostSubmissions() throws InterruptedException, ExecutionException, TimeoutException {
+        TestUser testUser = createTestUser("badgeTestUser");
+        DocumentReference userDoc = testUser.docRef;
+        String uniqueUsername = testUser.uniqueUsername;
 
         for (int i = 1; i <= 3; i++) {
             EmotionPost post = EmotionPost.create(
@@ -118,7 +130,7 @@ public class LeaderboardBadgeEmulatorTest {
                     null,
                     "Location",
                     "Alone",
-                    "badgeTestUser");
+                    uniqueUsername);
 
             CountDownLatch postLatch = new CountDownLatch(1);
             AtomicReference<DocumentReference> postRef = new AtomicReference<>();
@@ -163,12 +175,13 @@ public class LeaderboardBadgeEmulatorTest {
     }
 
     /**
-     * Test: Create a user via the view model and simulate 3 post operations,
+     * Test: Create a user via the repository and simulate 3 post operations,
      * ensuring the gold badge is awarded once.
      */
     @Test
-    public void testGoldBadgeAwardAfterThreePosts() throws InterruptedException {
-        DocumentReference userDoc = createUserViaViewModel("testUser1@example.com", "testUser1");
+    public void testGoldBadgeAwardAfterThreePosts() throws InterruptedException, ExecutionException, TimeoutException {
+        TestUser testUser = createTestUser("testUser1");
+        DocumentReference userDoc = testUser.docRef;
 
         for (int i = 1; i <= 3; i++) {
             CountDownLatch updateLatch = new CountDownLatch(1);
@@ -200,12 +213,13 @@ public class LeaderboardBadgeEmulatorTest {
     }
 
     /**
-     * Test: Create a user via the view model and simulate 6 post operations,
+     * Test: Create a user via the repository and simulate 6 post operations,
      * ensuring the gold badge is awarded twice.
      */
     @Test
-    public void testGoldBadgeAwardAfterSixPosts() throws InterruptedException {
-        DocumentReference userDoc = createUserViaViewModel("testUser2@example.com", "testUser2");
+    public void testGoldBadgeAwardAfterSixPosts() throws InterruptedException, ExecutionException, TimeoutException {
+        TestUser testUser = createTestUser("testUser2");
+        DocumentReference userDoc = testUser.docRef;
 
         for (int i = 1; i <= 6; i++) {
             CountDownLatch updateLatch = new CountDownLatch(1);
@@ -241,8 +255,9 @@ public class LeaderboardBadgeEmulatorTest {
      * Uses the nested field "badges.dailyBadgeDates" and verifies unique addition.
      */
     @Test
-    public void testDailyBadgeCount() throws InterruptedException {
-        DocumentReference userDoc = createUserViaViewModel("testUser3@example.com", "testUser3");
+    public void testDailyBadgeCount() throws InterruptedException, ExecutionException, TimeoutException {
+        TestUser testUser = createTestUser("testUser3");
+        DocumentReference userDoc = testUser.docRef;
 
         for (int i = 0; i < 3; i++) {
             CountDownLatch updateLatch = new CountDownLatch(1);
@@ -272,22 +287,23 @@ public class LeaderboardBadgeEmulatorTest {
 
     /**
      * Test: Verify that the leaderboard query orders users correctly based on karma.
-     * Here, we create users via the view model and then update their Firestore documents with the desired values.
+     * Here, we create test users via the repository and then update their Firestore documents
+     * with the desired values.
      */
     @Test
-    public void testLeaderboardOrdering() throws InterruptedException {
-        // Create three users via the view model.
-        DocumentReference userDoc1 = createUserViaViewModel("user1@example.com", "user1");
-        DocumentReference userDoc2 = createUserViaViewModel("user2@example.com", "user2");
-        DocumentReference userDoc3 = createUserViaViewModel("user3@example.com", "user3");
+    public void testLeaderboardOrdering() throws InterruptedException, ExecutionException, TimeoutException {
+        // Create three test users.
+        TestUser user1 = createTestUser("user1");
+        TestUser user2 = createTestUser("user2");
+        TestUser user3 = createTestUser("user3");
 
-        // Now update each user with desired karma and badge values.
+        // Update each user with desired karma and badge values.
         CountDownLatch updateLatch = new CountDownLatch(3);
-        userDoc1.update("karma", 50, "badges.goldBadges", 2, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
+        user1.docRef.update("karma", 50, "badges.goldBadges", 2, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
-        userDoc2.update("karma", 60, "badges.goldBadges", 1, "badges.silverBadges", 2, "badges.dailyBadgeDates", new ArrayList<Date>())
+        user2.docRef.update("karma", 60, "badges.goldBadges", 1, "badges.silverBadges", 2, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
-        userDoc3.update("karma", 55, "badges.goldBadges", 1, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
+        user3.docRef.update("karma", 55, "badges.goldBadges", 1, "badges.silverBadges", 1, "badges.dailyBadgeDates", new ArrayList<Date>())
                 .addOnCompleteListener(task -> updateLatch.countDown());
         updateLatch.await();
 
