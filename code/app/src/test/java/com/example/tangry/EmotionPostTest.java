@@ -77,10 +77,10 @@ public class EmotionPostTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateWithTooLongExplanation() {
-        // Should throw exception for explanation that exceeds 20 chars
+        // Should throw exception for explanation that exceeds 200 chars
         EmotionPost.create(
                 "Happiness", // emotion
-                "This explanation is way too long", // explanation - too many words/chars
+                "This explanation is way too long and needs to be expanded to exceed the 200 character limit in order to properly test the validation. I am adding more and more text to ensure that we definitely go beyond the limit. We need to make sure this string contains well over two hundred characters to trigger the validation check and throw the expected exception.", // explanation - too many chars
                 "image_uri", // imageUri
                 "Location", // location
                 "Alone", // socialSituation
@@ -131,7 +131,7 @@ public class EmotionPostTest {
         );
 
         assertEquals("Happiness", post.getEmotion());
-        assertEquals("", post.getSocialSituation());
+        assertEquals("null", post.getSocialSituation());
     }
 
     @Test
@@ -148,6 +148,6 @@ public class EmotionPostTest {
         );
 
         assertEquals("Happiness", post.getEmotion());
-        assertEquals("", post.getLocation());
+        assertEquals("null", post.getLocation());
     }
 }

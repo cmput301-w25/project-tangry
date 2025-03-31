@@ -48,8 +48,8 @@ public class EmotionPost implements Serializable {
         this.emotion = emotion;
         this.explanation = explanation;
         this.imageUri = imageUri;
-        this.location = location;
-        this.socialSituation = socialSituation;
+        this.location = location == null ? "null" : location;  // Handle null location
+        this.socialSituation = socialSituation == null ? "null" : socialSituation;  // Handle null socialSituation
         this.username = username;
         this.timestamp = Timestamp.now();
         this.isPublic = false; // Default to private
@@ -69,7 +69,7 @@ public class EmotionPost implements Serializable {
         if ((explanation == null || explanation.isEmpty()) && (imageUri == null || imageUri.isEmpty())) {
             throw new IllegalArgumentException("Emotion post requires text or image.");
         }
-        if (socialSituation != null && (!VALID_SOCIAL_SITUATIONS.contains(socialSituation) || socialSituation.isEmpty())) {
+        if (socialSituation != null && !socialSituation.isEmpty() && !VALID_SOCIAL_SITUATIONS.contains(socialSituation)) {
             throw new IllegalArgumentException("Invalid social situation.");
         }
         if (!VALID_EMOTIONS.contains(emotion)) {
