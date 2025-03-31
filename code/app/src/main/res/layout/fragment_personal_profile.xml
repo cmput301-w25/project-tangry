@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:padding="16dp">
 
-                <!-- Username Display -->
+                <!-- Username TextView - Added this element -->
                 <TextView
                     android:id="@+id/username_text"
                     android:layout_width="wrap_content"
@@ -68,7 +68,6 @@
                     android:text="Username"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

@@ -88,26 +88,31 @@ public class AddUserViewModel extends ViewModel {
 
     /**
      * Searches for a user by their username.
-     * Queries the Firestore "users" collection for a matching username.
+     * Performs substring matching rather than exact matching.
      * On success, updates the searchResults LiveData and sets a message if no user is found.
      *
      * @param query the username to search for.
      */
     public void searchUser(String query) {
+        // Get all users and filter client-side for substring matches
         db.collection("users")
-                .whereEqualTo("username", query)
+                .orderBy("username")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> results = new ArrayList<>();
+
+                    // Perform case-insensitive substring matching
+                    String lowercaseQuery = query.toLowerCase();
                     for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                         String username = doc.getString("username");
-                        if (username != null) {
+                        if (username != null && username.toLowerCase().contains(lowercaseQuery)) {
                             results.add(username);
                         }
                     }
+
                     searchResults.setValue(results);
                     if (results.isEmpty()) {
-                        message.setValue("No user found with username: " + query);
+                        message.setValue("No user found containing: " + query);
                     }
                 })
                 .addOnFailureListener(e -> message.setValue("Error searching user: " + e.getMessage()));

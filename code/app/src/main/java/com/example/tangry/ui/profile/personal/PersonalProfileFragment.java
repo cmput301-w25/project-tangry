@@ -51,8 +51,7 @@ public class PersonalProfileFragment extends Fragment {
 
         // Populate the badges card views
         // These views are in your XML (fragment_personal_profile) and include:
-        // username_text, karma_text, gold_badge_count, silver_badge_count, daily_badge_count.
-        TextView usernameText = view.findViewById(R.id.username_text);
+        // karma_text, gold_badge_count, silver_badge_count, daily_badge_count.
         TextView karmaText = view.findViewById(R.id.karma_text);
         TextView goldBadgeCount = view.findViewById(R.id.gold_badge_count);
         TextView silverBadgeCount = view.findViewById(R.id.silver_badge_count);

@@ -107,9 +107,21 @@ public class UserProfileFragment extends Fragment {
                     List<EmotionPost> posts = querySnapshot.toObjects(EmotionPost.class);
                     Log.d("UserProfileFragment", "Found " + posts.size() + " posts for " + profileUsername);
                     adapter.setPosts(posts);
+
+                    // Toggle visibility based on whether there are posts
+                    if (posts.isEmpty()) {
+                        binding.postsRecyclerView.setVisibility(View.GONE);
+                        binding.noPostsTextView.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.postsRecyclerView.setVisibility(View.VISIBLE);
+                        binding.noPostsTextView.setVisibility(View.GONE);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("UserProfileFragment", "Error retrieving posts", e);
+                    // Show "no posts" message on error
+                    binding.postsRecyclerView.setVisibility(View.GONE);
+                    binding.noPostsTextView.setVisibility(View.VISIBLE);
                 });
     }
 }

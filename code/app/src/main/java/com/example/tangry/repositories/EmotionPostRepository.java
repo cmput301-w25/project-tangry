@@ -160,6 +160,7 @@ public class EmotionPostRepository {
     public Query getPostsByUser(String username) {
         return firebaseDataSource.getCollectionReference()
                 .whereEqualTo("username", username)
+                .whereEqualTo("public", true)
                 .orderBy("timestamp", Query.Direction.DESCENDING);
     }
 
