@@ -17,7 +17,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Home", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
 
         assertEquals("Happiness", post.getEmotion());
@@ -37,7 +38,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Home", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
 
         assertEquals("Happiness", post.getEmotion());
@@ -54,7 +56,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Location", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
     }
 
@@ -67,7 +70,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Location", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
     }
 
@@ -80,7 +84,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Location", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
     }
 
@@ -93,7 +98,8 @@ public class EmotionPostTest {
                 null, // imageUri - null
                 "Location", // location
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
     }
 
@@ -106,7 +112,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Location", // location
                 "Invalid Situation", // socialSituation - invalid
-                "testUser" // username
+                "testUser", // username
+                true
         );
     }
 
@@ -119,7 +126,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 "Location", // location
                 null, // socialSituation - null but valid
-                "testUser" // username
+                "testUser", // username
+                true
         );
 
         assertEquals("Happiness", post.getEmotion());
@@ -135,7 +143,8 @@ public class EmotionPostTest {
                 "image_uri", // imageUri
                 null, // location - null
                 "Alone", // socialSituation
-                "testUser" // username
+                "testUser", // username
+                true
         );
 
         assertEquals("Happiness", post.getEmotion());
