@@ -1,3 +1,22 @@
+/**
+ * UserRepository.java
+ * 
+ * This file contains the repository implementation for managing user data and relationships
+ * in the Tangry application. It provides a data access layer for user profiles, statistics,
+ * achievements, and social connections in Firebase Firestore.
+ * 
+ * Key features:
+ * - Implements singleton pattern for application-wide access to user data
+ * - Manages user registration and username/email mappings
+ * - Tracks karma points and badge achievements (gold, silver, daily)
+ * - Handles user statistics for the leaderboard and profile displays
+ * - Supports friend relationship management through following/follower lists
+ * - Implements achievements logic for post creation and commenting
+ * - Provides user search functionality by username prefix
+ * - Tracks daily login rewards through badge system
+ * - Encapsulates all Firestore user-related operations behind a clean API
+ * - Enables testability through dependency injection
+ */
 package com.example.tangry.repositories;
 
 import com.example.tangry.datasource.FirebaseDataSource;

@@ -1,3 +1,17 @@
+/**
+ * UserStats.java
+ * 
+ * This file contains the model class for representing user statistics in the Tangry application.
+ * The UserStats model provides a dedicated structure for tracking numerical achievements and
+ * engagement metrics for users across the platform.
+ * 
+ * Key features:
+ * - Tracks karma points as a measure of user contribution and activity
+ * - Maintains counts of achievement badges (gold, silver, daily)
+ * - Supports the achievement and rewards system
+ * - Provides a focused view of user statistics for profiles and leaderboards
+ * - Used for calculating user rankings and displaying achievement progress
+ */
 package com.example.tangry.models;
 
 public class UserStats {

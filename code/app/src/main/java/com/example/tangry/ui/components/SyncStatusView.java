@@ -1,4 +1,10 @@
-// code/app/src/main/java/com/example/tangry/ui/components/SyncStatusView.java
+/**
+ * SyncStatusView.java
+ * 
+ * Custom view that displays the current synchronization status.
+ * Shows an icon and text indicating whether data is synced, pending sync,
+ * or if there are sync errors. Listens for status changes from OfflineSyncManager.
+ */
 package com.example.tangry.ui.components;
 
 import android.content.Context;

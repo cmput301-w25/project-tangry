@@ -1,5 +1,14 @@
 package com.example.tangry.ui.add_user;
 
+/**
+ * AddUserViewModel.java
+ * 
+ * ViewModel that manages data for the AddUserFragment.
+ * Handles user searches, follow requests, and tracks follow status
+ * (already following or pending requests). Communicates with Firestore
+ * through the FollowController.
+ */
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

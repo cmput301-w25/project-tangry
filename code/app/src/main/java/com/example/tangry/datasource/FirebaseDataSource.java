@@ -1,3 +1,18 @@
+/**
+ * FirebaseDataSource.java
+ * 
+ * This file contains a data access layer implementation for Firebase Firestore operations in the Tangry
+ * application. It provides a simplified interface for CRUD operations on Firestore collections.
+ * 
+ * Key features:
+ * - Abstracts Firebase Firestore implementation details from the rest of the application
+ * - Provides methods for creating, reading, updating, and deleting documents
+ * - Supports custom collection specification for different data types
+ * - Handles query construction and execution with appropriate ordering
+ * - Implements callback patterns for asynchronous operations
+ * - Serves as the foundation for all repository classes in the application
+ * - Enables testability through dependency injection of Firestore instances
+ */
 package com.example.tangry.datasource;
 
 import com.google.android.gms.tasks.OnFailureListener;

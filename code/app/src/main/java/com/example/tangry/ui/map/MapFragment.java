@@ -1,3 +1,11 @@
+/**
+ * MapFragment.java
+ * 
+ * Fragment that displays emotion posts on a map.
+ * Uses OSMDroid to show a map with custom markers representing posts,
+ * colored by emotion type. Supports filtering, user location tracking,
+ * and showing post details when markers are tapped.
+ */
 package com.example.tangry.ui.map;
 
 import com.bumptech.glide.Glide;

@@ -1,5 +1,11 @@
 package com.example.tangry.ui.profile.others;
-
+/**
+ * UserProfileViewModel.java
+ * 
+ * ViewModel for handling user profile follow functionalities.
+ * Manages follow status, follow requests, and updates the UI accordingly.
+ * Controls the state of follow buttons and handles sending follow requests.
+ */
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

@@ -1,3 +1,17 @@
+/**
+ * Comment.java
+ * 
+ * This file contains the model class for representing comments on emotion posts in the Tangry application.
+ * The Comment model stores information about who made the comment, its content, and when it was created.
+ * 
+ * Key features:
+ * - Stores username of the commenter for attribution
+ * - Contains the text content of the comment
+ * - Includes timestamp information for when the comment was created
+ * - Implements Serializable for data transfer between components
+ * - Compatible with Firestore serialization/deserialization
+ * - Provides a human-readable string representation
+ */
 package com.example.tangry.models;
 
 import com.google.firebase.Timestamp;

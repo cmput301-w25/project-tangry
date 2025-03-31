@@ -1,3 +1,11 @@
+/**
+ * CommentAdapter.java
+ * 
+ * This file contains the adapter implementation for displaying comments in the Tangry application.
+ * It converts Comment objects into view items that can be displayed in a RecyclerView.
+ * The adapter handles the creation of view holders and binding of comment data to the appropriate
+ * views, including username, comment text, and timestamp information.
+ */
 package com.example.tangry.adapters;
 
 import android.view.LayoutInflater;

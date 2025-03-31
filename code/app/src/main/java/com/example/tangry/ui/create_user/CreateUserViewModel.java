@@ -1,5 +1,14 @@
 package com.example.tangry.ui.create_user;
 
+/**
+ * CreateUserViewModel.java
+ * 
+ * ViewModel for the user account creation process.
+ * Handles validation, Firebase authentication, and storing user data in Firestore.
+ * Checks for duplicate usernames/emails and communicates results to the UI.
+ */
+
+
 import android.text.TextUtils;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

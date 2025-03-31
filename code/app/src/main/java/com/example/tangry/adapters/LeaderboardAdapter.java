@@ -1,3 +1,16 @@
+/**
+ * LeaderboardAdapter.java
+ * 
+ * This file contains the adapter implementation for displaying user rankings in the Tangry application's
+ * leaderboard feature. It converts User objects into list items showing their achievements and stats.
+ * 
+ * Key features:
+ * - Displays usernames and karma scores for each user
+ * - Shows counts for different badge types (gold, silver, daily)
+ * - Applies visual styling to indicate badge counts (dimming icons when count is zero)
+ * - Supports updating the list of displayed users
+ * - Follows a consistent display format for comparing user achievements
+ */
 package com.example.tangry.adapters;
 
 import android.view.LayoutInflater;

@@ -1,5 +1,11 @@
 package com.example.tangry.ui.leaderboard;
-
+/**
+ * LeaderboardFragment.java
+ * 
+ * Fragment that displays a leaderboard ranking users by karma points and badges.
+ * Shows real-time user rankings with their username, karma points, and badge counts.
+ * Uses a live Firestore listener to update the leaderboard automatically when data changes.
+ */
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;

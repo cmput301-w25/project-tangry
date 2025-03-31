@@ -1,5 +1,11 @@
 package com.example.tangry.ui.profile.others;
-
+/**
+ * UserProfileFragment.java
+ * 
+ * Fragment for displaying another user's profile information.
+ * Shows the selected user's stats, allows sending follow requests,
+ * and displays their public posts in a scrollable list.
+ */
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;

@@ -1,3 +1,17 @@
+/**
+ * FollowController.java
+ * 
+ * This file contains the controller implementation for managing user relationships in the Tangry
+ * application. It handles the lifecycle of follow requests and connections between users.
+ * 
+ * Key features:
+ * - Manages sending and processing of follow requests between users
+ * - Handles acceptance and rejection of pending follow requests
+ * - Updates follower and following lists for connected users
+ * - Maintains relationship status tracking between users
+ * - Interacts with Firestore to persist relationship data
+ * - Provides utility classes for representing follow requests and status
+ */
 package com.example.tangry.controllers;
 
 import androidx.annotation.NonNull;
