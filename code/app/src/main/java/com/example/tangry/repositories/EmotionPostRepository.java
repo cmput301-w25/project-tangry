@@ -67,7 +67,7 @@ public class EmotionPostRepository {
         data.put("location", post.getLocation());
         data.put("socialSituation", post.getSocialSituation());
         data.put("username", post.getUsername());
-        data.put("isPublic", post.isPublic()); // Add the isPublic field
+        data.put("public", post.isPublic()); // Add the isPublic field
         data.put("timestamp", FieldValue.serverTimestamp());
         firebaseDataSource.saveData(data, successListener, failureListener);
     }
