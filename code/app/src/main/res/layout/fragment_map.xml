@@ -10,23 +10,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Optional: Custom zoom buttons container in the top-right corner -->
+    <!-- Buttons container in the top right corner -->
     <LinearLayout
-        android:id="@+id/zoom_buttons_container"
+        android:id="@+id/buttons_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:orientation="horizontal"
         android:padding="16dp">
 
+        <!-- Filter button (appears first) -->
+        <ImageButton
+            android:id="@+id/btn_filter"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_filter_list"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:scaleType="centerInside"
+            android:layout_marginEnd="8dp"
+            android:contentDescription="Filter posts" />
+
+        <!-- Zoom In button -->
         <ImageButton
             android:id="@+id/btn_zoom_in"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@android:color/transparent"
             android:contentDescription="Zoom in"
-            android:src="@drawable/ic_zoom_in" />
+            android:src="@drawable/ic_zoom_in"
+            android:layout_marginEnd="8dp" />
 
+        <!-- Zoom Out button -->
         <ImageButton
             android:id="@+id/btn_zoom_out"
             android:layout_width="48dp"
