@@ -37,17 +37,13 @@ git clone <repository-url>
 Configure Firebase:
 
 Create a Firebase project in the Firebase console.
-
 Add your Android app to the Firebase project and download the google-services.json file.
-
 Place the google-services.json file into the app/ directory of the project.
 
 Build and Run:
 
 Open the project in Android Studio.
-
 Sync the Gradle files to download all necessary dependencies.
-
 Run the application on an emulator or a physical device with internet connectivity.
 
 ## Documentation
