@@ -153,6 +153,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="16dp"/>
+
+            <!-- No Posts TextView -->
+            <TextView
+                android:id="@+id/noPostsTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No posts to show"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="italic"
+                android:textColor="#757575"
+                android:padding="32dp"
+                android:visibility="gone"/>
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
