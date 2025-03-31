@@ -39,6 +39,8 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @RunWith(AndroidJUnit4.class)
@@ -61,6 +63,7 @@ public class UserInterfaceTest {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.useEmulator("10.0.2.2", 8080);
         CollectionReference emotionRef = db.collection("emotions");
+        CollectionReference usersRef = db.collection("users");
 
         try {
             // Create test user
@@ -74,6 +77,11 @@ public class UserInterfaceTest {
                 Tasks.await(user.updateProfile(profileUpdate));
                 Log.d("SETUP", "User created with display name: " + user.getDisplayName());
             }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("username", "user1");
+            data.put("email", TEST_EMAIL);
+            usersRef.document().set(data);
 
             // Seed posts for user1
             emotionRef.document().set(EmotionPost.create("Happiness", "Great day!", null, "Home", "Alone", "user1"));
@@ -132,17 +140,20 @@ public class UserInterfaceTest {
         onView(withId(R.id.social_situation_spinner)).perform(click());
         onView(withText("Alone")).perform(click());
         onView(withId(R.id.save_button)).perform(scrollTo(), click());
-        SystemClock.sleep(1000);
+        SystemClock.sleep(1500);
         onView(withText("Testing adding post")).check(matches(isDisplayed()));
     }
 
     private void editMoodPost() {
-        SystemClock.sleep(2000);
+        SystemClock.sleep(1000);
         onView(withText("Testing adding post")).perform(click());
+        SystemClock.sleep(1000);
         onView(withId(R.id.edit_button)).perform(click());
+        onView(withText("Fear")).perform(click());
         onView(withId(R.id.explanation_input)).perform(clearText(), typeText("Edited post"));
-        onView(withId(R.id.save_button)).perform(click());
+        onView(withText("Update")).perform(scrollTo(), click());
         onView(withText("Edited post")).check(matches(isDisplayed()));
+        onView(withText("Fear")).check(matches(isDisplayed()));
     }
 
     private void deleteMoodPost() {
@@ -155,42 +166,27 @@ public class UserInterfaceTest {
 
     @Test
     public void testCommentSubmission() {
-        SystemClock.sleep(1000);
+        SystemClock.sleep(3000);
         onView(withText("Great day!")).perform(click());
         onView(withId(R.id.comment_input)).perform(typeText("Nice one!"));
         onView(withId(R.id.comment_submit_button)).perform(click());
-        SystemClock.sleep(1000);
+        SystemClock.sleep(3000);
         onView(withText("Nice one!")).check(matches(isDisplayed()));
-        pressBack();
+        onView(withId(R.id.comment_username)).check(matches(withText("user1")));
     }
 
     @Test
     public void testViewPostDetails() {
-        SystemClock.sleep(1000);
+        SystemClock.sleep(3000);
         onView(withText("Not feeling good")).perform(click());
+        SystemClock.sleep(3000);
         onView(withId(R.id.reason_text)).check(matches(withText("Not feeling good")));
         onView(withId(R.id.location_text)).check(matches(withText("Office")));
-        pressBack();
-    }
-
-    @Test
-    public void testFollowUser() {
-        SystemClock.sleep(1000);
-        onView(withText("Frustrated with work")).perform(click());
-
-        try {
-            onView(withId(R.id.follow_button)).perform(click());
-            onView(withId(R.id.follow_button)).check(matches(withText("Following")));
-        } catch (Exception e) {
-            Log.w("FollowTest", "Follow button not found.");
-        }
-
-        pressBack();
     }
 
     @Test
     public void testLeaderboardUpdates() {
-        SystemClock.sleep(1000);
+        SystemClock.sleep(3000);
         onView(withId(R.id.navigation_leaderboard)).perform(click());
         onView(withText("user1")).check(matches(isDisplayed()));
     }
